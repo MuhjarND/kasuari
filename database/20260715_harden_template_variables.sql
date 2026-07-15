@@ -135,3 +135,14 @@ WHERE var_nomor='0037';
 UPDATE master_variabel
 SET var_default_data='1.\tMengabulkan gugatan Penggugat; 2.\tMenjatuhkan talak satu ba''in shughra Tergugat (...................) terhadap Penggugat (..................); 3.\tMenghukum Tergugat untuk membayar nafkah anak bernama ................ kepada Penggugat sejumlah Rp........ (........ rupiah) setiap bulan sampai anak berusia 21 (dua puluh satu) tahun atau setelah anak tersebut hidup mandiri; 4.\tMembebankan kepada Penggugat untuk membayar biaya perkara dalam tingkat pertama sejumlah Rp........ (........ rupiah);'
 WHERE var_nomor='0039';
+
+-- Sinkronisasi versi lama hanya mengirim agama_nama dan belum mengirim
+-- agama_id. Jangan biarkan nilai agama_id yang NULL mengosongkan seluruh
+-- identitas Pembanding/Terbanding pada CONCAT.
+UPDATE master_variabel
+SET var_sql_data=REGEXP_REPLACE(
+  var_sql_data,
+  '\\([[:space:]]*SELECT[[:space:]]+nama[[:space:]]+FROM[[:space:]]+agama[[:space:]]+WHERE[[:space:]]+id[[:space:]]*=[[:space:]]*b\\.agama_id[[:space:]]*\\)',
+  'COALESCE(NULLIF(b.agama_nama, ''''), ''-'')'
+)
+WHERE var_nomor IN ('9800','9801');

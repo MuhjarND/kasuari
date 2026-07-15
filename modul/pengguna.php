@@ -9,7 +9,8 @@ $errors = array();
 $form = array(
   'fullname' => '',
   'username' => '',
-  'email' => ''
+  'email' => '',
+  'no_wa' => ''
 );
 
 if (empty($_SESSION['csrf_pengguna'])) {
@@ -29,7 +30,12 @@ function kasuari_managed_user_group($connection, $userId)
   return $found ? (int) $targetGroup : null;
 }
 
-function kasuari_user_identity_errors($fullname, $username, $email)
+function kasuari_normalize_wa($number)
+{
+  return preg_replace('/[^0-9]/', '', (string) $number);
+}
+
+function kasuari_user_identity_errors($fullname, $username, $email, $noWa)
 {
   $validationErrors = array();
   if (strlen($fullname) < 3 || strlen($fullname) > 255) {
@@ -40,6 +46,9 @@ function kasuari_user_identity_errors($fullname, $username, $email)
   }
   if (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 100) {
     $validationErrors[] = 'Alamat email tidak valid.';
+  }
+  if (!preg_match('/^(?:62|0)8[0-9]{8,12}$/', $noWa)) {
+    $validationErrors[] = 'Nomor WhatsApp harus berupa nomor seluler Indonesia yang valid.';
   }
   return $validationErrors;
 }
@@ -55,10 +64,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $form['fullname'] = trim(isset($_POST['fullname']) ? $_POST['fullname'] : '');
       $form['username'] = strtolower(trim(isset($_POST['username']) ? $_POST['username'] : ''));
       $form['email'] = strtolower(trim(isset($_POST['email']) ? $_POST['email'] : ''));
+      $form['no_wa'] = kasuari_normalize_wa(isset($_POST['no_wa']) ? $_POST['no_wa'] : '');
       $password = isset($_POST['password']) ? (string) $_POST['password'] : '';
       $passwordConfirmation = isset($_POST['password_confirmation']) ? (string) $_POST['password_confirmation'] : '';
 
-      $errors = array_merge($errors, kasuari_user_identity_errors($form['fullname'], $form['username'], $form['email']));
+      $errors = array_merge($errors, kasuari_user_identity_errors($form['fullname'], $form['username'], $form['email'], $form['no_wa']));
       if (strlen($password) < 8) {
         $errors[] = 'Password minimal 8 karakter.';
       }
@@ -85,17 +95,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $insert = mysqli_prepare(
           $koneksi,
           "INSERT INTO sys_users
-            (fullname, username, password, `group`, email, block, diinput_oleh, diinput_tanggal)
-           VALUES (?, ?, ?, ?, ?, ?, ?, NOW())"
+            (fullname, username, password, `group`, email, no_wa, block, diinput_oleh, diinput_tanggal)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())"
         );
         mysqli_stmt_bind_param(
           $insert,
-          'sssisis',
+          'sssissis',
           $form['fullname'],
           $form['username'],
           $passwordHash,
           $group,
           $form['email'],
+          $form['no_wa'],
           $block,
           $createdBy
         );
@@ -115,15 +126,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       }
     } elseif ($action === 'update') {
       $targetUserId = isset($_POST['userid']) ? (int) $_POST['userid'] : 0;
+      $currentUserId = isset($_SESSION['userid']) ? (int) $_SESSION['userid'] : 0;
       $editFullname = trim(isset($_POST['edit_fullname']) ? $_POST['edit_fullname'] : '');
       $editUsername = strtolower(trim(isset($_POST['edit_username']) ? $_POST['edit_username'] : ''));
       $editEmail = strtolower(trim(isset($_POST['edit_email']) ? $_POST['edit_email'] : ''));
+      $editNoWa = kasuari_normalize_wa(isset($_POST['edit_no_wa']) ? $_POST['edit_no_wa'] : '');
       $targetGroup = kasuari_managed_user_group($koneksi, $targetUserId);
 
-      if ($targetUserId <= 0 || $targetGroup === null || $targetGroup === 0) {
-        $errors[] = 'Akun Administrator tidak dapat diubah dari halaman ini.';
+      if ($targetUserId <= 0 || $targetGroup === null || ((int) $targetGroup === 0 && $targetUserId !== $currentUserId)) {
+        $errors[] = 'Administrator hanya dapat mengubah akun miliknya sendiri.';
       } else {
-        $errors = array_merge($errors, kasuari_user_identity_errors($editFullname, $editUsername, $editEmail));
+        $errors = array_merge($errors, kasuari_user_identity_errors($editFullname, $editUsername, $editEmail, $editNoWa));
       }
 
       if (empty($errors)) {
@@ -145,10 +158,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $update = mysqli_prepare(
           $koneksi,
           "UPDATE sys_users
-           SET fullname = ?, username = ?, email = ?, diedit_oleh = ?, diedit_tanggal = NOW()
-           WHERE userid = ? AND `group` <> 0"
+           SET fullname = ?, username = ?, email = ?, no_wa = ?, diedit_oleh = ?, diedit_tanggal = NOW()
+           WHERE userid = ?"
         );
-        mysqli_stmt_bind_param($update, 'ssssi', $editFullname, $editUsername, $editEmail, $editedBy, $targetUserId);
+        mysqli_stmt_bind_param($update, 'sssssi', $editFullname, $editUsername, $editEmail, $editNoWa, $editedBy, $targetUserId);
         if (mysqli_stmt_execute($update)) {
           $_SESSION['pengguna_flash'] = array('type' => 'success', 'message' => 'Data pengguna berhasil diperbarui.');
           mysqli_stmt_close($update);
@@ -200,12 +213,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       }
     } elseif ($action === 'reset_password') {
       $targetUserId = isset($_POST['userid']) ? (int) $_POST['userid'] : 0;
+      $currentUserId = isset($_SESSION['userid']) ? (int) $_SESSION['userid'] : 0;
       $newPassword = isset($_POST['new_password']) ? (string) $_POST['new_password'] : '';
       $newPasswordConfirmation = isset($_POST['new_password_confirmation']) ? (string) $_POST['new_password_confirmation'] : '';
       $targetGroup = kasuari_managed_user_group($koneksi, $targetUserId);
 
-      if ($targetUserId <= 0 || $targetGroup === null || $targetGroup === 0) {
-        $errors[] = 'Password akun Administrator tidak dapat diubah dari halaman ini.';
+      if ($targetUserId <= 0 || $targetGroup === null || ((int) $targetGroup === 0 && $targetUserId !== $currentUserId)) {
+        $errors[] = 'Administrator hanya dapat mengubah password miliknya sendiri.';
       }
       if (strlen($newPassword) < 8) {
         $errors[] = 'Password baru minimal 8 karakter.';
@@ -220,7 +234,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $update = mysqli_prepare(
           $koneksi,
           "UPDATE sys_users SET password = ?, diedit_oleh = ?, diedit_tanggal = NOW()
-           WHERE userid = ? AND `group` <> 0"
+           WHERE userid = ?"
         );
         mysqli_stmt_bind_param($update, 'ssi', $passwordHash, $editedBy, $targetUserId);
         if (mysqli_stmt_execute($update)) {
@@ -260,7 +274,7 @@ unset($_SESSION['pengguna_flash']);
 $users = array();
 $userQuery = mysqli_query(
   $koneksi,
-  "SELECT userid, fullname, username, `group`, email, block, diinput_tanggal
+  "SELECT userid, fullname, username, `group`, email, no_wa, block, diinput_tanggal
    FROM sys_users
    ORDER BY (`group` = 0) DESC, fullname ASC, userid ASC"
 );
@@ -351,6 +365,16 @@ include_once("sys/header.php");
             </div>
 
             <div class="mb-3">
+              <label for="no_wa" class="form-label">Nomor WhatsApp</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-whatsapp" aria-hidden="true"></i></span>
+                <input type="tel" class="form-control" id="no_wa" name="no_wa" maxlength="20" required
+                  inputmode="numeric" placeholder="08xxxxxxxxxx"
+                  value="<?php echo htmlspecialchars($form['no_wa'], ENT_QUOTES, 'UTF-8'); ?>">
+              </div>
+            </div>
+
+            <div class="mb-3">
               <label for="new_password" class="form-label">Password</label>
               <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-lock" aria-hidden="true"></i></span>
@@ -406,6 +430,7 @@ include_once("sys/header.php");
               <tbody>
                 <?php foreach ($users as $user) {
                   $isAdminUser = (int) $user['group'] === 0;
+                  $isCurrentUser = (int) $user['userid'] === (int) $_SESSION['userid'];
                   $isBlocked = (int) $user['block'] === 1;
                   $userName = trim((string) $user['fullname']);
                   $userInitial = strtoupper(function_exists('mb_substr') ? mb_substr($userName, 0, 1) : substr($userName, 0, 1));
@@ -420,6 +445,7 @@ include_once("sys/header.php");
                         <div>
                           <strong><?php echo htmlspecialchars($user['fullname'], ENT_QUOTES, 'UTF-8'); ?></strong>
                           <span>@<?php echo htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8'); ?> | <?php echo htmlspecialchars($user['email'], ENT_QUOTES, 'UTF-8'); ?></span>
+                          <span><i class="bi bi-whatsapp" aria-hidden="true"></i> <?php echo htmlspecialchars(!empty($user['no_wa']) ? $user['no_wa'] : '-', ENT_QUOTES, 'UTF-8'); ?></span>
                         </div>
                       </div>
                     </td>
@@ -436,7 +462,7 @@ include_once("sys/header.php");
                     </td>
                     <td><span class="kasuari-user-date"><?php echo htmlspecialchars($createdDate, ENT_QUOTES, 'UTF-8'); ?></span></td>
                     <td class="text-end">
-                      <?php if (!$isAdminUser) { ?>
+                      <?php if (!$isAdminUser || $isCurrentUser) { ?>
                         <div class="kasuari-user-actions">
                           <button type="button" class="kasuari-icon-action edit" title="Ubah data pengguna"
                             aria-label="Ubah data pengguna"
@@ -444,7 +470,8 @@ include_once("sys/header.php");
                             data-user-id="<?php echo (int) $user['userid']; ?>"
                             data-user-fullname="<?php echo htmlspecialchars($user['fullname'], ENT_QUOTES, 'UTF-8'); ?>"
                             data-user-username="<?php echo htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8'); ?>"
-                            data-user-email="<?php echo htmlspecialchars($user['email'], ENT_QUOTES, 'UTF-8'); ?>">
+                            data-user-email="<?php echo htmlspecialchars($user['email'], ENT_QUOTES, 'UTF-8'); ?>"
+                            data-user-no-wa="<?php echo htmlspecialchars($user['no_wa'], ENT_QUOTES, 'UTF-8'); ?>">
                             <i class="bi bi-pencil" aria-hidden="true"></i>
                           </button>
 
@@ -456,26 +483,28 @@ include_once("sys/header.php");
                             <i class="bi bi-key" aria-hidden="true"></i>
                           </button>
 
-                          <form method="post" action="pengguna" class="d-inline">
-                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8'); ?>">
-                            <input type="hidden" name="action" value="toggle_status">
-                            <input type="hidden" name="userid" value="<?php echo (int) $user['userid']; ?>">
-                            <button type="submit" class="kasuari-icon-action <?php echo $isBlocked ? 'activate' : 'deactivate'; ?>"
-                              title="<?php echo $isBlocked ? 'Aktifkan akun' : 'Nonaktifkan akun'; ?>"
-                              aria-label="<?php echo $isBlocked ? 'Aktifkan akun' : 'Nonaktifkan akun'; ?>">
-                              <i class="bi <?php echo $isBlocked ? 'bi-person-check' : 'bi-person-x'; ?>" aria-hidden="true"></i>
-                            </button>
-                          </form>
+                          <?php if (!$isAdminUser) { ?>
+                            <form method="post" action="pengguna" class="d-inline">
+                              <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8'); ?>">
+                              <input type="hidden" name="action" value="toggle_status">
+                              <input type="hidden" name="userid" value="<?php echo (int) $user['userid']; ?>">
+                              <button type="submit" class="kasuari-icon-action <?php echo $isBlocked ? 'activate' : 'deactivate'; ?>"
+                                title="<?php echo $isBlocked ? 'Aktifkan akun' : 'Nonaktifkan akun'; ?>"
+                                aria-label="<?php echo $isBlocked ? 'Aktifkan akun' : 'Nonaktifkan akun'; ?>">
+                                <i class="bi <?php echo $isBlocked ? 'bi-person-check' : 'bi-person-x'; ?>" aria-hidden="true"></i>
+                              </button>
+                            </form>
 
-                          <form method="post" action="pengguna" class="d-inline"
-                            onsubmit="return confirm('Hapus akun @<?php echo htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8'); ?>?');">
-                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8'); ?>">
-                            <input type="hidden" name="action" value="delete">
-                            <input type="hidden" name="userid" value="<?php echo (int) $user['userid']; ?>">
-                            <button type="submit" class="kasuari-icon-action delete" title="Hapus akun" aria-label="Hapus akun">
-                              <i class="bi bi-trash3" aria-hidden="true"></i>
-                            </button>
-                          </form>
+                            <form method="post" action="pengguna" class="d-inline"
+                              onsubmit="return confirm('Hapus akun @<?php echo htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8'); ?>?');">
+                              <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8'); ?>">
+                              <input type="hidden" name="action" value="delete">
+                              <input type="hidden" name="userid" value="<?php echo (int) $user['userid']; ?>">
+                              <button type="submit" class="kasuari-icon-action delete" title="Hapus akun" aria-label="Hapus akun">
+                                <i class="bi bi-trash3" aria-hidden="true"></i>
+                              </button>
+                            </form>
+                          <?php } ?>
                         </div>
                       <?php } else { ?>
                         <span class="kasuari-protected-account" title="Akun utama dilindungi"><i class="bi bi-lock-fill"></i></span>
@@ -519,6 +548,11 @@ include_once("sys/header.php");
           <div>
             <label for="edit_email" class="form-label">Email</label>
             <input type="email" class="form-control" id="edit_email" name="edit_email" maxlength="100" required>
+          </div>
+          <div class="mt-3">
+            <label for="edit_no_wa" class="form-label">Nomor WhatsApp</label>
+            <input type="tel" class="form-control" id="edit_no_wa" name="edit_no_wa" maxlength="20"
+              inputmode="numeric" required>
           </div>
         </div>
         <div class="modal-footer">
@@ -577,6 +611,7 @@ document.addEventListener('DOMContentLoaded', function () {
       document.getElementById('edit_fullname').value = button.getAttribute('data-user-fullname') || '';
       document.getElementById('edit_username').value = button.getAttribute('data-user-username') || '';
       document.getElementById('edit_email').value = button.getAttribute('data-user-email') || '';
+      document.getElementById('edit_no_wa').value = button.getAttribute('data-user-no-wa') || '';
     });
   }
 

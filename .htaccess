@@ -1,4 +1,5 @@
 RewriteEngine On 
+AddType application/manifest+json .webmanifest
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^([^/]+)/?$ index.php?modul=$1 [L,QSA]
@@ -8,4 +9,3 @@ RewriteRule ^([^/]+)/?$ index.php?modul=$1 [L,QSA]
 
 php_flag  log_errors on
 php_value error_log  PHP_errors.log
- 

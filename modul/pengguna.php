@@ -9,8 +9,7 @@ $errors = array();
 $form = array(
   'fullname' => '',
   'username' => '',
-  'email' => '',
-  'no_wa' => ''
+  'email' => ''
 );
 
 if (empty($_SESSION['csrf_pengguna'])) {
@@ -30,12 +29,7 @@ function kasuari_managed_user_group($connection, $userId)
   return $found ? (int) $targetGroup : null;
 }
 
-function kasuari_normalize_wa($number)
-{
-  return preg_replace('/[^0-9]/', '', (string) $number);
-}
-
-function kasuari_user_identity_errors($fullname, $username, $email, $noWa)
+function kasuari_user_identity_errors($fullname, $username, $email)
 {
   $validationErrors = array();
   if (strlen($fullname) < 3 || strlen($fullname) > 255) {
@@ -46,9 +40,6 @@ function kasuari_user_identity_errors($fullname, $username, $email, $noWa)
   }
   if (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 100) {
     $validationErrors[] = 'Alamat email tidak valid.';
-  }
-  if (!preg_match('/^(?:62|0)8[0-9]{8,12}$/', $noWa)) {
-    $validationErrors[] = 'Nomor WhatsApp harus berupa nomor seluler Indonesia yang valid.';
   }
   return $validationErrors;
 }
@@ -64,11 +55,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $form['fullname'] = trim(isset($_POST['fullname']) ? $_POST['fullname'] : '');
       $form['username'] = strtolower(trim(isset($_POST['username']) ? $_POST['username'] : ''));
       $form['email'] = strtolower(trim(isset($_POST['email']) ? $_POST['email'] : ''));
-      $form['no_wa'] = kasuari_normalize_wa(isset($_POST['no_wa']) ? $_POST['no_wa'] : '');
       $password = isset($_POST['password']) ? (string) $_POST['password'] : '';
       $passwordConfirmation = isset($_POST['password_confirmation']) ? (string) $_POST['password_confirmation'] : '';
 
-      $errors = array_merge($errors, kasuari_user_identity_errors($form['fullname'], $form['username'], $form['email'], $form['no_wa']));
+      $errors = array_merge($errors, kasuari_user_identity_errors($form['fullname'], $form['username'], $form['email']));
       if (strlen($password) < 8) {
         $errors[] = 'Password minimal 8 karakter.';
       }
@@ -95,18 +85,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $insert = mysqli_prepare(
           $koneksi,
           "INSERT INTO sys_users
-            (fullname, username, password, `group`, email, no_wa, block, diinput_oleh, diinput_tanggal)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())"
+            (fullname, username, password, `group`, email, block, diinput_oleh, diinput_tanggal)
+           VALUES (?, ?, ?, ?, ?, ?, ?, NOW())"
         );
         mysqli_stmt_bind_param(
           $insert,
-          'sssissis',
+          'sssisis',
           $form['fullname'],
           $form['username'],
           $passwordHash,
           $group,
           $form['email'],
-          $form['no_wa'],
           $block,
           $createdBy
         );
@@ -130,13 +119,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $editFullname = trim(isset($_POST['edit_fullname']) ? $_POST['edit_fullname'] : '');
       $editUsername = strtolower(trim(isset($_POST['edit_username']) ? $_POST['edit_username'] : ''));
       $editEmail = strtolower(trim(isset($_POST['edit_email']) ? $_POST['edit_email'] : ''));
-      $editNoWa = kasuari_normalize_wa(isset($_POST['edit_no_wa']) ? $_POST['edit_no_wa'] : '');
       $targetGroup = kasuari_managed_user_group($koneksi, $targetUserId);
 
       if ($targetUserId <= 0 || $targetGroup === null || ((int) $targetGroup === 0 && $targetUserId !== $currentUserId)) {
         $errors[] = 'Administrator hanya dapat mengubah akun miliknya sendiri.';
       } else {
-        $errors = array_merge($errors, kasuari_user_identity_errors($editFullname, $editUsername, $editEmail, $editNoWa));
+        $errors = array_merge($errors, kasuari_user_identity_errors($editFullname, $editUsername, $editEmail));
       }
 
       if (empty($errors)) {
@@ -158,10 +146,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $update = mysqli_prepare(
           $koneksi,
           "UPDATE sys_users
-           SET fullname = ?, username = ?, email = ?, no_wa = ?, diedit_oleh = ?, diedit_tanggal = NOW()
+           SET fullname = ?, username = ?, email = ?, diedit_oleh = ?, diedit_tanggal = NOW()
            WHERE userid = ?"
         );
-        mysqli_stmt_bind_param($update, 'sssssi', $editFullname, $editUsername, $editEmail, $editNoWa, $editedBy, $targetUserId);
+        mysqli_stmt_bind_param($update, 'ssssi', $editFullname, $editUsername, $editEmail, $editedBy, $targetUserId);
         if (mysqli_stmt_execute($update)) {
           $_SESSION['pengguna_flash'] = array('type' => 'success', 'message' => 'Data pengguna berhasil diperbarui.');
           mysqli_stmt_close($update);
@@ -274,7 +262,7 @@ unset($_SESSION['pengguna_flash']);
 $users = array();
 $userQuery = mysqli_query(
   $koneksi,
-  "SELECT userid, fullname, username, `group`, email, no_wa, block, diinput_tanggal
+  "SELECT userid, fullname, username, `group`, email, block, diinput_tanggal
    FROM sys_users
    ORDER BY (`group` = 0) DESC, fullname ASC, userid ASC"
 );
@@ -365,16 +353,6 @@ include_once("sys/header.php");
             </div>
 
             <div class="mb-3">
-              <label for="no_wa" class="form-label">Nomor WhatsApp</label>
-              <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-whatsapp" aria-hidden="true"></i></span>
-                <input type="tel" class="form-control" id="no_wa" name="no_wa" maxlength="20" required
-                  inputmode="numeric" placeholder="08xxxxxxxxxx"
-                  value="<?php echo htmlspecialchars($form['no_wa'], ENT_QUOTES, 'UTF-8'); ?>">
-              </div>
-            </div>
-
-            <div class="mb-3">
               <label for="new_password" class="form-label">Password</label>
               <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-lock" aria-hidden="true"></i></span>
@@ -445,7 +423,6 @@ include_once("sys/header.php");
                         <div>
                           <strong><?php echo htmlspecialchars($user['fullname'], ENT_QUOTES, 'UTF-8'); ?></strong>
                           <span>@<?php echo htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8'); ?> | <?php echo htmlspecialchars($user['email'], ENT_QUOTES, 'UTF-8'); ?></span>
-                          <span><i class="bi bi-whatsapp" aria-hidden="true"></i> <?php echo htmlspecialchars(!empty($user['no_wa']) ? $user['no_wa'] : '-', ENT_QUOTES, 'UTF-8'); ?></span>
                         </div>
                       </div>
                     </td>
@@ -470,8 +447,7 @@ include_once("sys/header.php");
                             data-user-id="<?php echo (int) $user['userid']; ?>"
                             data-user-fullname="<?php echo htmlspecialchars($user['fullname'], ENT_QUOTES, 'UTF-8'); ?>"
                             data-user-username="<?php echo htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8'); ?>"
-                            data-user-email="<?php echo htmlspecialchars($user['email'], ENT_QUOTES, 'UTF-8'); ?>"
-                            data-user-no-wa="<?php echo htmlspecialchars($user['no_wa'], ENT_QUOTES, 'UTF-8'); ?>">
+                            data-user-email="<?php echo htmlspecialchars($user['email'], ENT_QUOTES, 'UTF-8'); ?>">
                             <i class="bi bi-pencil" aria-hidden="true"></i>
                           </button>
 
@@ -549,11 +525,6 @@ include_once("sys/header.php");
             <label for="edit_email" class="form-label">Email</label>
             <input type="email" class="form-control" id="edit_email" name="edit_email" maxlength="100" required>
           </div>
-          <div class="mt-3">
-            <label for="edit_no_wa" class="form-label">Nomor WhatsApp</label>
-            <input type="tel" class="form-control" id="edit_no_wa" name="edit_no_wa" maxlength="20"
-              inputmode="numeric" required>
-          </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
@@ -611,7 +582,6 @@ document.addEventListener('DOMContentLoaded', function () {
       document.getElementById('edit_fullname').value = button.getAttribute('data-user-fullname') || '';
       document.getElementById('edit_username').value = button.getAttribute('data-user-username') || '';
       document.getElementById('edit_email').value = button.getAttribute('data-user-email') || '';
-      document.getElementById('edit_no_wa').value = button.getAttribute('data-user-no-wa') || '';
     });
   }
 

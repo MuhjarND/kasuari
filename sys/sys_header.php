@@ -5,8 +5,18 @@ include_once("sys/sys_config.php");
 <html lang="id">
 <title><?php echo @$nama_halaman; ?><?php if(@$nama_halaman && @$nama_app) echo ' · '; ?><?php echo @$nama_app; ?></title>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light">
+<meta name="theme-color" content="#214a9a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="application-name" content="KASUARI">
+<meta name="apple-mobile-web-app-title" content="KASUARI">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/icons/logo-icon-32.png?v=<?php echo @filemtime('assets/icons/logo-icon-32.png'); ?>">
+<link rel="icon" type="image/png" sizes="192x192" href="assets/icons/logo-icon-192.png?v=<?php echo @filemtime('assets/icons/logo-icon-192.png'); ?>">
+<link rel="shortcut icon" href="assets/icons/logo-icon-32.png?v=<?php echo @filemtime('assets/icons/logo-icon-32.png'); ?>">
+<link rel="apple-touch-icon" sizes="192x192" href="assets/icons/logo-icon-192.png?v=<?php echo @filemtime('assets/icons/logo-icon-192.png'); ?>">
+<link rel="manifest" href="manifest.webmanifest?v=<?php echo @filemtime('manifest.webmanifest'); ?>">
 
 <!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -118,14 +128,14 @@ include_once("sys/sys_config.php");
   }
 </style>
 
-<body>
+<body class="kasuari-legacy">
 <!-- Preloader -->
 <div id="loader" class="loading">Loading…</div>
 
 <!-- Top bar -->
 <div class="ks-legacy-topbar">
   <a href="beranda" class="brand">
-    <span class="brand-dot"></span>
+    <img src="assets/logo_teks.png" alt="" class="ks-legacy-brand-logo" aria-hidden="true">
     <?php echo htmlspecialchars(@$nama_app ?: 'KASUARI', ENT_QUOTES, 'UTF-8'); ?>
   </a>
   <a href="beranda" class="back-btn">

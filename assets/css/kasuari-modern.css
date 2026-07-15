@@ -3478,3 +3478,961 @@ body,
     font-size: 1.65rem;
   }
 }
+
+/* =============================================================
+   MOBILE APPLICATION LAYER
+   Shared responsive behavior for modern and legacy pages.
+   ============================================================= */
+.kasuari-mobile-nav,
+.kasuari-legacy-mobile-nav {
+  display: none;
+}
+
+@media (max-width: 991.98px) {
+  html,
+  body {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .app-sidebar {
+    width: min(86vw, 310px) !important;
+  }
+
+  .app-sidebar .sidebar-wrapper {
+    height: calc(100dvh - 64px);
+    padding-bottom: 24px;
+    overscroll-behavior: contain;
+  }
+
+  .app-content > .container-fluid,
+  .app-content-header > .container-fluid {
+    max-width: 100%;
+  }
+
+  .kasuari-page-title {
+    align-items: flex-start;
+  }
+
+  .kasuari-panel-title {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .kasuari-responsive-data:not(.ks-satker-table):not(.ks-banding-table),
+  .kasuari-responsive-data:not(.ks-satker-table):not(.ks-banding-table) tbody,
+  .kasuari-responsive-data:not(.ks-satker-table):not(.ks-banding-table) tr,
+  .kasuari-responsive-data:not(.ks-satker-table):not(.ks-banding-table) td {
+    display: block;
+    width: 100% !important;
+  }
+
+  .kasuari-responsive-data:not(.ks-satker-table):not(.ks-banding-table) thead {
+    display: none;
+  }
+
+  .kasuari-responsive-data:not(.ks-satker-table):not(.ks-banding-table) tbody {
+    display: grid;
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .kasuari-responsive-data:not(.ks-satker-table):not(.ks-banding-table) tbody tr {
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    box-shadow: var(--sh-xs);
+  }
+
+  .kasuari-responsive-data:not(.ks-satker-table):not(.ks-banding-table) tbody td {
+    display: grid;
+    grid-template-columns: minmax(118px, 34%) minmax(0, 1fr);
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px !important;
+    border-bottom: 1px solid var(--border) !important;
+    text-align: left !important;
+    overflow-wrap: anywhere;
+    white-space: normal !important;
+  }
+
+  .kasuari-responsive-data:not(.ks-satker-table):not(.ks-banding-table) tbody td:last-child {
+    border-bottom: 0 !important;
+  }
+
+  .kasuari-responsive-data:not(.ks-satker-table):not(.ks-banding-table) tbody td::before {
+    content: attr(data-label);
+    color: #748096;
+    font-size: .65rem;
+    font-weight: 800;
+    letter-spacing: 0;
+    line-height: 1.3;
+    text-transform: uppercase;
+  }
+
+  .kasuari-responsive-data:not(.ks-satker-table):not(.ks-banding-table) tbody td[colspan] {
+    display: block;
+    text-align: center !important;
+  }
+
+  .kasuari-responsive-data:not(.ks-satker-table):not(.ks-banding-table) tbody td[colspan]::before {
+    display: none;
+  }
+}
+
+@media (max-width: 767.98px) {
+  :root {
+    --mobile-nav-height: 68px;
+  }
+
+  body.kasuari-app {
+    padding-bottom: calc(var(--mobile-nav-height) + env(safe-area-inset-bottom));
+  }
+
+  .app-header {
+    height: 58px !important;
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .app-header .container-fluid {
+    min-width: 0;
+    padding-right: 10px !important;
+    padding-left: 10px !important;
+    gap: 6px !important;
+  }
+
+  .app-header .navbar-nav.me-2 {
+    margin-right: 2px !important;
+  }
+
+  .app-header .navbar-brand-inline {
+    min-width: 0;
+    max-width: calc(100vw - 135px);
+    overflow: hidden;
+    font-size: .85rem !important;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .app-header .navbar-brand-inline .brand-dot {
+    flex: 0 0 auto;
+  }
+
+  .kasuari-fullscreen-item {
+    display: none !important;
+  }
+
+  .user-menu .nav-link {
+    width: 40px !important;
+    min-width: 40px;
+    padding: 5px !important;
+    justify-content: center;
+  }
+
+  .user-menu .dropdown-menu {
+    position: fixed !important;
+    top: 62px !important;
+    right: 10px !important;
+    left: auto !important;
+    width: min(310px, calc(100vw - 20px));
+    transform: none !important;
+  }
+
+  .app-main {
+    min-height: calc(100dvh - 58px);
+    padding-bottom: 12px;
+  }
+
+  .app-content-header {
+    padding: 12px 0;
+  }
+
+  .app-content {
+    padding-top: 14px;
+    padding-bottom: 24px;
+  }
+
+  .app-content > .container-fluid,
+  .app-content-header > .container-fluid {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .app-footer {
+    display: none;
+  }
+
+  .kasuari-mobile-nav,
+  .kasuari-legacy-mobile-nav {
+    position: fixed;
+    z-index: 1050;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    min-height: var(--mobile-nav-height);
+    padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
+    background: rgba(255, 255, 255, .98);
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -8px 28px rgba(15, 23, 42, .10);
+  }
+
+  .kasuari-mobile-nav a,
+  .kasuari-mobile-nav button,
+  .kasuari-legacy-mobile-nav a {
+    min-width: 0;
+    min-height: 52px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 4px 2px;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: #748096;
+    font-family: 'Inter', sans-serif;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .kasuari-mobile-nav i,
+  .kasuari-legacy-mobile-nav i {
+    font-size: 1.08rem;
+    line-height: 1;
+  }
+
+  .kasuari-mobile-nav span,
+  .kasuari-legacy-mobile-nav span {
+    max-width: 100%;
+    overflow: hidden;
+    font-size: .61rem;
+    font-weight: 700;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .kasuari-mobile-nav a.active {
+    background: #eef4ff;
+    color: var(--indigo);
+  }
+
+  .kasuari-mobile-nav a:focus-visible,
+  .kasuari-mobile-nav button:focus-visible,
+  .kasuari-legacy-mobile-nav a:focus-visible {
+    outline: 2px solid var(--indigo-light);
+    outline-offset: -2px;
+  }
+
+  .ks-dashboard-header,
+  .ks-dashboard-meta {
+    flex-direction: row !important;
+    align-items: center !important;
+  }
+
+  .ks-dashboard-header > div:first-child {
+    min-width: 0;
+  }
+
+  .ks-dashboard-header > div:first-child p {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ks-dashboard-meta .kasuari-chip:last-child {
+    display: none;
+  }
+
+  .kasuari-clock {
+    padding: 6px 10px;
+    font-size: .72rem;
+  }
+
+  .ks-greeting {
+    margin-bottom: 16px !important;
+  }
+
+  .ks-greeting h2 {
+    font-size: 1.2rem;
+    line-height: 1.35;
+    letter-spacing: 0;
+  }
+
+  .ks-greeting p {
+    margin-top: 4px;
+    font-size: .78rem;
+    line-height: 1.55;
+  }
+
+  .ks-stat-grid {
+    --bs-gutter-x: 10px;
+    --bs-gutter-y: 10px;
+  }
+
+  .ks-stat {
+    min-height: 154px;
+    gap: 6px;
+    padding: 13px;
+    border-radius: 8px;
+  }
+
+  .ks-stat:hover {
+    transform: none;
+  }
+
+  .ks-stat-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    font-size: 1rem;
+  }
+
+  .ks-stat-num {
+    margin-top: 2px;
+    font-size: 1.45rem;
+    letter-spacing: 0;
+  }
+
+  .ks-stat-label {
+    min-height: 30px;
+    font-size: .71rem;
+    line-height: 1.35;
+  }
+
+  .ks-stat-sub {
+    width: fit-content;
+    max-width: 100%;
+    padding: 2px 6px;
+    font-size: .6rem;
+    line-height: 1.25;
+  }
+
+  .ks-stat-link {
+    margin-top: auto;
+    font-size: .67rem;
+  }
+
+  .ks-card,
+  .kasuari-panel,
+  .kasuari-table-wrap,
+  .card,
+  .ks-detail-card,
+  .ks-detail-hero {
+    border-radius: 8px !important;
+  }
+
+  .ks-card-header {
+    min-height: 52px;
+    padding: 13px 14px;
+  }
+
+  .ks-card-header h3 {
+    min-width: 0;
+    font-size: .82rem;
+  }
+
+  .ks-card-header .see-all {
+    flex: 0 0 auto;
+    font-size: .67rem;
+  }
+
+  .ks-perkara-item {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: 9px 10px;
+    padding: 12px 14px;
+  }
+
+  .ks-perkara-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+  }
+
+  .ks-perkara-title {
+    font-size: .78rem;
+  }
+
+  .ks-perkara-right {
+    grid-column: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    text-align: left;
+  }
+
+  .ks-perkara-date {
+    margin: 0;
+  }
+
+  .ks-satker-list {
+    grid-template-columns: 1fr;
+  }
+
+  .ks-quick-grid {
+    gap: 7px;
+    padding: 10px;
+  }
+
+  .ks-quick-btn {
+    min-height: 82px;
+    padding: 10px 4px;
+    border-radius: 8px;
+  }
+
+  .kasuari-page-title {
+    gap: 10px;
+  }
+
+  .kasuari-page-title h1 {
+    font-size: 1.12rem;
+    letter-spacing: 0;
+  }
+
+  .kasuari-page-title p {
+    font-size: .76rem;
+    line-height: 1.5;
+  }
+
+  .kasuari-page-title > .btn,
+  .kasuari-page-title > a.btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .kasuari-panel {
+    padding: 14px;
+  }
+
+  .kasuari-panel-table,
+  .kasuari-banding-register {
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .kasuari-panel-table .kasuari-toolbar,
+  .kasuari-banding-register .kasuari-toolbar {
+    padding: 15px 14px 12px;
+    margin-bottom: 0;
+  }
+
+  .kasuari-toolbar {
+    align-items: stretch;
+  }
+
+  .kasuari-toolbar > div,
+  .kasuari-toolbar > a.btn,
+  .kasuari-toolbar > button.btn {
+    width: 100%;
+  }
+
+  .kasuari-toolbar > a.btn,
+  .kasuari-toolbar > button.btn {
+    justify-content: center;
+  }
+
+  .ks-register-actions {
+    display: grid;
+    gap: 9px;
+  }
+
+  .ks-satker-filter select,
+  .ks-register-actions .btn {
+    width: 100%;
+  }
+
+  .dt-top,
+  .dt-bottom {
+    align-items: stretch;
+    gap: 9px;
+    padding: 10px 12px;
+  }
+
+  .dt-top > div,
+  .dt-bottom > div,
+  .dt-search,
+  .dt-dropdown {
+    width: 100%;
+  }
+
+  .dt-input {
+    width: 100% !important;
+    min-height: 42px;
+  }
+
+  .dt-selector {
+    min-height: 40px;
+  }
+
+  .dt-pagination ul {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+  }
+
+  .dt-pagination .dt-paging-button {
+    margin: 0;
+  }
+
+  .kasuari-user-table,
+  .kasuari-user-table tbody,
+  .kasuari-user-table tr,
+  .kasuari-user-table td {
+    display: block;
+    width: 100% !important;
+  }
+
+  .kasuari-user-table thead {
+    display: none;
+  }
+
+  .kasuari-user-table tbody {
+    display: grid;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .kasuari-user-table tbody tr {
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #fff;
+  }
+
+  .kasuari-user-table tbody td {
+    display: grid;
+    grid-template-columns: 104px minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    padding: 9px 11px !important;
+    border-bottom: 1px solid var(--border) !important;
+    text-align: left !important;
+  }
+
+  .kasuari-user-table tbody td::before {
+    color: #748096;
+    font-size: .64rem;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+
+  .kasuari-user-table tbody td:nth-child(1) {
+    display: block;
+  }
+
+  .kasuari-user-table tbody td:nth-child(1)::before {
+    display: none;
+  }
+
+  .kasuari-user-table tbody td:nth-child(2)::before { content: "Peran"; }
+  .kasuari-user-table tbody td:nth-child(3)::before { content: "Status"; }
+  .kasuari-user-table tbody td:nth-child(4)::before { content: "Dibuat"; }
+  .kasuari-user-table tbody td:nth-child(5)::before { content: "Aksi"; }
+
+  .kasuari-user-table tbody td:last-child {
+    border-bottom: 0 !important;
+  }
+
+  .kasuari-user-actions {
+    justify-content: flex-start;
+  }
+
+  .ks-detail-hero {
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+
+  .ks-detail-hero h2 {
+    font-size: 1.15rem;
+    overflow-wrap: anywhere;
+    letter-spacing: 0;
+  }
+
+  .ks-detail-meta > span,
+  .ks-type-badge,
+  .ks-status-pill,
+  .ks-satker-badge,
+  .ks-date-chip {
+    max-width: 100%;
+    white-space: normal;
+  }
+
+  .ks-detail-card-header,
+  .ks-detail-card-body {
+    padding: 14px;
+  }
+
+  .ks-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ks-long-text {
+    max-height: 58dvh;
+    padding: 13px;
+    font-size: .82rem;
+    line-height: 1.65;
+  }
+
+  .app-content .card-header {
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 14px;
+  }
+
+  .app-content .card-header .card-title {
+    width: 100%;
+    margin: 0;
+    font-size: .92rem;
+  }
+
+  .app-content .card-header .card-tools,
+  .app-content .card-header .card-tools .input-group {
+    float: none !important;
+    width: 100% !important;
+  }
+
+  .app-content .card-body {
+    padding: 14px;
+  }
+
+  .breadcrumb {
+    margin: 4px 0 0;
+    font-size: .72rem;
+  }
+
+  .modal-dialog {
+    width: calc(100% - 16px);
+    max-width: none;
+    margin: 8px auto;
+  }
+
+  .modal-dialog-scrollable {
+    height: calc(100dvh - 16px);
+  }
+
+  .modal-content,
+  .kasuari-user-modal .modal-content {
+    max-height: calc(100dvh - 16px);
+    border-radius: 8px !important;
+  }
+
+  .modal-header,
+  .modal-body,
+  .modal-footer,
+  .kasuari-user-modal .modal-header,
+  .kasuari-user-modal .modal-body,
+  .kasuari-user-modal .modal-footer {
+    padding: 14px !important;
+  }
+
+  .modal-footer {
+    flex-wrap: nowrap;
+  }
+
+  .modal-footer .btn {
+    flex: 1 1 0;
+  }
+
+  .kasuari-login-showcase {
+    padding: 20px 16px 18px;
+  }
+
+  .kasuari-login-logo-badge {
+    width: 72px;
+    height: 72px;
+    margin-bottom: 12px;
+    border-radius: 16px;
+  }
+
+  .kasuari-login-logo-badge img {
+    width: 52px;
+  }
+
+  .kasuari-login-showcase h1 {
+    margin-bottom: 5px;
+    font-size: 1.65rem;
+    letter-spacing: 0;
+  }
+
+  .kasuari-login-showcase h2 {
+    font-size: .88rem;
+    line-height: 1.4;
+  }
+
+  .kasuari-login-divider,
+  .kasuari-login-showcase p {
+    display: none;
+  }
+
+  .kasuari-login-panel {
+    padding: 24px 16px 32px;
+  }
+
+  .kasuari-login-heading-icon {
+    width: 30px;
+    height: 30px;
+  }
+
+  .kasuari-login-form-card h2 {
+    font-size: 1.45rem;
+    letter-spacing: 0;
+  }
+
+  .kasuari-login-form-card .login-sub {
+    margin-bottom: 18px;
+    font-size: .86rem;
+  }
+
+  .kasuari-login-field .input-group,
+  .kasuari-login-field .form-control {
+    min-height: 52px !important;
+  }
+
+  .kasuari-login-field .input-group-text {
+    width: 50px;
+  }
+
+  body.kasuari-legacy {
+    padding-bottom: calc(var(--mobile-nav-height) + env(safe-area-inset-bottom));
+  }
+
+  .ks-legacy-topbar {
+    height: 56px !important;
+    padding: 0 14px !important;
+  }
+
+  .ks-legacy-topbar .brand {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ks-legacy-topbar .back-btn {
+    padding: 7px 10px !important;
+  }
+
+  #AppContent {
+    padding: 12px 10px 24px !important;
+  }
+
+  #AppContent .w3-container.w3-margin-bottom,
+  #AppContent .w3-row.w3-margin {
+    margin: 0 0 10px !important;
+    padding: 14px !important;
+    border-radius: 8px !important;
+  }
+
+  #AppContent .w3-container.w3-margin-bottom h3 {
+    margin-top: 0;
+    padding-right: 70px;
+    font-size: 1rem !important;
+  }
+
+  .w3-modal {
+    padding: 0 !important;
+  }
+
+  .w3-modal-content {
+    width: 100% !important;
+    min-height: 100dvh !important;
+    max-height: 100dvh;
+    margin: 0 !important;
+    overflow-y: auto;
+    border-radius: 0 !important;
+  }
+
+  .w3-half,
+  .w3-third,
+  .w3-twothird {
+    width: 100% !important;
+  }
+
+  .dropzone {
+    min-height: 150px !important;
+  }
+
+  #AppContent #tampilan .w3-responsive {
+    overflow-x: hidden;
+  }
+
+  #AppContent #tampilan .w3-button,
+  #AppContent #tampilan .w3-btn,
+  #AppContent #tampilan li,
+  #AppContent #tampilan a,
+  #AppContent #tampilan span {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    white-space: normal !important;
+  }
+
+  #AppContent #tampilan .w3-button,
+  #AppContent #tampilan .w3-btn {
+    width: 100%;
+    line-height: 1.45;
+    text-align: left !important;
+  }
+
+  .kasuari-legacy-mobile-nav {
+    --mobile-nav-height: 68px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .kasuari-panel-table .ks-satker-table tbody,
+  .kasuari-banding-register .ks-banding-table tbody {
+    gap: 10px;
+    padding: 9px;
+  }
+
+  .kasuari-panel-table .ks-satker-table tbody td,
+  .kasuari-banding-register .ks-banding-table tbody td,
+  .kasuari-responsive-data:not(.ks-satker-table):not(.ks-banding-table) tbody td {
+    grid-template-columns: minmax(94px, 31%) minmax(0, 1fr);
+    gap: 9px;
+    padding: 9px 10px !important;
+  }
+
+  .kasuari-panel-table .ks-satker-table tbody td::before,
+  .kasuari-banding-register .ks-banding-table tbody td::before {
+    font-size: .6rem;
+    letter-spacing: 0;
+  }
+
+  .kasuari-table-wrap .ks-satker-table .ks-type-badge,
+  .kasuari-table-wrap .ks-satker-table .ks-status-pill,
+  .kasuari-table-wrap .ks-banding-status {
+    font-size: .68rem;
+  }
+
+  #AppContent #results_content > .w3-table-all:not(.kasuari-responsive-data),
+  #AppContent #results_content > .w3-table-all:not(.kasuari-responsive-data) tbody,
+  #AppContent #results_content > .w3-table-all:not(.kasuari-responsive-data) tr,
+  #AppContent #results_content > .w3-table-all:not(.kasuari-responsive-data) td {
+    display: block;
+    width: 100% !important;
+  }
+
+  #AppContent #results_content > .w3-table-all:not(.kasuari-responsive-data) tr {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  #AppContent #results_content > .w3-table-all:not(.kasuari-responsive-data) tr:last-child {
+    border-bottom: 0;
+  }
+
+  #AppContent #results_content > .w3-table-all:not(.kasuari-responsive-data) td {
+    padding: 4px 0 !important;
+    border: 0 !important;
+  }
+
+  #AppContent #results_content > .w3-table-all:not(.kasuari-responsive-data) td:first-child {
+    color: var(--text-m);
+    font-size: .72rem;
+    font-weight: 800;
+  }
+}
+
+/* =============================================================
+   KASUARI BRAND ASSETS
+   ============================================================= */
+.brand-link .brand-image {
+  width: 36px !important;
+  height: 40px !important;
+  border-radius: 0 !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  box-shadow: none !important;
+}
+
+.sidebar-brand .brand-link.sidebar-logo-only {
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+}
+
+.sidebar-brand.sidebar-brand-logo-only {
+  height: 80px;
+}
+
+.sidebar-brand .brand-link.sidebar-logo-only .sidebar-brand-logo {
+  width: 190px !important;
+  height: auto !important;
+  max-height: 76px;
+  filter:
+    drop-shadow(0 0 1px rgba(255,255,255,.96))
+    drop-shadow(0 0 8px rgba(255,255,255,.58))
+    drop-shadow(0 10px 16px rgba(2,18,49,.28));
+}
+
+.navbar-brand-logo {
+  width: 22px;
+  height: 28px;
+  display: block;
+  flex: 0 0 auto;
+  object-fit: contain;
+}
+
+.ks-legacy-brand-logo {
+  width: 21px;
+  height: 28px;
+  display: block;
+  object-fit: contain;
+}
+
+.kasuari-login-logo-badge.kasuari-login-logo-main {
+  width: min(100%, 470px);
+  height: auto;
+  min-height: 0;
+  margin-bottom: 24px;
+  padding: 4px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+}
+
+.kasuari-login-logo-badge.kasuari-login-logo-main img {
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+  object-fit: contain;
+  filter:
+    drop-shadow(0 0 1px rgba(255,255,255,.72))
+    drop-shadow(0 2px 1px rgba(255,255,255,.30))
+    drop-shadow(0 16px 22px rgba(4,14,38,.34));
+}
+
+@media (max-width: 991.98px) {
+  .kasuari-login-logo-badge.kasuari-login-logo-main {
+    width: min(100%, 390px);
+    margin-bottom: 18px;
+    padding: 3px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .kasuari-login-logo-badge.kasuari-login-logo-main {
+    width: min(100%, 300px);
+    margin-bottom: 10px;
+    padding: 2px;
+  }
+
+  .navbar-brand-logo {
+    width: 19px;
+    height: 24px;
+  }
+}

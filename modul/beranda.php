@@ -98,14 +98,14 @@ $greetingIcon = $jam < 12 ? 'bi-brightness-alt-high' : ($jam < 18 ? 'bi-hand-ind
 <!--begin::App Content Header-->
 <div class="app-content-header">
   <div class="container-fluid">
-    <div class="d-flex align-items-center justify-content-between gap-3">
+    <div class="ks-dashboard-header d-flex align-items-center justify-content-between gap-3">
       <div>
         <p class="mb-0" style="font-size:.78rem;color:#6b7280;font-weight:500;">
           <i class="bi bi-calendar3 me-1"></i>
           <?php echo ucfirst(strftime('%A, %d %B %Y')); ?>
         </p>
       </div>
-      <div class="d-flex align-items-center gap-2">
+      <div class="ks-dashboard-meta d-flex align-items-center gap-2">
         <span class="kasuari-chip kasuari-clock" id="witClock" aria-label="Waktu Indonesia Timur">
           <i class="bi bi-clock" aria-hidden="true"></i>
           <span id="witClockValue"><?php echo $waktuWit->format('H:i:s'); ?></span>
@@ -138,9 +138,9 @@ $greetingIcon = $jam < 12 ? 'bi-brightness-alt-high' : ($jam < 18 ? 'bi-hand-ind
         </div>
 
         <!-- â”€â”€ Stat Cards â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
-        <div class="row g-3 mb-4">
+        <div class="row g-3 mb-4 ks-stat-grid">
 
-          <div class="col-sm-6 col-xl-3">
+          <div class="col-6 col-xl-3">
             <div class="ks-stat">
               <div class="ks-stat-top">
                 <div class="ks-stat-icon purple"><i class="bi bi-folder2-open"></i></div>
@@ -152,7 +152,7 @@ $greetingIcon = $jam < 12 ? 'bi-brightness-alt-high' : ($jam < 18 ? 'bi-hand-ind
             </div>
           </div>
 
-          <div class="col-sm-6 col-xl-3">
+          <div class="col-6 col-xl-3">
             <div class="ks-stat">
               <div class="ks-stat-top">
                 <div class="ks-stat-icon blue"><i class="bi bi-send-exclamation"></i></div>
@@ -164,7 +164,7 @@ $greetingIcon = $jam < 12 ? 'bi-brightness-alt-high' : ($jam < 18 ? 'bi-hand-ind
             </div>
           </div>
 
-          <div class="col-sm-6 col-xl-3">
+          <div class="col-6 col-xl-3">
             <div class="ks-stat">
               <div class="ks-stat-top">
                 <div class="ks-stat-icon amber"><i class="bi bi-hourglass-split"></i></div>
@@ -176,7 +176,7 @@ $greetingIcon = $jam < 12 ? 'bi-brightness-alt-high' : ($jam < 18 ? 'bi-hand-ind
             </div>
           </div>
 
-          <div class="col-sm-6 col-xl-3">
+          <div class="col-6 col-xl-3">
             <div class="ks-stat">
               <div class="ks-stat-top">
                 <div class="ks-stat-icon emerald"><i class="bi bi-patch-check"></i></div>

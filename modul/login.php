@@ -16,7 +16,16 @@ unset($_SESSION['pesan_error_login']);
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="light" />
   <meta name="theme-color" content="#214a9a" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="application-name" content="KASUARI" />
+  <meta name="apple-mobile-web-app-title" content="KASUARI" />
   <title>Masuk - <?php echo htmlspecialchars(@$nama_app ?: 'KASUARI', ENT_QUOTES, 'UTF-8'); ?></title>
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/logo-icon-32.png?v=<?php echo @filemtime('assets/icons/logo-icon-32.png'); ?>" />
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/logo-icon-192.png?v=<?php echo @filemtime('assets/icons/logo-icon-192.png'); ?>" />
+  <link rel="shortcut icon" href="assets/icons/logo-icon-32.png?v=<?php echo @filemtime('assets/icons/logo-icon-32.png'); ?>" />
+  <link rel="apple-touch-icon" sizes="192x192" href="assets/icons/logo-icon-192.png?v=<?php echo @filemtime('assets/icons/logo-icon-192.png'); ?>" />
+  <link rel="manifest" href="manifest.webmanifest?v=<?php echo @filemtime('manifest.webmanifest'); ?>" />
   <script>
     document.documentElement.setAttribute('data-bs-theme','light');
     document.documentElement.style.colorScheme='light';
@@ -39,12 +48,9 @@ unset($_SESSION['pesan_error_login']);
   <main class="kasuari-login-shell">
     <section class="kasuari-login-showcase" aria-label="Informasi aplikasi KASUARI">
       <div class="kasuari-login-showcase-inner">
-        <div class="kasuari-login-logo-badge">
-          <img src="assets/images/logo.png" alt="<?php echo htmlspecialchars(@$nama_app ?: 'KASUARI', ENT_QUOTES, 'UTF-8'); ?>" />
+        <div class="kasuari-login-logo-badge kasuari-login-logo-main">
+          <img src="assets/logo_icon.png" alt="KASUARI - Kanal Asisten Terintegrasi" />
         </div>
-
-        <h1><?php echo htmlspecialchars(@$nama_app ?: 'KASUARI', ENT_QUOTES, 'UTF-8'); ?></h1>
-        <h2><?php echo htmlspecialchars(@$nama_panjang_app ?: 'Kanal Asisten Terintegrasi', ENT_QUOTES, 'UTF-8'); ?></h2>
         <span class="kasuari-login-divider" aria-hidden="true"></span>
         <p><?php echo htmlspecialchars(@$deskripsi_app ?: 'Sistem manajemen dan layanan digital terpadu untuk mendukung tupoksi Pengadilan Tinggi Agama Papua Barat', ENT_QUOTES, 'UTF-8'); ?>.</p>
 

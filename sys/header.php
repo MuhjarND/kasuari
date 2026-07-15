@@ -14,11 +14,22 @@ $isMenu = function ($items) use ($currentModule) {
 <html lang="id" data-bs-theme="light">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="color-scheme" content="light" />
   <meta name="theme-color" content="#0f1f3d" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="application-name" content="KASUARI" />
+  <meta name="apple-mobile-web-app-title" content="KASUARI" />
   <meta name="description" content="<?php echo htmlspecialchars(@$deskripsi_app ?: 'Sistem manajemen dan layanan digital terpadu untuk mendukung tupoksi Pengadilan Tinggi Agama Papua Barat', ENT_QUOTES, 'UTF-8'); ?>" />
   <title><?php echo @$nama_halaman; ?><?php if(@$nama_halaman && @$nama_app) echo ' - '; ?><?php echo @$nama_app; ?></title>
+
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/logo-icon-32.png?v=<?php echo @filemtime('assets/icons/logo-icon-32.png'); ?>" />
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/logo-icon-192.png?v=<?php echo @filemtime('assets/icons/logo-icon-192.png'); ?>" />
+  <link rel="shortcut icon" href="assets/icons/logo-icon-32.png?v=<?php echo @filemtime('assets/icons/logo-icon-32.png'); ?>" />
+  <link rel="apple-touch-icon" sizes="192x192" href="assets/icons/logo-icon-192.png?v=<?php echo @filemtime('assets/icons/logo-icon-192.png'); ?>" />
+  <link rel="manifest" href="manifest.webmanifest?v=<?php echo @filemtime('manifest.webmanifest'); ?>" />
 
   <!-- Force light mode before any paint -->
   <script>
@@ -45,7 +56,7 @@ $isMenu = function ($items) use ($currentModule) {
   <!-- Kasuari UI -->
   <link rel="stylesheet" href="assets/css/kasuari-modern.css?v=<?php echo @filemtime('assets/css/kasuari-modern.css'); ?>" />
 </head>
-<body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+<body class="layout-fixed sidebar-expand-lg bg-body-tertiary kasuari-app">
 
   <!-- Ã¢â€â‚¬Ã¢â€â‚¬ Preloader Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ -->
   <div id="loader"
@@ -88,7 +99,7 @@ $isMenu = function ($items) use ($currentModule) {
         <span class="navbar-brand-inline me-auto"
               style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:0.95rem;
                      color:#0f1f3d;display:flex;align-items:center;gap:8px;">
-          <span class="brand-dot" style="width:8px;height:8px;border-radius:50%;background:#3b82f6;display:inline-block;"></span>
+          <img src="assets/logo_teks.png" alt="" class="navbar-brand-logo" aria-hidden="true" />
           <?php echo htmlspecialchars(@$nama_app ?: 'KASUARI', ENT_QUOTES, 'UTF-8'); ?>
         </span>
 
@@ -96,7 +107,7 @@ $isMenu = function ($items) use ($currentModule) {
         <ul class="navbar-nav align-items-center gap-1">
 
           <!-- Fullscreen -->
-          <li class="nav-item">
+          <li class="nav-item kasuari-fullscreen-item">
             <a class="nav-link d-flex align-items-center justify-content-center"
                style="width:36px;height:36px;border-radius:8px;"
                href="#" data-lte-toggle="fullscreen" aria-label="Toggle fullscreen">
@@ -167,10 +178,9 @@ $isMenu = function ($items) use ($currentModule) {
     <aside class="app-sidebar" data-bs-theme="dark">
 
       <!-- Brand -->
-      <div class="sidebar-brand">
-        <a href="beranda" class="brand-link">
-          <img src="assets/images/logo.png" alt="KASUARI" class="brand-image" />
-          <span class="brand-text" title="<?php echo htmlspecialchars(@$nama_panjang_app ?: 'Kanal Asisten Terintegrasi', ENT_QUOTES, 'UTF-8'); ?>"><?php echo htmlspecialchars(@$nama_app ?: 'KASUARI', ENT_QUOTES, 'UTF-8'); ?></span>
+      <div class="sidebar-brand sidebar-brand-logo-only">
+        <a href="beranda" class="brand-link sidebar-logo-only" aria-label="KASUARI - Beranda">
+          <img src="assets/logo_icon.png?v=<?php echo @filemtime('assets/logo_icon.png'); ?>" alt="KASUARI - Kanal Asisten Terintegrasi" class="brand-image sidebar-brand-logo" />
         </a>
       </div>
 

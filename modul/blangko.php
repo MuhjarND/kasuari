@@ -1,12 +1,12 @@
 <?php
 include_once("sys/sys_session.php");
 //echo base64_decode("dmFyaWFiZWxfc2ltcGFuX2VkaXQ=");exit;
-    $nama_halaman="Managemen Blangko";
+    $nama_halaman="Manajemen Blangko";
     include_once("sys/sys_header.php");
 ?>
 <div class="w3-row" id="AppContent">
     <div class="w3-container w3-margin-bottom">
-        <h3 class="w3-border-bottom">Managemen Blangko</h3>
+        <h3 class="w3-border-bottom">Manajemen Blangko</h3>
         <button class="w3-btn w3-small w3-round w3-teal w3-right" onclick="tambah_blangko()">Tambah</button>
     </div>
     <div class="w3-row w3-margin " id="tampilan">
@@ -252,4 +252,3 @@ function ubah_jenis(isi){
   });
 </script>
 <?php include_once("sys/sys_footer.php");?>
-

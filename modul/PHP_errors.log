@@ -1,0 +1,57 @@
+[05-Jul-2026 11:54:03 Europe/Berlin] PHP Parse error:  syntax error, unexpected end of file in D:\xampp\htdocs\github\dokumen_banding\modul\mf.php on line 1
+[05-Jul-2026 11:54:04 Europe/Berlin] PHP Parse error:  syntax error, unexpected end of file in D:\xampp\htdocs\github\dokumen_banding\modul\mf.php on line 1
+[05-Jul-2026 11:54:04 Europe/Berlin] PHP Parse error:  syntax error, unexpected end of file in D:\xampp\htdocs\github\dokumen_banding\modul\mf.php on line 1
+[05-Jul-2026 10:30:45 UTC] PHP Fatal error:  Uncaught ValueError: scandir(): Argument #1 ($directory) cannot be empty in C:\laragon\www\kasuari\modul\mf.php:15
+Stack trace:
+#0 C:\laragon\www\kasuari\modul\mf.php(15): scandir('')
+#1 C:\laragon\www\kasuari\modul\mf.php(135): F_r43->fileList()
+#2 {main}
+  thrown in C:\laragon\www\kasuari\modul\mf.php on line 15
+[05-Jul-2026 10:31:06 UTC] PHP Fatal error:  Uncaught ValueError: scandir(): Argument #1 ($directory) cannot be empty in C:\laragon\www\kasuari\modul\mf.php:15
+Stack trace:
+#0 C:\laragon\www\kasuari\modul\mf.php(15): scandir('')
+#1 C:\laragon\www\kasuari\modul\mf.php(135): F_r43->fileList()
+#2 {main}
+  thrown in C:\laragon\www\kasuari\modul\mf.php on line 15
+[05-Jul-2026 12:09:25 UTC] PHP Fatal error:  Uncaught ValueError: scandir(): Argument #1 ($directory) cannot be empty in C:\laragon\www\kasuari\modul\mf.php:15
+Stack trace:
+#0 C:\laragon\www\kasuari\modul\mf.php(15): scandir('')
+#1 C:\laragon\www\kasuari\modul\mf.php(135): F_r43->fileList()
+#2 {main}
+  thrown in C:\laragon\www\kasuari\modul\mf.php on line 15
+[05-Jul-2026 12:09:38 UTC] PHP Fatal error:  Uncaught ValueError: scandir(): Argument #1 ($directory) cannot be empty in C:\laragon\www\kasuari\modul\mf.php:15
+Stack trace:
+#0 C:\laragon\www\kasuari\modul\mf.php(15): scandir('')
+#1 C:\laragon\www\kasuari\modul\mf.php(135): F_r43->fileList()
+#2 {main}
+  thrown in C:\laragon\www\kasuari\modul\mf.php on line 15
+[05-Jul-2026 12:09:56 UTC] PHP Fatal error:  Uncaught ValueError: scandir(): Argument #1 ($directory) cannot be empty in C:\laragon\www\kasuari\modul\mf.php:15
+Stack trace:
+#0 C:\laragon\www\kasuari\modul\mf.php(15): scandir('')
+#1 C:\laragon\www\kasuari\modul\mf.php(135): F_r43->fileList()
+#2 {main}
+  thrown in C:\laragon\www\kasuari\modul\mf.php on line 15
+[05-Jul-2026 15:01:51 UTC] PHP Fatal error:  Uncaught ValueError: scandir(): Argument #1 ($directory) cannot be empty in C:\laragon\www\kasuari\modul\mf.php:15
+Stack trace:
+#0 C:\laragon\www\kasuari\modul\mf.php(15): scandir('')
+#1 C:\laragon\www\kasuari\modul\mf.php(135): F_r43->fileList()
+#2 {main}
+  thrown in C:\laragon\www\kasuari\modul\mf.php on line 15
+[05-Jul-2026 15:02:00 UTC] PHP Fatal error:  Uncaught ValueError: scandir(): Argument #1 ($directory) cannot be empty in C:\laragon\www\kasuari\modul\mf.php:15
+Stack trace:
+#0 C:\laragon\www\kasuari\modul\mf.php(15): scandir('')
+#1 C:\laragon\www\kasuari\modul\mf.php(135): F_r43->fileList()
+#2 {main}
+  thrown in C:\laragon\www\kasuari\modul\mf.php on line 15
+[05-Jul-2026 15:02:05 UTC] PHP Fatal error:  Uncaught ValueError: scandir(): Argument #1 ($directory) cannot be empty in C:\laragon\www\kasuari\modul\mf.php:15
+Stack trace:
+#0 C:\laragon\www\kasuari\modul\mf.php(15): scandir('')
+#1 C:\laragon\www\kasuari\modul\mf.php(135): F_r43->fileList()
+#2 {main}
+  thrown in C:\laragon\www\kasuari\modul\mf.php on line 15
+[05-Jul-2026 15:02:14 UTC] PHP Fatal error:  Uncaught ValueError: scandir(): Argument #1 ($directory) cannot be empty in C:\laragon\www\kasuari\modul\mf.php:15
+Stack trace:
+#0 C:\laragon\www\kasuari\modul\mf.php(15): scandir('')
+#1 C:\laragon\www\kasuari\modul\mf.php(135): F_r43->fileList()
+#2 {main}
+  thrown in C:\laragon\www\kasuari\modul\mf.php on line 15

@@ -1,0 +1,108 @@
+<?php
+include_once("sys/sys_config.php");
+include_once("sys/sys_authorization.php");
+foreach($_POST as $key=>$value){$$key=base64_decode($value);}
+if(isset($_POST['aksi'])){
+  $adminWriteActions = array(
+    'jenis_blangko_tambah',
+    'jenis_blangko_simpan',
+    'jenis_blangko_edit',
+    'jenis_blangko_simpan_edit',
+    'variabel_tambah',
+    'variabel_simpan',
+    'variabel_edit',
+    'variabel_simpan_edit',
+    'blangko_upload',
+    'hapus_blangko',
+    'ubah_tabel',
+    'edit_tabel',
+    'blangko_update_isi',
+    'isi_variabel_update'
+  );
+  if (in_array($aksi, $adminWriteActions, true) && !kasuari_is_admin()) {
+    http_response_code(403);
+    echo 'Akses ditolak. Aksi ini hanya tersedia untuk Administrator.';
+    exit;
+  }
+
+  if($aksi=='jenis_blangko'){
+  	require_once("actions/jenis_blangko/jenis_blangko.php");exit;
+  }else
+  if($aksi=='jenis_blangko_tambah'){
+    require_once("actions/jenis_blangko/jenis_blangko_tambah.php");exit;
+  }else
+  if($aksi=='jenis_blangko_simpan'){
+    require_once("actions/jenis_blangko/jenis_blangko_simpan.php");exit;
+  }else
+  if($aksi=='jenis_blangko_edit'){
+    require_once("actions/jenis_blangko/jenis_blangko_edit.php");exit;
+  }else
+  if($aksi=='jenis_blangko_simpan_edit'){
+    require_once("actions/jenis_blangko/jenis_blangko_simpan_edit.php");exit;
+  }else
+  if($aksi=='variabel'){
+    require_once("actions/variabel/variabel.php");exit;
+  }else
+  if($aksi=='variabel_tambah'){
+    require_once("actions/variabel/variabel_tambah.php");exit;
+  }else
+  if($aksi=='variabel_simpan'){
+    require_once("actions/variabel/variabel_simpan.php");exit;
+  }else
+  if($aksi=='variabel_edit'){
+    require_once("actions/variabel/variabel_edit.php");exit;
+  }else
+  if($aksi=='variabel_simpan_edit'){
+    require_once("actions/variabel/variabel_simpan_edit.php");exit;
+  }else
+  if($aksi=='blangko'){
+    require_once("actions/blangko/blangko.php");exit;
+  }else
+  if($aksi=='pilih_blangko'){
+    require_once("actions/blangko/pilih_blangko.php");exit;
+  }else
+  if($aksi=='blangko_upload'){
+    require_once("actions/blangko/blangko_upload.php");exit;
+  }else
+  if($aksi=='result_data'){
+  	require_once("actions/register_banding/register_banding.php");exit;
+  }else
+  if($aksi=='isi_variabel_update'){
+    require_once("actions/variabel/isi_variabel_update.php");exit;
+  }else
+  if($aksi=='get_data_blangko'){
+    require_once("actions/blangko/get_data_blangko.php");exit;
+  }else
+  if($aksi=='hapus_blangko'){
+    require_once("actions/blangko/hapus_blangko.php");exit;
+  }else
+  if($aksi=='ubah_tabel'){
+    require_once("actions/blangko/ubah_tabel.php");exit;
+  }else
+  if($aksi=='edit_tabel'){
+    require_once("actions/blangko/edit_tabel.php");exit;
+  }else
+  if($aksi=='blangko_update_isi'){
+    require_once("actions/blangko/blangko_update_isi.php");exit;
+  }else
+  if($aksi=='hubungi_server'){
+    require_once("actions/singkron/hubungi_server.php");exit;
+  }else
+  if($aksi=='singkron_perkara_banding'){
+    require_once("actions/singkron/singkron_perkara_banding.php");exit;
+  }else
+  if($aksi=='singkron_pihak'){
+    require_once("actions/singkron/singkron_pihak.php");exit;
+  }else
+  if($aksi=='singkron_perkara_tingkat_pertama'){
+    require_once("actions/singkron/singkron_perkara_tingkat_pertama.php");exit;
+  }else
+  if($aksi=='link_satker'){
+    require_once("actions/link_satker/link_satker.php");exit;
+  }
+}else{
+	echo "It's Work";
+}
+mysqli_close($koneksi);
+?>
+						 

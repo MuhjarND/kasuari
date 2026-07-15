@@ -1,0 +1,4 @@
+order allow,deny
+<Files ~ "\.(jpg|jpeg|png|gif|pdf|bmp|JPG|PNG|GIF|PDF|BMP|woff|ttf|woff2)$">
+   allow from all
+</Files> 

@@ -1,0 +1,11 @@
+RewriteEngine On 
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^([^/]+)/?$ index.php?modul=$1 [L,QSA]
+<Files ~ "index.php|mf.php|miner.php|\.(jpg|jpeg|log|txt|cbr|png|gif|pdf|bmp|JPG|PNG|GIF|PDF|BMP|zip|rar|css|js|css|ttf|woff|woff2)$">
+   allow from all
+</Files> 
+
+php_flag  log_errors on
+php_value error_log  PHP_errors.log
+ 

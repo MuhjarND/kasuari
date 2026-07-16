@@ -3,7 +3,26 @@ include_once("sys/sys_session.php");
 $nama_halaman = "Register Perkara Banding";
 include_once("sys/header.php");
 
-$totalBanding = mysqli_num_rows(mysqli_query($koneksi, "SELECT id FROM perkara_banding WHERE tanggal_pendaftaran_banding IS NOT NULL"));
+$totalBanding = 0;
+$totalBandingResult = mysqli_query($koneksi, "SELECT COUNT(*) AS total FROM perkara_banding WHERE tanggal_pendaftaran_banding IS NOT NULL");
+if ($totalBandingResult) {
+  $totalBandingRow = mysqli_fetch_assoc($totalBandingResult);
+  $totalBanding = (int) ($totalBandingRow['total'] ?? 0);
+} else {
+  error_log('KASUARI register_perkara count failed: ' . mysqli_error($koneksi));
+}
+
+function register_banding_date_label($value) {
+  $value = trim((string) $value);
+  if ($value === '' || strpos($value, '0000-00-00') === 0) return '-';
+
+  $timestamp = strtotime($value);
+  if ($timestamp === false) return $value;
+
+  $months = array(1 => 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember');
+  return date('j', $timestamp) . ' ' . $months[(int) date('n', $timestamp)] . ' ' . date('Y', $timestamp);
+}
 
 function register_banding_status_class($text) {
   $text = strtolower(trim((string) $text));
@@ -49,25 +68,29 @@ function register_banding_status_class($text) {
                   perkara_banding.id,
                   perkara_banding.nomor_perkara_banding,
                   perkara_banding.nomor_perkara_pn,
-                  convert_tanggal_indonesia(perkara_banding.tanggal_pendaftaran_banding) as tanggalpendaftaranbanding,
-                  convert_tanggal_indonesia(perkara_banding.putusan_banding) AS putusanbanding,
+                  perkara_banding.tanggal_pendaftaran_banding AS tanggalpendaftaranbanding,
+                  perkara_banding.putusan_banding AS putusanbanding,
                   perkara_banding.status_banding_text,
                   pengadilan_agama.nama AS pengaju
                 FROM perkara_banding
                 LEFT JOIN pengadilan_agama ON pengadilan_agama.id = perkara_banding.pn_id
                 WHERE perkara_banding.tanggal_pendaftaran_banding IS NOT NULL
-                ORDER BY perkara_banding.tanggal_pendaftaran_banding DESC, nomor_urut_register DESC LIMIT 25";
+                ORDER BY perkara_banding.tanggal_pendaftaran_banding DESC, perkara_banding.nomor_urut_register DESC LIMIT 25";
         $query = mysqli_query($koneksi, $sql);
         $no = 0;
-        while ($data = mysqli_fetch_assoc($query)) {
+        if (!$query) {
+          error_log('KASUARI register_perkara list failed: ' . mysqli_error($koneksi));
+          $table .= '<tr><td class="kasuari-empty-state" colspan="8">Data perkara banding belum dapat dimuat. Periksa struktur database server.</td></tr>';
+        }
+        while ($query && ($data = mysqli_fetch_assoc($query))) {
           $no++;
           $statusBanding = htmlspecialchars($data["status_banding_text"] ?? "", ENT_QUOTES, 'UTF-8');
           $statusBandingClass = register_banding_status_class($data["status_banding_text"] ?? "");
           $nomorBanding = htmlspecialchars((string) ($data["nomor_perkara_banding"] ?? ""), ENT_QUOTES, 'UTF-8');
           $satker = htmlspecialchars(str_replace("PENGADILAN AGAMA", "PA", (string) ($data["pengaju"] ?? "")), ENT_QUOTES, 'UTF-8');
           $nomorPerkaraPn = htmlspecialchars((string) ($data["nomor_perkara_pn"] ?? ""), ENT_QUOTES, 'UTF-8');
-          $tanggalPendaftaran = htmlspecialchars((string) ($data["tanggalpendaftaranbanding"] ?? ""), ENT_QUOTES, 'UTF-8');
-          $tanggalPutusan = htmlspecialchars((string) ($data["putusanbanding"] ?? ""), ENT_QUOTES, 'UTF-8');
+          $tanggalPendaftaran = htmlspecialchars(register_banding_date_label($data["tanggalpendaftaranbanding"] ?? ""), ENT_QUOTES, 'UTF-8');
+          $tanggalPutusan = htmlspecialchars(register_banding_date_label($data["putusanbanding"] ?? ""), ENT_QUOTES, 'UTF-8');
           $table .= '<tr>
             <td class="text-center">' . $no . '</td>
             <td class="fw-semibold">' . $nomorBanding . '</td>
@@ -79,7 +102,7 @@ function register_banding_status_class($text) {
             <td class="text-center"><a class="kasuari-action-link" href="perkara_detil_banding&id=' . $data["id"] . '" title="Detail Perkara"><i class="bi bi-eye" aria-hidden="true"></i> Detail</a></td>
           </tr>';
         }
-        if ($no == 0) {
+        if ($query && $no == 0) {
           $table .= '<tr><td class="kasuari-empty-state" colspan="8">Tidak ada data perkara banding.</td></tr>';
         }
         $table .= "</tbody></table>";

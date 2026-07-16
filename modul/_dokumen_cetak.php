@@ -104,10 +104,15 @@ $rtf=normalisasi_penanda_variabel_dokumen($rtf);
 	$rtf= str_replace("\'ef\'bf\'bd\loch\f1","",$rtf) ;
 	$rtf= str_replace("\'ef\'bf\'bd","",$rtf) ;
 	//replace karakter khusus
+	$hasil_direktori=__DIR__."/../hasil";
+	if (!is_dir($hasil_direktori) && !@mkdir($hasil_direktori,0775,true)) {
+		dokumen_cetak_gagal('Folder hasil dokumen tidak dapat dibuat. Periksa hak akses server.', 'Gagal membuat folder: '.$hasil_direktori);
+	}
 	$hasil_lokasi="hasil/".$nama_file_hasil;
-	$hasil=file_put_contents($hasil_lokasi,$rtf);
+	$hasil_file=$hasil_direktori.DIRECTORY_SEPARATOR.$nama_file_hasil;
+	$hasil=file_put_contents($hasil_file,$rtf);
 	if ($hasil === false) {
-		dokumen_cetak_gagal('Dokumen gagal disimpan. Periksa hak akses folder hasil.', 'Gagal menulis dokumen: '.$hasil_lokasi);
+		dokumen_cetak_gagal('Dokumen gagal disimpan. Periksa hak akses folder hasil.', 'Gagal menulis dokumen: '.$hasil_file);
 	}
 	//echo '<br><center><a href="'.$hasil_lokasi.'" class="w3-btn  w3-small w3-green">.:: Unduh Ulang ::.</a><center>';
 	echo '^'.$hasil_lokasi;

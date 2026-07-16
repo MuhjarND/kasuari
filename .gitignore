@@ -1,0 +1,6 @@
+# Runtime logs
+*.log
+
+# Generated document previews and exports
+/hasil/*
+!/hasil/.gitkeep

@@ -77,8 +77,20 @@ Lama\intbl\cell
     $rtf= str_replace("#tanggal#",tanggal_indon(date("Y-m-d")),$rtf) ;
     $rtf= str_replace("#data#",$tabelnya,$rtf) ;
     $nama_file_hasil="perkara_belum_dikirim.rtf";
+    $hasil_direktori=__DIR__."/../hasil";
+    if (!is_dir($hasil_direktori) && !@mkdir($hasil_direktori,0775,true)) {
+      error_log('KASUARI gagal membuat folder hasil: '.$hasil_direktori);
+      http_response_code(500);
+      die('Folder hasil dokumen tidak dapat dibuat. Periksa hak akses server.');
+    }
     $hasil_lokasi="hasil/".$nama_file_hasil;
-    $hasil=file_put_contents($hasil_lokasi,$rtf);
+    $hasil_file=$hasil_direktori.DIRECTORY_SEPARATOR.$nama_file_hasil;
+    $hasil=file_put_contents($hasil_file,$rtf);
+    if ($hasil === false) {
+      error_log('KASUARI gagal menulis hasil ekspor: '.$hasil_file);
+      http_response_code(500);
+      die('Dokumen ekspor gagal disimpan. Periksa hak akses folder hasil.');
+    }
     lempar($hasil_lokasi);
     exit;
 }

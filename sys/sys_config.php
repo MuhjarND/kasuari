@@ -1,6 +1,9 @@
 <?php
 if(!isset($_SESSION)){session_start();}
-ini_set('display_errors', 'On');
+$kasuariDebugMode = getenv('KASUARI_DEBUG') === '1';
+ini_set('display_errors', $kasuariDebugMode ? '1' : '0');
+ini_set('display_startup_errors', $kasuariDebugMode ? '1' : '0');
+ini_set('log_errors', '1');
 error_reporting(E_ALL);
 date_default_timezone_set("Asia/Jakarta");
 include_once("sys/sys_koneksi.php");
@@ -14,7 +17,7 @@ while($data=mysqli_fetch_assoc($query)){
   }*/
 $kode_perkara="PTA.Pb";
 $url_app="http://41.216.191.70:8181/kasuari/";
-$url_api="hhttp://41.216.191.70:8181/kasuari/";
+$url_api="http://41.216.191.70:8181/kasuari/";
 $nama_app="KASUARI";
 $nama_panjang_app="Kanal Asisten Terintegrasi";
 $deskripsi_app="Sistem manajemen dan layanan digital terpadu untuk mendukung tupoksi Pengadilan Tinggi Agama Papua Barat";

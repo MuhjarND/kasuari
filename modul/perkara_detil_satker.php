@@ -21,8 +21,8 @@ $sql = "SELECT
           perkara.petitum,
           perkara.tahapan_terakhir_text,
           perkara.proses_terakhir_text,
-          convert_tanggal_indonesia(perkara.tanggal_pendaftaran) AS tanggal_pendaftaran,
-          convert_tanggal_indonesia(putusan.tanggal_putusan) AS tanggal_putusan,
+          perkara.tanggal_pendaftaran AS tanggal_pendaftaran,
+          putusan.tanggal_putusan AS tanggal_putusan,
           putusan.status_putusan_text,
           putusan.amar_putusan,
           pengadilan_agama.nama AS pengaju
@@ -43,6 +43,13 @@ $sql = "SELECT
         LIMIT 1";
 $query = mysqli_query($koneksi, $sql);
 $perkara = $query ? mysqli_fetch_assoc($query) : null;
+if (!$query) {
+  error_log('KASUARI perkara_detil_satker query failed: ' . mysqli_error($koneksi));
+}
+if ($perkara) {
+  $perkara['tanggal_pendaftaran'] = kasuari_tanggal_indonesia($perkara['tanggal_pendaftaran'] ?? '');
+  $perkara['tanggal_putusan'] = kasuari_tanggal_indonesia($perkara['tanggal_putusan'] ?? '');
+}
 
 function ks_value($value, $fallback = '-') {
   $value = trim((string) $value);

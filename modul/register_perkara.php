@@ -12,18 +12,6 @@ if ($totalBandingResult) {
   error_log('KASUARI register_perkara count failed: ' . mysqli_error($koneksi));
 }
 
-function register_banding_date_label($value) {
-  $value = trim((string) $value);
-  if ($value === '' || strpos($value, '0000-00-00') === 0) return '-';
-
-  $timestamp = strtotime($value);
-  if ($timestamp === false) return $value;
-
-  $months = array(1 => 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember');
-  return date('j', $timestamp) . ' ' . $months[(int) date('n', $timestamp)] . ' ' . date('Y', $timestamp);
-}
-
 function register_banding_status_class($text) {
   $text = strtolower(trim((string) $text));
   if ($text === '') return 'kosong';
@@ -89,8 +77,8 @@ function register_banding_status_class($text) {
           $nomorBanding = htmlspecialchars((string) ($data["nomor_perkara_banding"] ?? ""), ENT_QUOTES, 'UTF-8');
           $satker = htmlspecialchars(str_replace("PENGADILAN AGAMA", "PA", (string) ($data["pengaju"] ?? "")), ENT_QUOTES, 'UTF-8');
           $nomorPerkaraPn = htmlspecialchars((string) ($data["nomor_perkara_pn"] ?? ""), ENT_QUOTES, 'UTF-8');
-          $tanggalPendaftaran = htmlspecialchars(register_banding_date_label($data["tanggalpendaftaranbanding"] ?? ""), ENT_QUOTES, 'UTF-8');
-          $tanggalPutusan = htmlspecialchars(register_banding_date_label($data["putusanbanding"] ?? ""), ENT_QUOTES, 'UTF-8');
+          $tanggalPendaftaran = htmlspecialchars(kasuari_tanggal_indonesia($data["tanggalpendaftaranbanding"] ?? ""), ENT_QUOTES, 'UTF-8');
+          $tanggalPutusan = htmlspecialchars(kasuari_tanggal_indonesia($data["putusanbanding"] ?? ""), ENT_QUOTES, 'UTF-8');
           $table .= '<tr>
             <td class="text-center">' . $no . '</td>
             <td class="fw-semibold">' . $nomorBanding . '</td>

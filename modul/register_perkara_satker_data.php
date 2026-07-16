@@ -1,9 +1,11 @@
 <?php
 include_once("sys/sys_session.php");
 include_once("sys/sys_koneksi.php");
+include_once("sys/sys_fungsi.php");
+header('Content-Type: application/json; charset=utf-8');
 
 $startGET = filter_input(INPUT_GET, "start", FILTER_SANITIZE_NUMBER_INT);
-$start = $startGET ? intval($startGET) : 0;
+$start = $startGET ? max(0, intval($startGET)) : 0;
 $lengthGET = filter_input(INPUT_GET, "length", FILTER_SANITIZE_NUMBER_INT);
 $length = $lengthGET ? intval($lengthGET) : 25;
 $searchQuery = isset($_GET["searchQuery"]) ? $_GET["searchQuery"] : "";
@@ -57,26 +59,25 @@ $baseSql = "SELECT
               perkara.id,
               perkara.nomor_perkara,
               perkara.jenis_perkara_nama,
-              convert_tanggal_indonesia(perkara.tanggal_pendaftaran) AS tanggalpendaftaran,
+              perkara.tanggal_pendaftaran AS tanggalpendaftaran,
               perkara.tahapan_terakhir_text,
               perkara.proses_terakhir_text,
               pengadilan_agama.nama AS pengaju,
-              convert_tanggal_indonesia(putusan.tanggal_putusan) AS tanggalputusan
+              putusan.tanggal_putusan AS tanggalputusan
             FROM perkara
             LEFT JOIN pengadilan_agama ON pengadilan_agama.id = perkara.pn_id
             LEFT JOIN (
               SELECT pn_id, perkara_id, MAX(tanggal_putusan) AS tanggal_putusan
               FROM perkara_putusan
               GROUP BY pn_id, perkara_id
-            ) putusan ON putusan.pn_id = perkara.pn_id AND putusan.perkara_id = perkara.perkara_id
-            WHERE 1=1";
+            ) putusan ON putusan.pn_id = perkara.pn_id AND putusan.perkara_id = perkara.perkara_id";
 
-$query = $baseSql;
+$filterSql = " WHERE 1=1";
 if ($satkerId > 0) {
-  $query .= " AND perkara.pn_id = " . $satkerId;
+  $filterSql .= " AND perkara.pn_id = " . $satkerId;
 }
 if ($search !== "") {
-  $query .= " AND (
+  $filterSql .= " AND (
     perkara.nomor_perkara LIKE '%" . $search . "%'
     OR perkara.jenis_perkara_nama LIKE '%" . $search . "%'
     OR perkara.tahapan_terakhir_text LIKE '%" . $search . "%'
@@ -84,6 +85,7 @@ if ($search !== "") {
     OR pengadilan_agama.nama LIKE '%" . $search . "%'
   )";
 }
+$query = $baseSql . $filterSql;
 
 if ($sortColumnIndex !== null && $sortColumnIndex !== false && isset($column[(int) $sortColumnIndex])) {
   $query .= " ORDER BY " . $column[(int) $sortColumnIndex] . " " . $sortDirection . " ";
@@ -97,9 +99,31 @@ if ($length != -1) {
 }
 
 $result = mysqli_query($koneksi, $query . $queryLimit);
-$filteredResult = mysqli_query($koneksi, $query);
-$number_filter_row = $filteredResult ? mysqli_num_rows($filteredResult) : 0;
-$number_all_data = mysqli_num_rows(mysqli_query($koneksi, "SELECT id FROM perkara"));
+$countAllResult = mysqli_query($koneksi, "SELECT COUNT(*) AS total FROM perkara");
+$countFilteredResult = mysqli_query(
+  $koneksi,
+  "SELECT COUNT(*) AS total
+   FROM perkara
+   LEFT JOIN pengadilan_agama ON pengadilan_agama.id = perkara.pn_id" . $filterSql
+);
+
+if (!$result || !$countAllResult || !$countFilteredResult) {
+  error_log('KASUARI register_perkara_satker_data query failed: ' . mysqli_error($koneksi));
+  http_response_code(500);
+  echo json_encode(array(
+    "recordsTotal" => 0,
+    "recordsFiltered" => 0,
+    "data" => array(),
+    "error" => "Data perkara satker belum dapat dimuat. Periksa struktur database server."
+  ));
+  mysqli_close($koneksi);
+  exit;
+}
+
+$countAllRow = mysqli_fetch_assoc($countAllResult);
+$countFilteredRow = mysqli_fetch_assoc($countFilteredResult);
+$number_all_data = (int) ($countAllRow['total'] ?? 0);
+$number_filter_row = (int) ($countFilteredRow['total'] ?? 0);
 
 $nomor = $start;
 $data = array();
@@ -109,8 +133,8 @@ while ($row = mysqli_fetch_assoc($result)) {
   $nomorPerkara = htmlspecialchars($row['nomor_perkara'] ?? "", ENT_QUOTES, 'UTF-8');
   $satker = htmlspecialchars(str_replace("PENGADILAN AGAMA", "PA", $row["pengaju"] ?? ""), ENT_QUOTES, 'UTF-8');
   $jenis = htmlspecialchars($row['jenis_perkara_nama'] ?? "", ENT_QUOTES, 'UTF-8');
-  $tanggalDaftar = htmlspecialchars($row['tanggalpendaftaran'] ?? "", ENT_QUOTES, 'UTF-8');
-  $tanggalPutusan = htmlspecialchars($row['tanggalputusan'] ?? "-", ENT_QUOTES, 'UTF-8');
+  $tanggalDaftar = htmlspecialchars(kasuari_tanggal_indonesia($row['tanggalpendaftaran'] ?? ""), ENT_QUOTES, 'UTF-8');
+  $tanggalPutusan = htmlspecialchars(kasuari_tanggal_indonesia($row['tanggalputusan'] ?? ""), ENT_QUOTES, 'UTF-8');
   $tahapan = htmlspecialchars($row['tahapan_terakhir_text'] ?? "", ENT_QUOTES, 'UTF-8');
   $proses = htmlspecialchars($row['proses_terakhir_text'] ?? "", ENT_QUOTES, 'UTF-8');
   $typeClass = satker_type_class($row['jenis_perkara_nama'] ?? "");

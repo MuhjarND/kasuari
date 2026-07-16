@@ -1,6 +1,9 @@
-<?php if(!isset($_SESSION)){session_start();}  
-ini_set('display_errors', 1);
-ini_set('log_errors', 1);
+<?php if(!isset($_SESSION)){session_start();}
+$kasuariDebugMode = getenv('KASUARI_DEBUG') === '1';
+ini_set('display_errors', $kasuariDebugMode ? '1' : '0');
+ini_set('display_startup_errors', $kasuariDebugMode ? '1' : '0');
+ini_set('log_errors', '1');
+error_reporting(E_ALL);
 
 date_default_timezone_set("Asia/Jakarta"); 
 //include('sys_koneksi.php'); 
@@ -16,8 +19,22 @@ $sessionUser = mysqli_prepare(
   $koneksi,
   "SELECT fullname, username, `group`, email, block FROM sys_users WHERE userid = ? LIMIT 1"
 );
+if ($sessionUser === false) {
+  error_log('Validasi sesi gagal dipersiapkan: '.mysqli_error($koneksi));
+  session_unset();
+  session_destroy();
+  header('Location: login');
+  exit;
+}
 mysqli_stmt_bind_param($sessionUser, 'i', $sessionUserId);
-mysqli_stmt_execute($sessionUser);
+if (!mysqli_stmt_execute($sessionUser)) {
+  error_log('Validasi sesi gagal dijalankan: '.mysqli_stmt_error($sessionUser));
+  mysqli_stmt_close($sessionUser);
+  session_unset();
+  session_destroy();
+  header('Location: login');
+  exit;
+}
 mysqli_stmt_bind_result($sessionUser, $sessionFullname, $sessionUsername, $sessionGroup, $sessionEmail, $sessionBlock);
 $sessionUserFound = mysqli_stmt_fetch($sessionUser);
 mysqli_stmt_close($sessionUser);

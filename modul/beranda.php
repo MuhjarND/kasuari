@@ -12,14 +12,19 @@ $username = isset($_SESSION['username']) && $_SESSION['username'] !== ''
 /* â”€â”€â”€ Sinkronisasi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 $singkron = [1 => '-', 2 => '-', 3 => '-'];
 $q = mysqli_query($koneksi, "SELECT * FROM singkron");
-while ($r = mysqli_fetch_assoc($q)) {
+while ($q && ($r = mysqli_fetch_assoc($q))) {
   if (isset($singkron[$r['id']])) $singkron[$r['id']] = $r['waktu'];
 }
+if (!$q) error_log('KASUARI dashboard sync query failed: ' . mysqli_error($koneksi));
 
 /* â”€â”€â”€ Helper count â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 $cnt = function ($sql) use ($koneksi) {
   $res = mysqli_query($koneksi, $sql);
-  return $res ? mysqli_num_rows($res) : 0;
+  if (!$res) {
+    error_log('KASUARI dashboard count query failed: ' . mysqli_error($koneksi));
+    return 0;
+  }
+  return mysqli_num_rows($res);
 };
 
 /* â”€â”€â”€ Stat cards â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
@@ -45,7 +50,7 @@ $dicabut = $cnt("SELECT id FROM perkara_banding
 /* â”€â”€â”€ Perkara banding terbaru (sudah terdaftar) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 $sql_new = "SELECT pb.id, pb.nomor_perkara_banding, pb.nomor_perkara_pn,
   pb.status_banding_text,
-  convert_tanggal_indonesia(pb.tanggal_pendaftaran_banding) AS tgl_daftar,
+  pb.tanggal_pendaftaran_banding AS tgl_daftar,
   pa.nama AS pengaju
   FROM perkara_banding pb
   LEFT JOIN pengadilan_agama pa ON pa.id = pb.pn_id
@@ -53,11 +58,18 @@ $sql_new = "SELECT pb.id, pb.nomor_perkara_banding, pb.nomor_perkara_pn,
   ORDER BY pb.tanggal_pendaftaran_banding DESC LIMIT 5";
 $recent = mysqli_query($koneksi, $sql_new);
 $recentRows = [];
-if ($recent) while ($r = mysqli_fetch_assoc($recent)) $recentRows[] = $r;
+if ($recent) {
+  while ($r = mysqli_fetch_assoc($recent)) {
+    $r['tgl_daftar'] = kasuari_tanggal_indonesia($r['tgl_daftar'] ?? '');
+    $recentRows[] = $r;
+  }
+} else {
+  error_log('KASUARI dashboard recent cases query failed: ' . mysqli_error($koneksi));
+}
 
 /* â”€â”€â”€ Perkara perlu tindak lanjut (belum dikirim) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 $sql_tlj = "SELECT pb.id, pb.nomor_perkara_pn,
-  convert_tanggal_indonesia(pb.permohonan_banding) AS tgl_permohonan,
+  pb.permohonan_banding AS tgl_permohonan,
   DATEDIFF(CURDATE(), pb.permohonan_banding) AS hari,
   pa.nama AS pengaju
   FROM perkara_banding pb
@@ -70,13 +82,20 @@ $sql_tlj = "SELECT pb.id, pb.nomor_perkara_pn,
   ORDER BY pb.permohonan_banding ASC LIMIT 5";
 $tlj = mysqli_query($koneksi, $sql_tlj);
 $tljRows = [];
-if ($tlj) while ($r = mysqli_fetch_assoc($tlj)) $tljRows[] = $r;
+if ($tlj) {
+  while ($r = mysqli_fetch_assoc($tlj)) {
+    $r['tgl_permohonan'] = kasuari_tanggal_indonesia($r['tgl_permohonan'] ?? '');
+    $tljRows[] = $r;
+  }
+} else {
+  error_log('KASUARI dashboard follow-up cases query failed: ' . mysqli_error($koneksi));
+}
 
 $sql_satker = "SELECT
   perkara.id,
   perkara.nomor_perkara,
   perkara.jenis_perkara_nama,
-  convert_tanggal_indonesia(perkara.tanggal_pendaftaran) AS tanggal_daftar,
+  perkara.tanggal_pendaftaran AS tanggal_daftar,
   perkara.tahapan_terakhir_text,
   perkara.proses_terakhir_text,
   pengadilan_agama.nama AS pengaju
@@ -86,7 +105,14 @@ $sql_satker = "SELECT
   LIMIT 8";
 $satker = mysqli_query($koneksi, $sql_satker);
 $satkerRows = [];
-if ($satker) while ($r = mysqli_fetch_assoc($satker)) $satkerRows[] = $r;
+if ($satker) {
+  while ($r = mysqli_fetch_assoc($satker)) {
+    $r['tanggal_daftar'] = kasuari_tanggal_indonesia($r['tanggal_daftar'] ?? '');
+    $satkerRows[] = $r;
+  }
+} else {
+  error_log('KASUARI dashboard satker cases query failed: ' . mysqli_error($koneksi));
+}
 
 /* â”€â”€â”€ Greeting emoji berdasarkan waktu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 $waktuWit = new DateTimeImmutable('now', new DateTimeZone('Asia/Jayapura'));

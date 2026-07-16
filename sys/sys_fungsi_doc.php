@@ -1,8 +1,12 @@
-<?php  
-ini_set('display_errors', 'on');
-require_once("sys/sys_koneksi.php");  
+<?php
+require_once(__DIR__ . "/sys_koneksi.php");
 function halaman_index($jabatan_id, $group, $url_sipp, $mulai_wajib_upload_bas_put)
 { 
+$koneksi=isset($GLOBALS['koneksi']) ? $GLOBALS['koneksi'] : null;
+if (!($koneksi instanceof mysqli)) {
+	error_log('Koneksi database tidak tersedia pada halaman dokumen.');
+	return;
+}
 $sekarang=date("Y-m-d");
 	//hakim
 	//10 20
@@ -36,7 +40,10 @@ $sekarang=date("Y-m-d");
 			WHERE 
 			perkara_putusan.tanggal_putusan IS NULL AND ( perkara.posita IS NULL OR perkara.petitum IS NULL) ORDER BY perkara_id ASC";
 			$query=mysqli_query($koneksi,$sql);
-			$jumlah=mysql_num_rows($query);
+			if ($query === false) {
+				error_log('Gagal membaca daftar posita/petitum: '.mysqli_error($koneksi));
+			}
+			$jumlah=$query ? mysqli_num_rows($query) : 0;
 			if($jumlah>=1)
 			{
 				
@@ -91,7 +98,7 @@ $sekarang=date("Y-m-d");
 			WHERE 
 			perkara_hakim_pn.`hakim_id`=$jabatan_id  AND perkara_hakim_pn.`jabatan_hakim_id`=1 AND perkara_hakim_pn.`aktif`='Y' AND perkara_penetapan.`penetapan_hari_sidang` IS NULL";
 			$query=mysqli_query($koneksi,$sql);
-			$jumlah=mysql_num_rows($query);
+			$jumlah=$query ? mysqli_num_rows($query) : 0;
 			if($jumlah>=1)
 			{
 				
@@ -164,7 +171,7 @@ $sekarang=date("Y-m-d");
 					AND 
 					d.`jabatan_hakim_id`=1 AND d.`aktif`='Y'";
 			$query_putus=mysqli_query($koneksi,$sql_putus);		
-			$jumlah_putus=mysql_num_rows($query_putus);
+			$jumlah_putus=$query_putus ? mysqli_num_rows($query_putus) : 0;
 			if($jumlah_putus>=1)
 			{
 			//echo "---<br>".$sql_putus."<br>--------------------";
@@ -234,7 +241,7 @@ $sekarang=date("Y-m-d");
 							  ";
 			//echo "---<br>".$sql_putus_terakir."<br>--------------------";
 			$query_putus_terakhir=mysqli_query($koneksi,$sql_putus_terakir);
-			$jumlah_putus_terakhir=mysql_num_rows($query_putus_terakhir);
+			$jumlah_putus_terakhir=$query_putus_terakhir ? mysqli_num_rows($query_putus_terakhir) : 0;
 			if($jumlah_putus_terakhir>=1)
 			{
 				echo "<h3 align=center>Putusan yang belum dibuat / diupload (sebagai Hakim Anggota)</h3>
@@ -317,7 +324,7 @@ $sekarang=date("Y-m-d");
 							  ";
 			// echo "---<br>".$sql_sidang."<br>--------------------";
 			$query_sidang=mysqli_query($koneksi,$sql_sidang);
-			$jumlah_sidang=mysql_num_rows($query_sidang);
+			$jumlah_sidang=$query_sidang ? mysqli_num_rows($query_sidang) : 0;
 			if($jumlah_sidang>=1)
 			{
 				
@@ -406,7 +413,7 @@ $sekarang=date("Y-m-d");
 								";
 		//	echo "---<br>".$sql_data_sidang."<br>--------------------";
 			$query_data_sidang=mysqli_query($koneksi,$sql_data_sidang);
-			$jumlah_sidang=mysql_num_rows($query_data_sidang);
+			$jumlah_sidang=$query_data_sidang ? mysqli_num_rows($query_data_sidang) : 0;
 			if($jumlah_sidang>=1)
 			{
 				
@@ -475,7 +482,7 @@ $sekarang=date("Y-m-d");
 							  ";
 			// echo "---<br>".$sql_sidang."<br>--------------------";
 			$query_sidang=mysqli_query($koneksi,$sql_sidang);
-			$jumlah_sidang=mysql_num_rows($query_sidang);
+			$jumlah_sidang=$query_sidang ? mysqli_num_rows($query_sidang) : 0;
 			if($jumlah_sidang>=1)
 			{
 				
@@ -520,6 +527,11 @@ $sekarang=date("Y-m-d");
 
 function tanya_jawab($perkara_id, $sidang_id, $variabel,$db_host2,$pihak_ke)
 {
+	$koneksi=isset($GLOBALS['koneksi']) ? $GLOBALS['koneksi'] : null;
+	if (!($koneksi instanceof mysqli)) {
+		error_log('Koneksi database tidak tersedia pada tanya jawab dokumen.');
+		return;
+	}
 	//pilih template
 	
 	$sql="SELECT * from  $db_host2.template_keterangan_saksi_m WHERE pihak_id=$pihak_ke ";
@@ -529,7 +541,7 @@ function tanya_jawab($perkara_id, $sidang_id, $variabel,$db_host2,$pihak_ke)
 	$no=0;
 	echo "<select id='_pilihan_template' onchange='proses_pilih_template(this.value,".$variabel.")'>";
 	echo "<option disabled selected> .: Pilih Template :. </option>";
-	while($h=mysqli_fetch_assoc($query)) 
+	while($query && ($h=mysqli_fetch_assoc($query)))
 	{
 		$no++;foreach($h as $key=>$value) {$$key=$value;}
 		echo "<option value='".$id."'>".$nama."</option>";
@@ -552,7 +564,7 @@ function tanya_jawab($perkara_id, $sidang_id, $variabel,$db_host2,$pihak_ke)
 	$no=0;
 	$sql_data="SELECT * from  $db_host2.perkara_keterangan_saksi WHERE perkara_id=$perkara_id AND sidang_id=$sidang_id AND saksi_id=$variabel ORDER BY urutan_pertanyaan ASC ";
 	$query_data=mysqli_query($koneksi,$sql_data) ;  
-	while($h_data=mysqli_fetch_assoc($query_data)) 
+	while($query_data && ($h_data=mysqli_fetch_assoc($query_data)))
 	{
 		$no++;foreach($h_data as $key=>$value) {$$key=$value;}
 ?> 
@@ -563,7 +575,9 @@ function tanya_jawab($perkara_id, $sidang_id, $variabel,$db_host2,$pihak_ke)
 	</tr>
 <?php 
 	}
-	if(mysql_num_rows($query_data)==0)
+	if (!$query_data) {
+		error_log('Gagal membaca tanya jawab dokumen: '.mysqli_error($koneksi));
+	} elseif(mysqli_num_rows($query_data)==0)
 	{
 		 
 		$urutan_pertanyaan=1;
@@ -572,7 +586,7 @@ function tanya_jawab($perkara_id, $sidang_id, $variabel,$db_host2,$pihak_ke)
 		
 		$sql="INSERT INTO ".$db_host2.".perkara_keterangan_saksi  (perkara_id, sidang_id, penanya_id, saksi_id, urutan_pertanyaan)  values($perkara_id, $sidang_id,1,$variabel, 1)";
 		$simpan=mysqli_query($koneksi,$sql);
-		$id= mysql_insert_id();
+		$id=$simpan ? mysqli_insert_id($koneksi) : 0;
 	?> 
 	<tr>
 		<td><div id="data_id<?php echo $id?>"   ketid=""><?php echo $urutan_pertanyaan?></div></td> 
@@ -588,11 +602,11 @@ Tombol F2 : pada kolom jawaban, untuk menghapus Baris<br>
 Tombol F3 : pada kolom jawaban, untuk Menyisipkan Baris<br>";
     if($variabel==5058)
     {?>
-        <a href="#" onclick="copy_tanya_jawab(<?php echo $perkara_id?>, <?php echo $sidang_id?>, <?php echo $saksi_id?>,5059)">Duplikat Tanya Jawab ke Tanya Jawab Saksi 2</a><br></span>
+        <a href="#" onclick="copy_tanya_jawab(<?php echo $perkara_id?>, <?php echo $sidang_id?>, <?php echo $variabel?>,5059)">Duplikat Tanya Jawab ke Tanya Jawab Saksi 2</a><br></span>
     <?php 
     }else
     {?>
-<a href="#" onclick="copy_tanya_jawab(<?php echo $perkara_id?>, <?php echo $sidang_id?>, <?php echo $saksi_id?>,5058)">Duplikat Tanya Jawab ke Tanya Jawab Saksi 1</a><br></span>
+<a href="#" onclick="copy_tanya_jawab(<?php echo $perkara_id?>, <?php echo $sidang_id?>, <?php echo $variabel?>,5058)">Duplikat Tanya Jawab ke Tanya Jawab Saksi 1</a><br></span>
     <?php 
     }
 	echo "</div>";
@@ -606,6 +620,10 @@ Tombol F3 : pada kolom jawaban, untuk Menyisipkan Baris<br>";
 
 function tampilkan_data_tabel($nama_tabel, $nama_field, $filter, $order_by, $limit, $db_host2)
 {
+	$koneksi=isset($GLOBALS['koneksi']) ? $GLOBALS['koneksi'] : null;
+	if (!($koneksi instanceof mysqli)) {
+		return '';
+	}
 	//jumlah field
 	$cek_field=explode("#",$nama_field); 
 	$jumlah= count($cek_field);
@@ -629,7 +647,7 @@ function tampilkan_data_tabel($nama_tabel, $nama_field, $filter, $order_by, $lim
 	//echo "<br>".$sql."<br>";
 	
 	$no=0;
-	while($h=mysql_fetch_row($query)) 
+	while($query && ($h=mysqli_fetch_row($query)))
 	{
 		$no++;
 		//foreach($h as $key=>$value) {$$key=$value;}  
@@ -648,6 +666,10 @@ function tampilkan_data_tabel($nama_tabel, $nama_field, $filter, $order_by, $lim
 }
 function tampilkan_data_variabel($nama_tabel, $nama_field, $nama_judul, $filter, $order_by, $limit, $db_host2)
 {
+	$koneksi=isset($GLOBALS['koneksi']) ? $GLOBALS['koneksi'] : null;
+	if (!($koneksi instanceof mysqli)) {
+		return '';
+	}
 	//jumlah field
 	$cek_field=explode("#",$nama_field); 
 	$cek_judul=explode("#",$nama_judul); 
@@ -672,7 +694,7 @@ function tampilkan_data_variabel($nama_tabel, $nama_field, $nama_judul, $filter,
 	//echo "<br>".$sql."<br>";
 	
 	$no=0;
-	while($h=mysql_fetch_row($query)) 
+	while($query && ($h=mysqli_fetch_row($query)))
 	{
 		$no++;
 		//foreach($h as $key=>$value) {$$key=$value;}  
@@ -888,13 +910,26 @@ function cleanHtmlTag($text){
 
 		return $text;
 	}		 
+function normalisasi_penanda_variabel_dokumen($isi_dokumen)
+{
+	$isi_dokumen=(string) $isi_dokumen;
+	$hasil=preg_replace_callback('/#([^#]{0,1200})#/s',function($match){
+		$teks=$match[1];
+		$teks=preg_replace('/\\\\\'[0-9a-fA-F]{2}/','',$teks);
+		$teks=preg_replace('/\\\\[a-zA-Z]+-?\\d* ?/','',$teks);
+		$teks=str_replace(array('{','}','\\',"\r","\n","\t",' '),'',$teks);
+		return preg_match('/^[0-9]+$/',$teks) ? '#'.$teks.'#' : $match[0];
+	},$isi_dokumen);
+	return $hasil === null ? $isi_dokumen : $hasil;
+}
+
 function variabel_dokumen($isi_dokumen)
-{ 
-	$matches = array(); 
-	$pattern = "/#([0-9]*)#/";  
-	preg_match_all($pattern, $isi_dokumen, $matches); 
+{
+	$matches=array();
+	$isi_dokumen=normalisasi_penanda_variabel_dokumen($isi_dokumen);
+	preg_match_all('/#([0-9]+)#/',$isi_dokumen,$matches);
 	$variabel_unik=array_unique($matches[1]);
-	return array_merge($variabel_unik);
+	return array_values($variabel_unik);
 }
 function  getBulanFull($bln){
 	    switch  ($bln){
@@ -1083,6 +1118,105 @@ function  getBulanFull($bln){
 		}  
 	} 
 
+function kasuari_sql_split_arguments($arguments)
+{
+	$parts=array();
+	$start=0;
+	$depth=0;
+	$quote='';
+	$length=strlen($arguments);
+	for ($i=0; $i<$length; $i++) {
+		$char=$arguments[$i];
+		if ($quote !== '') {
+			if ($char === $quote && ($i === 0 || $arguments[$i-1] !== '\\')) {
+				$quote='';
+			}
+			continue;
+		}
+		if ($char === "'" || $char === '"' || $char === '`') {
+			$quote=$char;
+		} elseif ($char === '(') {
+			$depth++;
+		} elseif ($char === ')') {
+			$depth--;
+		} elseif ($char === ',' && $depth === 0) {
+			$parts[]=trim(substr($arguments,$start,$i-$start));
+			$start=$i+1;
+		}
+	}
+	$parts[]=trim(substr($arguments,$start));
+	return $parts;
+}
+
+function kasuari_sql_replace_function($sql, $functionName, $builder)
+{
+	$offset=0;
+	$pattern='/\\b'.preg_quote($functionName,'/').'\\s*\\(/i';
+	while (preg_match($pattern,$sql,$match,PREG_OFFSET_CAPTURE,$offset)) {
+		$start=$match[0][1];
+		$open=$start+strlen($match[0][0])-1;
+		$depth=1;
+		$quote='';
+		$close=-1;
+		$length=strlen($sql);
+		for ($i=$open+1; $i<$length; $i++) {
+			$char=$sql[$i];
+			if ($quote !== '') {
+				if ($char === $quote && $sql[$i-1] !== '\\') {
+					$quote='';
+				}
+				continue;
+			}
+			if ($char === "'" || $char === '"' || $char === '`') {
+				$quote=$char;
+			} elseif ($char === '(') {
+				$depth++;
+			} elseif ($char === ')') {
+				$depth--;
+				if ($depth === 0) {
+					$close=$i;
+					break;
+				}
+			}
+		}
+		if ($close < 0) {
+			break;
+		}
+		$arguments=substr($sql,$open+1,$close-$open-1);
+		$replacement=call_user_func($builder,kasuari_sql_split_arguments($arguments));
+		if (!is_string($replacement) || $replacement === '') {
+			$offset=$close+1;
+			continue;
+		}
+		$sql=substr($sql,0,$start).$replacement.substr($sql,$close+1);
+		$offset=$start+strlen($replacement);
+	}
+	return $sql;
+}
+
+function kasuari_normalisasi_sql_variabel($sql)
+{
+	$bulan="'Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'";
+	$romawi="'I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'";
+	$hari="'Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'";
+
+	$sql=kasuari_sql_replace_function($sql,'get_umur',function($args){
+		return count($args) === 2 ? 'TIMESTAMPDIFF(YEAR,('.$args[0].'),('.$args[1].'))' : '';
+	});
+	$sql=kasuari_sql_replace_function($sql,'bulan_romawi',function($args) use ($romawi){
+		return count($args) === 1 ? 'ELT(CAST(('.$args[0].') AS UNSIGNED),'.$romawi.')' : '';
+	});
+	$sql=kasuari_sql_replace_function($sql,'nama_hari',function($args) use ($hari){
+		return count($args) === 1 ? 'ELT(DAYOFWEEK('.$args[0].'),'.$hari.')' : '';
+	});
+	$sql=kasuari_sql_replace_function($sql,'convert_tanggal_indonesia',function($args) use ($bulan){
+		if (count($args) !== 1) return '';
+		$arg=$args[0];
+		return "CASE WHEN ($arg) IS NULL THEN '' ELSE CONCAT(DAY($arg),' ',ELT(MONTH($arg),$bulan),' ',YEAR($arg)) END";
+	});
+	return $sql;
+}
+
 function isi_variabel($variabelnya, $perkara_id, $pn_id, $var_model, $var_sumber_sipp, $var_sql_data, $var_tabel, $var_field, $var_cek_sidang, $var_fungsi_nama,$sebutan_pihak1,$sebutan_pihak2,$gugatan_permohonan,$var_keterangan,$koneksi){	
 	$isi="";
 	$sql_isi="";
@@ -1091,6 +1225,7 @@ function isi_variabel($variabelnya, $perkara_id, $pn_id, $var_model, $var_sumber
 		//	echo "<br>".$sql_isi ."<br>";
 			$sql_isi=str_replace('#perkara_id#',$perkara_id,$sql_isi); 
 			$sql_isi=str_replace('#pn_id#',$pn_id,$sql_isi); 
+			$sql_isi=kasuari_normalisasi_sql_variabel($sql_isi);
 		//	$sql_isi=str_replace()
 	}else
 	if(!empty($var_tabel) AND $var_tabel=="data_teks" ){

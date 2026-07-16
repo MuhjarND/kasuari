@@ -3,7 +3,14 @@ include_once("sys/sys_session.php");
 $nama_halaman = "Register Perkara Satker";
 include_once("sys/header.php");
 
-$totalPerkaraSatker = mysqli_num_rows(mysqli_query($koneksi, "SELECT id FROM perkara"));
+$totalPerkaraSatker = 0;
+$totalPerkaraSatkerResult = mysqli_query($koneksi, "SELECT COUNT(*) AS total FROM perkara");
+if ($totalPerkaraSatkerResult) {
+  $totalPerkaraSatkerRow = mysqli_fetch_assoc($totalPerkaraSatkerResult);
+  $totalPerkaraSatker = (int) ($totalPerkaraSatkerRow['total'] ?? 0);
+} else {
+  error_log('KASUARI register_perkara_satker count failed: ' . mysqli_error($koneksi));
+}
 $satkerOptions = array();
 $satkerQuery = mysqli_query($koneksi, "SELECT
   pengadilan_agama.id,
@@ -17,6 +24,8 @@ if ($satkerQuery) {
   while ($satkerRow = mysqli_fetch_assoc($satkerQuery)) {
     $satkerOptions[] = $satkerRow;
   }
+} else {
+  error_log('KASUARI register_perkara_satker filter failed: ' . mysqli_error($koneksi));
 }
 
 function satker_status_class($text) {
@@ -98,11 +107,11 @@ function satker_type_class($text) {
                       perkara.id,
                       perkara.nomor_perkara,
                       perkara.jenis_perkara_nama,
-                      convert_tanggal_indonesia(perkara.tanggal_pendaftaran) AS tanggalpendaftaran,
+                      perkara.tanggal_pendaftaran AS tanggalpendaftaran,
                       perkara.tahapan_terakhir_text,
                       perkara.proses_terakhir_text,
                       pengadilan_agama.nama AS pengaju,
-                      convert_tanggal_indonesia(putusan.tanggal_putusan) AS tanggalputusan
+                      putusan.tanggal_putusan AS tanggalputusan
                     FROM perkara
                     LEFT JOIN pengadilan_agama ON pengadilan_agama.id = perkara.pn_id
                     LEFT JOIN (
@@ -114,7 +123,11 @@ function satker_type_class($text) {
                     LIMIT 25";
             $query = mysqli_query($koneksi, $sql);
             $no = 0;
-            while ($data = mysqli_fetch_assoc($query)) {
+            if (!$query) {
+              error_log('KASUARI register_perkara_satker list failed: ' . mysqli_error($koneksi));
+              echo "<tr><td class='kasuari-empty-state' colspan='9'>Data perkara satker belum dapat dimuat. Periksa struktur database server.</td></tr>";
+            }
+            while ($query && ($data = mysqli_fetch_assoc($query))) {
               $no++;
               $nomorPerkara = htmlspecialchars($data["nomor_perkara"] ?? "", ENT_QUOTES, 'UTF-8');
               $satker = htmlspecialchars(str_replace("PENGADILAN AGAMA", "PA", $data["pengaju"] ?? ""), ENT_QUOTES, 'UTF-8');
@@ -129,14 +142,14 @@ function satker_type_class($text) {
               echo "<td><a class='ks-case-ref' href='perkara_detil_satker&id=" . (int) $data["id"] . "'><span>" . $nomorPerkara . "</span></a></td>";
               echo "<td><span class='ks-satker-badge'>" . $satker . "</span></td>";
               echo "<td><span class='ks-type-badge " . $typeClass . "'>" . $jenis . "</span></td>";
-              echo "<td><span class='ks-date-chip'>" . htmlspecialchars($data["tanggalpendaftaran"] ?? "", ENT_QUOTES, 'UTF-8') . "</span></td>";
-              echo "<td><span class='ks-date-chip muted'>" . htmlspecialchars($data["tanggalputusan"] ?? "-", ENT_QUOTES, 'UTF-8') . "</span></td>";
+              echo "<td><span class='ks-date-chip'>" . htmlspecialchars(kasuari_tanggal_indonesia($data["tanggalpendaftaran"] ?? ""), ENT_QUOTES, 'UTF-8') . "</span></td>";
+              echo "<td><span class='ks-date-chip muted'>" . htmlspecialchars(kasuari_tanggal_indonesia($data["tanggalputusan"] ?? ""), ENT_QUOTES, 'UTF-8') . "</span></td>";
               echo "<td><span class='ks-status-pill " . $stageClass . "'>" . $tahapan . "</span></td>";
               echo "<td><span class='ks-status-pill " . $processClass . "'>" . $proses . "</span></td>";
               echo "<td><a class='kasuari-action-link ks-view-action' href='perkara_detil_satker&id=" . (int) $data["id"] . "' title='Lihat detail perkara' aria-label='Lihat detail perkara'><i class='bi bi-eye' aria-hidden='true'></i></a></td>";
               echo "</tr>";
             }
-            if ($no == 0) {
+            if ($query && $no == 0) {
               echo "<tr><td class='kasuari-empty-state' colspan='9'>Tidak ada data perkara satker.</td></tr>";
             }
             ?>

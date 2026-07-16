@@ -14,8 +14,8 @@ date_default_timezone_set("Asia/Jakarta");
     $sql = "SELECT 
           perkara_banding.id,
           perkara_banding.nomor_perkara_pn,
-          convert_tanggal_indonesia(perkara_banding.permohonan_banding) as tanggalpermohonanbanding,
-          convert_tanggal_indonesia(perkara_banding.putusan_pn) as tanggalputusan,
+          perkara_banding.permohonan_banding AS tanggalpermohonanbanding,
+          perkara_banding.putusan_pn AS tanggalputusan,
           perkara_banding.status_banding_text,
           pengadilan_agama.nama AS pengaju,
           DATEDIFF(CURDATE(),perkara_banding.permohonan_banding) AS selisih
@@ -27,8 +27,11 @@ date_default_timezone_set("Asia/Jakarta");
          AND perkara_banding.nomor_perkara_banding=''
         ORDER BY pengadilan_agama.nama ASC, perkara_banding.permohonan_banding ASC, pengadilan_agama.nama ASC";
     $query=mysqli_query($koneksi,$sql);
+    if (!$query) {
+      error_log('KASUARI register_perkara_belum_dikirim export failed: ' . mysqli_error($koneksi));
+    }
     $rtf=file_get_contents("template/perkara_belum_dikirim.rtf");
-      $tabelnya.='\trowd
+      $tabelnya='\trowd
 \clbrdrt\brdrs\clbrdrl\brdrs\clbrdrb\brdrs\clbrdrr\brdrs
 \cellx500
 \clbrdrt\brdrs\clbrdrl\brdrs\clbrdrb\brdrs\clbrdrr\brdrs
@@ -46,8 +49,9 @@ Permohonan Banding\intbl\cell\rin57\lin57
 Lama\intbl\cell 
 \row';
     $no=0;
-    while($data=mysqli_fetch_assoc($query)){
+    while($query && ($data=mysqli_fetch_assoc($query))){
       $no++;
+      $data["tanggalpermohonanbanding"] = kasuari_tanggal_indonesia($data["tanggalpermohonanbanding"] ?? '');
       $tabelnya.='\trowd
 \clbrdrt\brdrs\clbrdrl\brdrs\clbrdrb\brdrs\clbrdrr\brdrs
 \cellx500
@@ -105,8 +109,8 @@ $table='<div class="w3-responsive"><table class="w3-table-all w3-border" id="dat
 $sql = "SELECT 
           perkara_banding.id,
           perkara_banding.nomor_perkara_pn,
-          convert_tanggal_indonesia(perkara_banding.permohonan_banding) as tanggalpermohonanbanding,
-          convert_tanggal_indonesia(perkara_banding.putusan_pn) as tanggalputusan,
+          perkara_banding.permohonan_banding AS tanggalpermohonanbanding,
+          perkara_banding.putusan_pn AS tanggalputusan,
           perkara_banding.status_banding_text,
           pengadilan_agama.nama AS pengaju,
           DATEDIFF(CURDATE(),perkara_banding.permohonan_banding) AS selisih
@@ -118,8 +122,14 @@ $sql = "SELECT
         ORDER BY perkara_banding.permohonan_banding ASC, pengadilan_agama.nama ASC";
 $query=mysqli_query($koneksi,$sql);
 $no=0;
-while($data=mysqli_fetch_assoc($query)){
+if (!$query) {
+  error_log('KASUARI register_perkara_belum_dikirim list failed: ' . mysqli_error($koneksi));
+  $table.='<tr><td class="w3-center w3-text-red" colspan="8">Data belum dapat dimuat. Periksa struktur database server.</td></tr>';
+}
+while($query && ($data=mysqli_fetch_assoc($query))){
   $no++;
+  $data["tanggalpermohonanbanding"] = kasuari_tanggal_indonesia($data["tanggalpermohonanbanding"] ?? '');
+  $data["tanggalputusan"] = kasuari_tanggal_indonesia($data["tanggalputusan"] ?? '');
   $table.='<tr>
   <td class="w3-center">'.$no.'</td>
   <td class="w3-left-align">'.str_replace("PENGADILAN AGAMA", "PA", $data["pengaju"]).'</td>
@@ -131,7 +141,7 @@ while($data=mysqli_fetch_assoc($query)){
   <td class="w3-center"><a href="perkara_detil_banding&id='.$data["id"].'" title="Detail Perkara">Link</a></td>
   </tr>';
 }
-if($no==0){
+if($query && $no==0){
   $table.='<tr><td class="w3-center w3-text-red" colspan="8">Tidak ada Data</td></tr>';
 }
 $table.="</tbody></table><br><br></div>";
@@ -149,4 +159,3 @@ echo "$table";
   }
 </script>
 <?php include_once("sys/sys_footer.php");?>
-

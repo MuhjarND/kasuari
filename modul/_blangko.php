@@ -1,8 +1,6 @@
 <?php
 include_once("sys/sys_session.php");
 //error_reporting(E_ALL | E_STRICT);
-ini_set('display_errors', true); 
-ini_set('display_startup_errors', true);
 $nama_halaman="Cetak Dokumen";
 include "sys/sys_header.php";
 include "sys/sys_fungsi_doc.php";
@@ -13,8 +11,31 @@ include "sys/sys_fungsi_doc.php";
 <script src="assets/plugins/pikaday/pikaday.js"></script>
 <div class="w3-container">
 <?php
-$template_id=$_GET['blangko_id'];
-$id_banding=$_GET['id_banding'];
+$template_id=isset($_GET['blangko_id']) ? (int) $_GET['blangko_id'] : 0;
+$id_banding=isset($_GET['id_banding']) ? (int) $_GET['id_banding'] : 0;
+$perkara_id=0;
+$pn_id=0;
+$kode_dokumen='';
+
+function blangko_gagal($pesan, $detail='')
+{
+	if ($detail !== '') {
+		error_log($detail);
+	}
+	echo "<div class='w3-panel w3-pale-red w3-leftbar w3-border-red'><p>".
+		htmlspecialchars($pesan, ENT_QUOTES, 'UTF-8')."</p></div>";
+	include_once("sys/sys_footer.php");
+	exit;
+}
+
+function blangko_teks($nilai)
+{
+	return htmlspecialchars(stripslashes((string) $nilai), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+}
+
+if ($template_id <= 0 || $id_banding <= 0) {
+	blangko_gagal('Data perkara atau template dokumen tidak valid.');
+}
 //cek GET
 
 
@@ -24,25 +45,45 @@ $id_banding=$_GET['id_banding'];
 <?php 
 //tanya jawab awal
 //SEBUTAN PIHAK DAN SURAT
-$sql_info="SELECT perkara_id, pn_id FROM perkara_banding WHERE id=".$id_banding;
-$quer_info=mysqli_query($koneksi,$sql_info); while($perkara_info=mysqli_fetch_assoc($quer_info)){
-	foreach($perkara_info as $key=>$value) {$$key=$value;}	
+$sql_info="SELECT perkara_id, pn_id FROM perkara_banding WHERE id=".$id_banding." LIMIT 1";
+$quer_info=mysqli_query($koneksi,$sql_info);
+if ($quer_info === false) {
+	blangko_gagal('Data perkara tidak dapat dibaca.', 'Gagal membaca perkara untuk blangko: '.mysqli_error($koneksi));
 }
+$perkara_info=mysqli_fetch_assoc($quer_info);
+if (!$perkara_info) {
+	blangko_gagal('Perkara banding tidak ditemukan.');
+}
+$perkara_id=(int) $perkara_info['perkara_id'];
+$pn_id=(int) $perkara_info['pn_id'];
 //SEBUTAN PIHAK DAN SURAT	
 
 
 //TEMPLATE YANG DIGUNAKAN 
-$sql_dokumen="SELECT kode FROM template_dokumen WHERE id=".$template_id;
+$sql_dokumen="SELECT kode FROM template_dokumen WHERE id=".$template_id." LIMIT 1";
 //echo "$sql_dokumen";
 $rtf="";
 $query_template=mysqli_query($koneksi,$sql_dokumen);
-while($template_info=mysqli_fetch_assoc($query_template)) {
-	$kode_dokumen=$template_info["kode"].".rtf";
+if ($query_template === false) {
+	blangko_gagal('Template dokumen tidak dapat dibaca.', 'Gagal membaca template dokumen: '.mysqli_error($koneksi));
 }
+$template_info=mysqli_fetch_assoc($query_template);
+if (!$template_info || trim((string) $template_info['kode']) === '') {
+	blangko_gagal('Template dokumen tidak ditemukan.');
+}
+$kode_dokumen=basename((string) $template_info['kode']).".rtf";
 //TEMPLATE YANG DIGUNAKAN 
 
 //BUKA TEMPLATE 
-$rtf=file_get_contents("template/".$kode_dokumen);
+$lokasi_template="template/".$kode_dokumen;
+if (!is_file($lokasi_template) || !is_readable($lokasi_template)) {
+	blangko_gagal('Berkas template belum tersedia. Hubungi administrator.', 'Template tidak ditemukan: '.$lokasi_template);
+}
+$rtf=file_get_contents($lokasi_template);
+if ($rtf === false) {
+	blangko_gagal('Berkas template tidak dapat dibuka. Hubungi administrator.', 'Gagal membaca template: '.$lokasi_template);
+}
+$rtf=normalisasi_penanda_variabel_dokumen($rtf);
 $variabel = variabel_dokumen($rtf);
 $jml_variabel= count($variabel);$no=0;
 //echo $jml_variabel."<br>"; 
@@ -52,7 +93,7 @@ echo "<form name='frm_cetak' id='frm_cetak' action='_dokumen_cetak' method=POST>
 echo "<input type='hidden' name='template_id' value='".$template_id."'>";
 echo "<input type='hidden' name='perkara_id' id='perkara_id' value='".$perkara_id."'>";
 echo "<input type='hidden' name='pn_id' id='pn_id' value='".$pn_id."'>";
-echo "<center><b>File Blangko : ".$kode_dokumen."</b></center>";
+echo "<center><b>File Blangko : ".blangko_teks($kode_dokumen)."</b></center>";
 echo "<table class='w3-table-all' align=center><tr><th>Keterangan</th><th>Data</th></tr>";
 for ($variabel_posisi = 0; $variabel_posisi < $jml_variabel; $variabel_posisi++){
 	$no++; 
@@ -60,6 +101,11 @@ for ($variabel_posisi = 0; $variabel_posisi < $jml_variabel; $variabel_posisi++)
 	$sql="select * from master_variabel where var_nomor='$variabelnya'";
  	//echo "----".$sql."----<br>";
 	$query=mysqli_query($koneksi,$sql);
+	if ($query === false) {
+		error_log('Gagal membaca master variabel '.$variabelnya.': '.mysqli_error($koneksi));
+		echo "<tr><td colspan='2' class='w3-text-red'>Data variabel tidak dapat dibaca.</td></tr>";
+		continue;
+	}
 	
 	/////JIKA BELUM ADA VARIABEL
 	if(mysqli_num_rows($query)==0){ 
@@ -69,6 +115,7 @@ for ($variabel_posisi = 0; $variabel_posisi < $jml_variabel; $variabel_posisi++)
 	
 while($h_info=mysqli_fetch_assoc($query)){ 
 	$var_keterangan=$h_info["var_keterangan"];
+	$fungsi='';
 	//$var_keterangan=str_replace("#0046#",$sebutan_pihak1,$var_keterangan);
 	//$var_keterangan=str_replace("#0047#",$sebutan_pihak2,$var_keterangan); 
 	//$var_keterangan=str_replace("#0053#",$gugatan_permohonan,$var_keterangan); 
@@ -92,7 +139,7 @@ while($h_info=mysqli_fetch_assoc($query)){
 		
 		//echo "<br> Variabel ".$variabelnya. " Data ".mysqli_num_rows
 		if($isi==""){
-			$default_data=$h_info["var_default_data"];
+			$default_data=isset($h_info["var_default_data"]) ? (string) $h_info["var_default_data"] : '';
 			
 			$variabel_default_data = variabel_dokumen($default_data);
 			$jml_variabel_default_data= count($variabel_default_data);$no_default_data=0;
@@ -102,6 +149,10 @@ while($h_info=mysqli_fetch_assoc($query)){
 				$sql_default_data="select * from master_variabel where var_nomor='$variabelnya_default_data'";
 				//echo "----".$sql."----<br>";
 				$query_default_data=mysqli_query($koneksi,$sql_default_data);
+				if ($query_default_data === false) {
+					error_log('Gagal membaca variabel default '.$variabelnya_default_data.': '.mysqli_error($koneksi));
+					continue;
+				}
 				 
 				/////JIKA BELUM ADA VARIABEL
 				 
@@ -130,10 +181,10 @@ while($h_info=mysqli_fetch_assoc($query)){
 		 if(!empty($h_info["var_tabel"])){$fungsi="onchange=edit_isi('".$variabelnya."',this.value)";}
 		 
 
-		echo "<tr><td valign='top' style='width:250px'>".@$var_keterangan."</td><td valign='top'>";
+		echo "<tr><td valign='top' style='width:250px'>".blangko_teks($var_keterangan)."</td><td valign='top'>";
 		
 		if($h_info["var_jenis"]=='textarea'){
-			$tinggi=strlen($isi)/60;
+			$tinggi=max(3,min(18,(int) ceil(strlen((string) $isi)/60)));
 			/////////////////////AMAR
 			if($h_info["var_nomor"]=='0065'){
 				$tinggi=10;
@@ -155,19 +206,19 @@ while($h_info=mysqli_fetch_assoc($query)){
 				}
 			</script>
 			<br>
-			<textarea <?php echo @$fungsi?> style="min-height:50px" class="w3-input w3-border" rows="<?php echo $tinggi?>" id="<?php echo $h_info['var_nomor']?>" name="<?php echo $h_info['var_nomor']?>"><?php echo stripslashes(str_replace(";;",";",$isi))?></textarea>
+			<textarea <?php echo $fungsi?> style="min-height:50px" class="w3-input w3-border" rows="<?php echo $tinggi?>" id="<?php echo $h_info['var_nomor']?>" name="<?php echo $h_info['var_nomor']?>"><?php echo blangko_teks(str_replace(";;",";",$isi))?></textarea>
 			<?php
 			/////////////////////AMAR
 			}else{
 			$fungsi="onchange=edit_isi('".$variabelnya."',this.value)";
 			//$tinggi=6;
-			?><textarea <?php echo @$fungsi?>  class="w3-input w3-border"  style="min-height:50px" rows="<?php echo $tinggi?>" id="<?php echo $h_info['var_nomor']?>" name="<?php echo $h_info['var_nomor']?>"><?php echo stripslashes(str_replace(";;",";",$isi))?></textarea>
+			?><textarea <?php echo $fungsi?>  class="w3-input w3-border"  style="min-height:50px" rows="<?php echo $tinggi?>" id="<?php echo $h_info['var_nomor']?>" name="<?php echo $h_info['var_nomor']?>"><?php echo blangko_teks(str_replace(";;",";",$isi))?></textarea>
 			<?php
 			}
 		}else
 		if($h_info["var_fungsi_nama"]=="tanggal_indonesia"){	
 			$fungsi="onBlur=edit_isi('".$variabelnya."',this.value)";	
-			?><input <?php echo @$fungsi?> class="w3-input w3-border" id="<?php echo $h_info['var_nomor']?>" name="<?php echo $h_info['var_nomor']?>" value="<?php echo stripslashes($isi)?>">
+			?><input <?php echo $fungsi?> class="w3-input w3-border" id="<?php echo $h_info['var_nomor']?>" name="<?php echo $h_info['var_nomor']?>" value="<?php echo blangko_teks($isi)?>">
 			 <script> 
 				 var picker_<?php echo $h_info['var_nomor']?> = new Pikaday({
 					field: document.getElementById('<?php echo $h_info['var_nomor']?>'),
@@ -189,12 +240,18 @@ while($h_info=mysqli_fetch_assoc($query)){
 		<?php 
 		}else{
 			$fungsi="onchange=edit_isi('".$variabelnya."',this.value)";
-			?><input <?php echo @$fungsi?> class="w3-input w3-border" id="<?php echo $h_info['var_nomor']?>" name="<?php echo $h_info['var_nomor']?>" value="<?php echo stripslashes($isi)?>">
+			?><input <?php echo $fungsi?> class="w3-input w3-border" id="<?php echo $h_info['var_nomor']?>" name="<?php echo $h_info['var_nomor']?>" value="<?php echo blangko_teks($isi)?>">
 			 <?php 
 			  
 		}
 		//jenis_inputan
 		echo "</td></tr>";	
+	} else {
+		$isi=isset($h_info["var_default_data"]) ? (string) $h_info["var_default_data"] : '';
+		$fungsi="onchange=edit_isi('".$variabelnya."',this.value)";
+		echo "<tr><td valign='top' style='width:250px'>".blangko_teks($var_keterangan)."</td><td valign='top'>";
+		echo "<textarea ".$fungsi." class='w3-input w3-border' style='min-height:120px' rows='6' id='".blangko_teks($variabelnya)."' name='".blangko_teks($variabelnya)."'>".blangko_teks($isi)."</textarea>";
+		echo "</td></tr>";
 	}
 }
 	  
@@ -292,4 +349,3 @@ function edit_isi(var_nomor, isi){
 </script>
 </div>
 <?php include_once("sys/sys_footer.php");?>
-

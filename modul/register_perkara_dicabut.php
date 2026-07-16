@@ -23,8 +23,8 @@ $table='<div class="w3-responsive"><table class="w3-table-all w3-border" id="dat
 $sql = "SELECT 
           perkara_banding.id,
           perkara_banding.nomor_perkara_pn,
-          convert_tanggal_indonesia(perkara_banding.permohonan_banding) as tanggalpermohonanbanding,
-          convert_tanggal_indonesia(perkara_banding.tanggal_cabut) as tanggalcabut,
+          perkara_banding.permohonan_banding AS tanggalpermohonanbanding,
+          perkara_banding.tanggal_cabut AS tanggalcabut,
           perkara_banding.status_banding_text,
           pengadilan_agama.nama AS pengaju,
           DATEDIFF(CURDATE(),perkara_banding.permohonan_banding) AS selisih
@@ -34,8 +34,14 @@ $sql = "SELECT
         ORDER BY perkara_banding.tanggal_cabut DESC, pengadilan_agama.nama ASC";
 $query=mysqli_query($koneksi,$sql);
 $no=0;
-while($data=mysqli_fetch_assoc($query)){
+if (!$query) {
+  error_log('KASUARI register_perkara_dicabut list failed: ' . mysqli_error($koneksi));
+  $table.='<tr><td class="w3-center w3-text-red" colspan="7">Data belum dapat dimuat. Periksa struktur database server.</td></tr>';
+}
+while($query && ($data=mysqli_fetch_assoc($query))){
   $no++;
+  $data["tanggalpermohonanbanding"] = kasuari_tanggal_indonesia($data["tanggalpermohonanbanding"] ?? '');
+  $data["tanggalcabut"] = kasuari_tanggal_indonesia($data["tanggalcabut"] ?? '');
   $table.='<tr>
   <td class="w3-center">'.$no.'</td>
   <td class="w3-left-align">'.str_replace("PENGADILAN AGAMA", "PA", $data["pengaju"]).'</td>
@@ -47,7 +53,7 @@ while($data=mysqli_fetch_assoc($query)){
   <td class="w3-center"><a href="perkara_detil_banding&id='.$data["id"].'" title="Detail Perkara">Link</a></td>
   </tr>';
 }
-if($no==0){
+if($query && $no==0){
   $table.='<tr><td class="w3-center w3-text-red" colspan="8">Tidak ada Data</td></tr>';
 }
 $table.="</tbody></table><br><br></div>";
@@ -65,4 +71,3 @@ echo "$table";
   }
 </script>
 <?php include_once("sys/sys_footer.php");?>
-

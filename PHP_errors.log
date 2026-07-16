@@ -679,3 +679,33 @@ Stack trace:
 [14-Jul-2026 15:18:28 Asia/Jayapura] Kasuari sync [431] gagal pada perkara satker: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near '' at line 1
 [14-Jul-2026 16:41:37 Asia/Jayapura] Kasuari sync [431] gagal pada perkara satker: Data too long for column 'posita' at row 2
 [14-Jul-2026 19:40:32 Asia/Jayapura] Kasuari sync gagal pada perkara satker: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ') ON DUPLICATE KEY UPDATE perkara_id=VALUES(perkara_id)' at line 1
+[16-Jul-2026 11:23:56 Asia/Jakarta] PHP Warning:  mysqli_fetch_assoc() expects parameter 1 to be mysqli_result, bool given in C:\xampp\htdocs\kasuari\modul\register_perkara_belum_dikirim.php on line 121
+[16-Jul-2026 11:24:02 Asia/Jakarta] PHP Warning:  mysqli_fetch_assoc() expects parameter 1 to be mysqli_result, bool given in C:\xampp\htdocs\kasuari\modul\register_perkara_satker.php on line 117
+[16-Jul-2026 11:24:07 Asia/Jakarta] PHP Warning:  mysqli_fetch_assoc() expects parameter 1 to be mysqli_result, bool given in C:\xampp\htdocs\kasuari\modul\perkara_detil_banding.php on line 35
+[16-Jul-2026 11:24:07 Asia/Jakarta] PHP Notice:  Undefined variable: nomor_perkara_banding in C:\xampp\htdocs\kasuari\modul\perkara_detil_banding.php on line 77
+[16-Jul-2026 11:24:07 Asia/Jakarta] PHP Notice:  Undefined variable: tanggalpendaftaranbanding in C:\xampp\htdocs\kasuari\modul\perkara_detil_banding.php on line 80
+[16-Jul-2026 11:24:07 Asia/Jakarta] PHP Notice:  Undefined variable: pengaju in C:\xampp\htdocs\kasuari\modul\perkara_detil_banding.php on line 91
+[16-Jul-2026 11:24:07 Asia/Jakarta] PHP Notice:  Undefined variable: nomor_perkara_pn in C:\xampp\htdocs\kasuari\modul\perkara_detil_banding.php on line 93
+[16-Jul-2026 11:24:07 Asia/Jakarta] PHP Notice:  Undefined variable: jenis_perkara_nama in C:\xampp\htdocs\kasuari\modul\perkara_detil_banding.php on line 95
+[16-Jul-2026 11:24:07 Asia/Jakarta] PHP Notice:  Undefined variable: putusanpn in C:\xampp\htdocs\kasuari\modul\perkara_detil_banding.php on line 97
+[16-Jul-2026 11:24:07 Asia/Jakarta] PHP Notice:  Undefined variable: status_banding_text in C:\xampp\htdocs\kasuari\modul\perkara_detil_banding.php on line 111
+[16-Jul-2026 11:24:07 Asia/Jakarta] PHP Notice:  Undefined variable: majelis_hakim_banding in C:\xampp\htdocs\kasuari\modul\perkara_detil_banding.php on line 129
+[16-Jul-2026 11:24:07 Asia/Jakarta] PHP Notice:  Undefined variable: panitera_pengganti_banding in C:\xampp\htdocs\kasuari\modul\perkara_detil_banding.php on line 130
+[16-Jul-2026 11:24:07 Asia/Jakarta] PHP Notice:  Undefined variable: penerimaan_memori_banding in C:\xampp\htdocs\kasuari\modul\perkara_detil_banding.php on line 152
+[16-Jul-2026 11:24:07 Asia/Jakarta] PHP Notice:  Undefined variable: penerimaan_kontra_banding in C:\xampp\htdocs\kasuari\modul\perkara_detil_banding.php on line 159
+[16-Jul-2026 11:24:07 Asia/Jakarta] PHP Notice:  Undefined variable: pelaksanaan_inzage in C:\xampp\htdocs\kasuari\modul\perkara_detil_banding.php on line 166
+[16-Jul-2026 11:24:07 Asia/Jakarta] PHP Notice:  Undefined variable: pelaksanaan_inzage_terbanding in C:\xampp\htdocs\kasuari\modul\perkara_detil_banding.php on line 173
+[16-Jul-2026 11:24:07 Asia/Jakarta] PHP Notice:  Undefined variable: perkara_id in C:\xampp\htdocs\kasuari\modul\perkara_detil_banding.php on line 200
+[16-Jul-2026 11:24:07 Asia/Jakarta] PHP Notice:  Undefined variable: pn_id in C:\xampp\htdocs\kasuari\modul\perkara_detil_banding.php on line 200
+[16-Jul-2026 11:24:07 Asia/Jakarta] PHP Warning:  mysqli_fetch_assoc() expects parameter 1 to be mysqli_result, bool given in C:\xampp\htdocs\kasuari\modul\perkara_detil_banding.php on line 203
+[16-Jul-2026 11:24:07 Asia/Jakarta] PHP Notice:  Undefined variable: nomor_perkara_banding in C:\xampp\htdocs\kasuari\modul\perkara_detil_banding.php on line 267
+[16-Jul-2026 11:34:51 Asia/Jakarta] Kasuari gagal mengisi variabel #9800#: FUNCTION dok_banding.bulan_romawi does not exist
+[16-Jul-2026 11:34:51 Asia/Jakarta] Kasuari gagal mengisi variabel #9810#: FUNCTION dok_banding.convert_tanggal_indonesia does not exist
+[16-Jul-2026 11:34:51 Asia/Jakarta] Kasuari gagal mengisi variabel #9801#: FUNCTION dok_banding.bulan_romawi does not exist
+[16-Jul-2026 11:34:51 Asia/Jakarta] Kasuari gagal mengisi variabel #9811#: FUNCTION dok_banding.convert_tanggal_indonesia does not exist
+[16-Jul-2026 11:34:51 Asia/Jakarta] Kasuari gagal mengisi variabel #0029#: FUNCTION dok_banding.nama_hari does not exist
+[16-Jul-2026 11:36:11 Asia/Jakarta] Kasuari gagal mengisi variabel #9800#: FUNCTION dok_banding.bulan_romawi does not exist
+[16-Jul-2026 11:36:11 Asia/Jakarta] Kasuari gagal mengisi variabel #9810#: FUNCTION dok_banding.convert_tanggal_indonesia does not exist
+[16-Jul-2026 11:36:11 Asia/Jakarta] Kasuari gagal mengisi variabel #9801#: FUNCTION dok_banding.bulan_romawi does not exist
+[16-Jul-2026 11:36:11 Asia/Jakarta] Kasuari gagal mengisi variabel #9811#: FUNCTION dok_banding.convert_tanggal_indonesia does not exist
+[16-Jul-2026 11:36:11 Asia/Jakarta] Kasuari gagal mengisi variabel #0029#: FUNCTION dok_banding.nama_hari does not exist

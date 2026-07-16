@@ -74,18 +74,24 @@ include_once("sys/header.php");
           perkara_banding.id,
           perkara_banding.nomor_perkara_banding,
           perkara_banding.nomor_perkara_pn,
-          convert_tanggal_indonesia(perkara_banding.tanggal_pendaftaran_banding) as tanggalpendaftaranbanding,
-          convert_tanggal_indonesia(perkara_banding.putusan_banding) AS putusanbanding,
+          perkara_banding.tanggal_pendaftaran_banding AS tanggalpendaftaranbanding,
+          perkara_banding.putusan_banding AS putusanbanding,
           perkara_banding.status_banding_text,
           pengadilan_agama.nama AS pengaju
         FROM perkara_banding
         LEFT JOIN pengadilan_agama ON pengadilan_agama.id =perkara_banding.pn_id 
         WHERE perkara_banding.tanggal_pendaftaran_banding IS NOT NULL 
-        ORDER BY perkara_banding.tanggal_pendaftaran_banding DESC, nomor_urut_register DESC LIMIT 25";
+        ORDER BY perkara_banding.tanggal_pendaftaran_banding DESC, perkara_banding.nomor_urut_register DESC LIMIT 25";
           $query = mysqli_query($koneksi, $sql);
           $no = 0;
-          while ($data = mysqli_fetch_assoc($query)) {
+          if (!$query) {
+            error_log('KASUARI legacy register perkara query failed: ' . mysqli_error($koneksi));
+            $table .= '<tr><td class="w3-center w3-text-red" colspan="8">Data belum dapat dimuat. Periksa struktur database server.</td></tr>';
+          }
+          while ($query && ($data = mysqli_fetch_assoc($query))) {
             $no++;
+            $data["tanggalpendaftaranbanding"] = kasuari_tanggal_indonesia($data["tanggalpendaftaranbanding"] ?? '');
+            $data["putusanbanding"] = kasuari_tanggal_indonesia($data["putusanbanding"] ?? '');
             $table .= '<tr>
   <td class="w3-center">' . $no . '</td>
   <td class="w3-left-align">' . $data["nomor_perkara_banding"] . '</td>
@@ -97,7 +103,7 @@ include_once("sys/header.php");
   <td class="w3-center"><a href="perkara_detil_banding&id=' . $data["id"] . '" title="Detail Perkara">Link</a></td>
   </tr>';
           }
-          if ($no == 0) {
+          if ($query && $no == 0) {
             $table .= '<tr><td class="w3-center w3-text-red" colspan="11">Tidak ada Data</td></tr>';
           }
           $table .= "</tbody></table></div>";
@@ -115,9 +121,19 @@ include_once("sys/header.php");
 
 
 <script type="text/javascript">
+  <?php
+  $legacyTotalBanding = 0;
+  $legacyTotalResult = mysqli_query($koneksi, "SELECT COUNT(*) AS total FROM perkara_banding WHERE tanggal_pendaftaran_banding IS NOT NULL");
+  if ($legacyTotalResult) {
+    $legacyTotalRow = mysqli_fetch_assoc($legacyTotalResult);
+    $legacyTotalBanding = (int) ($legacyTotalRow['total'] ?? 0);
+  } else {
+    error_log('KASUARI legacy register perkara count failed: ' . mysqli_error($koneksi));
+  }
+  ?>
   var table = new JSTable("#datane_result", {
     serverSide: true,
-    deferLoading: <?php echo mysqli_num_rows(mysqli_query($koneksi, "SELECT id FROM perkara_banding WHERE tanggal_pendaftaran_banding IS NOT NULL ")) ?>,
+    deferLoading: <?php echo $legacyTotalBanding; ?>,
     ajax: "register_perkara_data"
   });
 

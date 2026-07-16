@@ -54,7 +54,10 @@ function proses_date_int($koneksi){
 $sql = "SELECT * FROM pengadilan_agama WHERE aktif='Y'";
 $query=mysqli_query($koneksi,$sql);
 $no=0;
-while($data=mysqli_fetch_assoc($query)){
+if (!$query) {
+  error_log('KASUARI legacy banding sync query failed: '.mysqli_error($koneksi));
+}
+while($query && ($data=mysqli_fetch_assoc($query))){
   $no++;
   $url_api=$data["ip_satker"].'/api_monitoring/get_data_api';
   $pn_id=$data["id"];

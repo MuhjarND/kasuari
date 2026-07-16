@@ -27,7 +27,10 @@ include_once("sys/sys_session.php");
               <?php
                 $sqlquery=" SELECT * FROM jenis_blangko where jenis_blangko_parent_id=0 order by urutan asc, jenis_blangko_id asc "; 
                 $query=mysqli_query($koneksi,$sqlquery);
-                while($row=mysqli_fetch_assoc($query)){
+                if (!$query) {
+                  error_log('KASUARI blangko category query failed: ' . mysqli_error($koneksi));
+                }
+                while($query && ($row=mysqli_fetch_assoc($query))){
                   echo '<option value="'.$row["jenis_blangko_id"].'">'.$row["jenis_blangko_nama"].'</option>';
                 }
 
@@ -61,7 +64,10 @@ include_once("sys/sys_session.php");
               <?php
                 $sqlquery=" SELECT * FROM jenis_blangko where jenis_blangko_parent_id=0 order by urutan asc, jenis_blangko_id asc "; 
                 $query=mysqli_query($koneksi,$sqlquery);
-                while($row=mysqli_fetch_assoc($query)){
+                if (!$query) {
+                  error_log('KASUARI blangko edit category query failed: ' . mysqli_error($koneksi));
+                }
+                while($query && ($row=mysqli_fetch_assoc($query))){
                   echo '<option value="'.$row["jenis_blangko_id"].'">'.$row["jenis_blangko_nama"].'</option>';
                 }
 

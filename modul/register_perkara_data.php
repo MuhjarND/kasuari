@@ -1,19 +1,8 @@
 <?php
 include_once("sys/sys_session.php");
 include_once("sys/sys_koneksi.php");
+include_once("sys/sys_fungsi.php");
 header('Content-Type: application/json; charset=utf-8');
-
-function register_banding_data_date_label($value) {
-	$value = trim((string) $value);
-	if ($value === '' || strpos($value, '0000-00-00') === 0) return '-';
-
-	$timestamp = strtotime($value);
-	if ($timestamp === false) return $value;
-
-	$months = array(1 => 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-		'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember');
-	return date('j', $timestamp) . ' ' . $months[(int) date('n', $timestamp)] . ' ' . date('Y', $timestamp);
-}
 
 function register_banding_status_class($text) {
 	$text = strtolower(trim((string) $text));
@@ -106,8 +95,8 @@ while($row=mysqli_fetch_assoc($result)){
 	$sub_array[] = htmlspecialchars((string) ($row['nomor_perkara_banding'] ?? ''), ENT_QUOTES, 'UTF-8');
 	$sub_array[] = htmlspecialchars(str_replace("PENGADILAN AGAMA", "PA", (string) ($row["pengaju"] ?? '')), ENT_QUOTES, 'UTF-8');
 	$sub_array[] = htmlspecialchars((string) ($row['nomor_perkara_pn'] ?? ''), ENT_QUOTES, 'UTF-8');
-	$sub_array[] = htmlspecialchars(register_banding_data_date_label($row['tanggalpendaftaranbanding'] ?? ''), ENT_QUOTES, 'UTF-8');
-	$sub_array[] = htmlspecialchars(register_banding_data_date_label($row['putusanbanding'] ?? ''), ENT_QUOTES, 'UTF-8');
+	$sub_array[] = htmlspecialchars(kasuari_tanggal_indonesia($row['tanggalpendaftaranbanding'] ?? ''), ENT_QUOTES, 'UTF-8');
+	$sub_array[] = htmlspecialchars(kasuari_tanggal_indonesia($row['putusanbanding'] ?? ''), ENT_QUOTES, 'UTF-8');
 	$statusBanding = htmlspecialchars($row['status_banding_text'] ?? "", ENT_QUOTES, 'UTF-8');
 	$statusBandingClass = register_banding_status_class($row['status_banding_text'] ?? "");
 	$sub_array[] = "<span class='ks-banding-status " . $statusBandingClass . "'>" . ($statusBanding !== '' ? $statusBanding : 'Belum ada status') . "</span>";

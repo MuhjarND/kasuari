@@ -2,7 +2,7 @@
 include_once("sys/sys_session.php");
 $nama_halaman = "INFORMASI DETAIL PERKARA BANDING";
 include_once("sys/header.php");
-$id = $_GET['id'];
+$id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 $sql = "SELECT 
           perkara.jenis_perkara_nama,
           perkara_banding.nomor_urut_register ,
@@ -14,11 +14,11 @@ $sql = "SELECT
           perkara_banding.status_banding_text,
           perkara_banding.nomor_perkara_banding,
           perkara_banding.nomor_perkara_pn,
-          convert_tanggal_indonesia(perkara_banding.permohonan_banding) as permohonanbanding,
-          convert_tanggal_indonesia(perkara_banding.pengiriman_berkas_banding) as pengirimanberkasbanding,
-          convert_tanggal_indonesia(perkara_banding.tanggal_pendaftaran_banding) as tanggalpendaftaranbanding,
-          convert_tanggal_indonesia(perkara_banding.putusan_banding) AS putusanbanding,
-          convert_tanggal_indonesia(perkara_banding.putusan_pn) AS putusanpn,
+          perkara_banding.permohonan_banding AS permohonanbanding,
+          perkara_banding.pengiriman_berkas_banding AS pengirimanberkasbanding,
+          perkara_banding.tanggal_pendaftaran_banding AS tanggalpendaftaranbanding,
+          perkara_banding.putusan_banding AS putusanbanding,
+          perkara_banding.putusan_pn AS putusanpn,
           perkara_banding.status_banding_text,
           pengadilan_agama.nama AS pengaju,
           perkara_banding.penerimaan_memori_banding,
@@ -32,11 +32,28 @@ $sql = "SELECT
         LEFT JOIN perkara_putusan ON perkara_putusan.perkara_id =perkara_banding.perkara_id AND perkara_putusan.pn_id=perkara_banding.pn_id
         WHERE perkara_banding.id=$id";
 $query = mysqli_query($koneksi, $sql);
-while ($data = mysqli_fetch_assoc($query)) {
-    foreach ($data as $key => $value) {
-        $$key = $value;
-    }
+if (!$query) {
+    error_log('KASUARI perkara_detil_banding query failed: ' . mysqli_error($koneksi));
+    echo '<div class="app-content"><div class="container-fluid"><div class="alert alert-danger">Detail perkara banding belum dapat dimuat. Periksa struktur database server.</div></div></div>';
+    include_once("sys/footer.php");
+    exit;
 }
+
+$data = mysqli_fetch_assoc($query);
+if (!$data) {
+    echo '<div class="app-content"><div class="container-fluid"><div class="alert alert-warning">Data perkara banding tidak ditemukan.</div></div></div>';
+    include_once("sys/footer.php");
+    exit;
+}
+
+foreach ($data as $key => $value) {
+    $$key = $value;
+}
+$permohonanbanding = kasuari_tanggal_indonesia($permohonanbanding ?? '');
+$pengirimanberkasbanding = kasuari_tanggal_indonesia($pengirimanberkasbanding ?? '');
+$tanggalpendaftaranbanding = kasuari_tanggal_indonesia($tanggalpendaftaranbanding ?? '');
+$putusanbanding = kasuari_tanggal_indonesia($putusanbanding ?? '');
+$putusanpn = kasuari_tanggal_indonesia($putusanpn ?? '');
 ?>
 <link rel="stylesheet" type="text/css" href="assets/plugins/jstable/jstable.css" />
 <script src="assets/plugins/jstable/jstable.min.js" type="text/javascript"></script>
@@ -200,7 +217,11 @@ while ($data = mysqli_fetch_assoc($query)) {
                       WHERE perkara_banding_detil.perkara_id=$perkara_id AND pn_id=$pn_id ORDER BY status_pihak_id ASC, urutan_banding ASC";
                                 $query1 = mysqli_query($koneksi, $sql1);
                                 $no = 0;
-                                while ($data1 = mysqli_fetch_assoc($query1)) {
+                                if (!$query1) {
+                                    error_log('KASUARI perkara_detil_banding parties query failed: ' . mysqli_error($koneksi));
+                                    echo '<li class="list-group-item p-3 text-danger">Daftar pihak belum dapat dimuat.</li>';
+                                }
+                                while ($query1 && ($data1 = mysqli_fetch_assoc($query1))) {
                                     foreach ($data1 as $key => $value) {
                                         $$key = $value;
                                     }

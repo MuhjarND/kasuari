@@ -6,8 +6,11 @@ if(!isset($_SESSION)){
 
 include_once("sys/sys_authorization.php");
  
-ini_set('display_errors', 1);
-ini_set('log_errors', 1);
+$kasuariDebugMode = getenv('KASUARI_DEBUG') === '1';
+ini_set('display_errors', $kasuariDebugMode ? '1' : '0');
+ini_set('display_startup_errors', $kasuariDebugMode ? '1' : '0');
+ini_set('log_errors', '1');
+error_reporting(E_ALL);
 foreach($_GET as $key=>$value){$$key=$value;}
 if(isset($modul)){
 	$adminModules = array('pengguna', 'blangko', 'jenis_blangko', 'variabel', 'identitas_satker');

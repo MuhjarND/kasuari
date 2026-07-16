@@ -3,9 +3,18 @@ include_once("sys/sys_session.php");
 //echo base64_decode("dmFyaWFiZWxfc2ltcGFuX2VkaXQ=");exit;
     $nama_halaman="Identitas Satker";
     include_once("sys/sys_header.php");
-    $sql="SELECT  * FROM sys_konfig";
+    $id = 0;
+    $nama_pta = '';
+    $nama_ketua = '';
+    $nama_wakil_ketua = '';
+    $nama_panitera = '';
+    $nama_panmud_banding = '';
+    $sql="SELECT * FROM sys_konfig ORDER BY id ASC LIMIT 1";
       $query=mysqli_query($koneksi,$sql);
-      while($data=mysqli_fetch_assoc($query)){
+      if (!$query) {
+        error_log('KASUARI identitas satker query failed: ' . mysqli_error($koneksi));
+      }
+      while($query && ($data=mysqli_fetch_assoc($query))){
         foreach($data as $key=>$value) {$$key=$value;}
       }
 ?>
@@ -18,23 +27,23 @@ include_once("sys/sys_session.php");
       <table class="w3-table-all">
         <tr>
           <td style="width: 200px">Nama PTA</td>
-          <td><input class="w3-input w3-border" value="<?php echo $nama_pta?>" onchange="edit_tabel('sys_konfig','nama_pta', 'id', <?php echo $id?>, this.value)"></td>
+          <td><input class="w3-input w3-border" value="<?php echo htmlspecialchars($nama_pta, ENT_QUOTES, 'UTF-8'); ?>" onchange="edit_tabel('sys_konfig','nama_pta', 'id', <?php echo (int) $id; ?>, this.value)"></td>
         </tr>
         <tr>
           <td>Nama Ketua</td>
-          <td><input class="w3-input w3-border" value="<?php echo $nama_ketua?>" onchange="edit_tabel('sys_konfig', 'nama_ketua','id', <?php echo $id?>, this.value)"></td>
+          <td><input class="w3-input w3-border" value="<?php echo htmlspecialchars($nama_ketua, ENT_QUOTES, 'UTF-8'); ?>" onchange="edit_tabel('sys_konfig', 'nama_ketua','id', <?php echo (int) $id; ?>, this.value)"></td>
         </tr>
         <tr>
           <td>Nama Wakil Ketua</td>
-          <td><input class="w3-input w3-border" value="<?php echo $nama_wakil_ketua?>" onchange="edit_tabel('sys_konfig', 'nama_wakil_ketua','id', <?php echo $id?>, this.value)"></td>
+          <td><input class="w3-input w3-border" value="<?php echo htmlspecialchars($nama_wakil_ketua, ENT_QUOTES, 'UTF-8'); ?>" onchange="edit_tabel('sys_konfig', 'nama_wakil_ketua','id', <?php echo (int) $id; ?>, this.value)"></td>
         </tr>
         <tr>
           <td>Nama Panitera</td>
-          <td><input class="w3-input w3-border" value="<?php echo $nama_panitera?>" onchange="edit_tabel('sys_konfig', 'nama_panitera','id', <?php echo $id?>, this.value)"></td>
+          <td><input class="w3-input w3-border" value="<?php echo htmlspecialchars($nama_panitera, ENT_QUOTES, 'UTF-8'); ?>" onchange="edit_tabel('sys_konfig', 'nama_panitera','id', <?php echo (int) $id; ?>, this.value)"></td>
         </tr>
         <tr>
           <td>Nama Panmud Banding</td>
-          <td><input class="w3-input w3-border" value="<?php echo $nama_panmud_banding?>" onchange="edit_tabel('sys_konfig', 'nama_panmud_banding','id', <?php echo $id?>, this.value)"></td>
+          <td><input class="w3-input w3-border" value="<?php echo htmlspecialchars($nama_panmud_banding, ENT_QUOTES, 'UTF-8'); ?>" onchange="edit_tabel('sys_konfig', 'nama_panmud_banding','id', <?php echo (int) $id; ?>, this.value)"></td>
         </tr>
       </table>
     </div>
@@ -67,4 +76,3 @@ function edit_tabel(tabel, field, kunci, id, isi){
 }
 </script>
 <?php include_once("sys/sys_footer.php");?>
-

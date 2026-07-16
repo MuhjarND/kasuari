@@ -1,4 +1,10 @@
 <?php
+$kasuariDebugMode = getenv('KASUARI_DEBUG') === '1';
+ini_set('display_errors', $kasuariDebugMode ? '1' : '0');
+ini_set('display_startup_errors', $kasuariDebugMode ? '1' : '0');
+ini_set('log_errors', '1');
+error_reporting(E_ALL);
+
 $nama_host = "localhost";
 $user_host = "dok_banding";
 $password_host = "123456";
@@ -10,10 +16,13 @@ if (!$koneksi) {
   if (function_exists('http_response_code')) {
     http_response_code(500);
   }
-  die(
-    "Koneksi database Kasuari gagal. Pastikan database dan akun MySQL pada " .
-    "sys/sys_koneksi.php sudah sesuai. Detail: " . mysqli_connect_error()
-  );
+  $connectionError = mysqli_connect_error();
+  error_log('Koneksi database Kasuari gagal: '.$connectionError);
+  $message = "Koneksi database Kasuari gagal. Pastikan database dan akun MySQL pada sys/sys_koneksi.php sudah sesuai.";
+  if ($kasuariDebugMode) {
+    $message .= " Detail: ".$connectionError;
+  }
+  die($message);
 }
 
 mysqli_set_charset($koneksi, "utf8mb4");

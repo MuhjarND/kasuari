@@ -36,6 +36,23 @@ function tanggal_indon($tanggal, $cetak_hari = false){
     }
     return $tgl_indo;
 }
+if (!function_exists('kasuari_tanggal_indonesia')) {
+  function kasuari_tanggal_indonesia($tanggal, $fallback = '-') {
+    $tanggal = trim((string) $tanggal);
+    if ($tanggal === '' || strpos($tanggal, '0000-00-00') === 0) {
+      return $fallback;
+    }
+
+    $timestamp = strtotime($tanggal);
+    if ($timestamp === false) {
+      return $fallback;
+    }
+
+    $bulan = array(1 => 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember');
+    return date('j', $timestamp) . ' ' . $bulan[(int) date('n', $timestamp)] . ' ' . date('Y', $timestamp);
+  }
+}
 function arr2md5($arrinput){ $hasil=''; foreach($arrinput as $val){ if($hasil==''){ $hasil=md5($val); } else { $code=md5($val); for($hit=0;$hit<min(array(strlen($code),strlen($hasil)));$hit++){ $hasil[$hit]=chr(ord($hasil[$hit]) ^ ord($code[$hit])); } } } return(md5($hasil)); } function getPassword($pase){ $pass = arr2md5($pase); return $pass; }
 function kukurl($url, $datanya){
   $ch = curl_init(); 

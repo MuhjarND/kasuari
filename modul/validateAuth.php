@@ -42,8 +42,20 @@ if(!isset($_POST["aksi"])){
 			"SELECT userid, fullname, username, password, `group`, email, block
 			 FROM sys_users WHERE username = ? LIMIT 1"
 		);
+		if (!$stmt) {
+			error_log('KASUARI login prepare failed: ' . mysqli_error($koneksi));
+			$_SESSION['pesan_error_login'] = 'Layanan login sedang bermasalah. Silakan coba kembali.';
+			ke("login");
+			exit;
+		}
 		mysqli_stmt_bind_param($stmt, 's', $username);
-		mysqli_stmt_execute($stmt);
+		if (!mysqli_stmt_execute($stmt)) {
+			error_log('KASUARI login execute failed: ' . mysqli_stmt_error($stmt));
+			mysqli_stmt_close($stmt);
+			$_SESSION['pesan_error_login'] = 'Layanan login sedang bermasalah. Silakan coba kembali.';
+			ke("login");
+			exit;
+		}
 		mysqli_stmt_store_result($stmt);
 
 		if (mysqli_stmt_num_rows($stmt) === 0) {
@@ -76,9 +88,15 @@ if(!isset($_POST["aksi"])){
 		if ($legacyValid) {
 			$newPasswordHash = password_hash($password, PASSWORD_DEFAULT);
 			$upgrade = mysqli_prepare($koneksi, "UPDATE sys_users SET password = ? WHERE userid = ?");
-			mysqli_stmt_bind_param($upgrade, 'si', $newPasswordHash, $useridDb);
-			mysqli_stmt_execute($upgrade);
-			mysqli_stmt_close($upgrade);
+			if ($upgrade) {
+				mysqli_stmt_bind_param($upgrade, 'si', $newPasswordHash, $useridDb);
+				if (!mysqli_stmt_execute($upgrade)) {
+					error_log('KASUARI password upgrade failed: ' . mysqli_stmt_error($upgrade));
+				}
+				mysqli_stmt_close($upgrade);
+			} else {
+				error_log('KASUARI password upgrade prepare failed: ' . mysqli_error($koneksi));
+			}
 		}
 
 		session_regenerate_id(true);

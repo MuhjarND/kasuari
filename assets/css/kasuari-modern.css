@@ -985,6 +985,43 @@ a:hover { color: var(--indigo-dark); }
   font-size: .9rem;
 }
 
+.ks-party-list {
+  display: grid;
+  gap: 8px;
+}
+
+.ks-party-role {
+  margin-top: 4px;
+  color: #4338ca;
+  font-size: .75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.ks-party-role:first-child {
+  margin-top: 0;
+}
+
+.ks-party-person {
+  padding: 10px 12px;
+  border-left: 3px solid #22c55e;
+  border-radius: 4px;
+  background: #f8fafc;
+  color: var(--text-h);
+  font-size: .9rem;
+  font-weight: 700;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.ks-party-empty {
+  padding: 12px;
+  border-radius: 4px;
+  background: #f8fafc;
+  color: var(--text-m);
+  font-size: .88rem;
+}
+
 .ks-long-text {
   max-height: 360px;
   overflow: auto;

@@ -76,6 +76,41 @@ function curl($url, $data){
     return $output;
 }
 
+if (!function_exists('kasuari_text_lines')) {
+  function kasuari_text_lines($value) {
+    $value = trim((string) $value);
+    if ($value === '') {
+      return array();
+    }
+
+    // Some SIPP records contain encoded HTML more than once.
+    for ($decodeCount = 0; $decodeCount < 3; $decodeCount++) {
+      $decoded = html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+      if ($decoded === $value) {
+        break;
+      }
+      $value = $decoded;
+    }
+
+    $value = preg_replace('~<\s*br\s*/?\s*>~i', "\n", $value);
+    $value = preg_replace('~</\s*(?:p|div|li|tr|td|h[1-6])\s*>~i', "\n", $value);
+    $value = preg_replace('~<\s*li(?:\s[^>]*)?>~i', "\n", $value);
+    $value = strip_tags($value);
+    $value = str_replace(array("\xc2\xa0", "\r\n", "\r"), array(' ', "\n", "\n"), $value);
+    $value = preg_replace('/[ \t]+/', ' ', $value);
+
+    $lines = array();
+    foreach (preg_split('/\n+/', $value) as $line) {
+      $line = trim($line);
+      if ($line !== '') {
+        $lines[] = $line;
+      }
+    }
+
+    return $lines;
+  }
+}
+
 if (!function_exists('kasuari_sanitize_rich_node')) {
   function kasuari_sanitize_rich_node($parent, $allowedTags, $blockedTags) {
     $children = array();

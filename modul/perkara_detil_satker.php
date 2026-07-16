@@ -118,6 +118,21 @@ function ks_type_class($text) {
       $typeClass = ks_type_class($jenis);
       $stageClass = ks_status_class($tahapan);
       $processClass = ks_status_class($proses);
+      $partyLines = kasuari_text_lines($perkara['para_pihak'] ?? '');
+
+      if (empty($partyLines)) {
+        for ($partyNumber = 1; $partyNumber <= 4; $partyNumber++) {
+          $fallbackPartyLines = kasuari_text_lines($perkara['pihak' . $partyNumber . '_text'] ?? '');
+          if (empty($fallbackPartyLines)) {
+            continue;
+          }
+
+          $partyLines[] = 'Pihak ' . $partyNumber . ':';
+          foreach ($fallbackPartyLines as $fallbackPartyLine) {
+            $partyLines[] = $fallbackPartyLine;
+          }
+        }
+      }
     ?>
 
       <div class="ks-detail-hero mb-3">
@@ -169,23 +184,17 @@ function ks_type_class($text) {
               <h3>Para Pihak</h3>
             </div>
             <div class="ks-detail-card-body">
-              <div class="ks-info-grid">
-                <div class="ks-info-box">
-                  <label>Pihak 1</label>
-                  <strong><?php echo htmlspecialchars(ks_value($perkara['pihak1_text'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></strong>
-                </div>
-                <div class="ks-info-box">
-                  <label>Pihak 2</label>
-                  <strong><?php echo htmlspecialchars(ks_value($perkara['pihak2_text'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></strong>
-                </div>
-                <div class="ks-info-box">
-                  <label>Pihak 3</label>
-                  <strong><?php echo htmlspecialchars(ks_value($perkara['pihak3_text'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></strong>
-                </div>
-                <div class="ks-info-box">
-                  <label>Pihak 4</label>
-                  <strong><?php echo htmlspecialchars(ks_value($perkara['pihak4_text'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></strong>
-                </div>
+              <div class="ks-party-list">
+                <?php if (empty($partyLines)): ?>
+                  <div class="ks-party-empty">Data para pihak belum tersedia.</div>
+                <?php else: ?>
+                  <?php foreach ($partyLines as $partyLine): ?>
+                    <?php $isPartyRole = substr($partyLine, -1) === ':'; ?>
+                    <div class="<?php echo $isPartyRole ? 'ks-party-role' : 'ks-party-person'; ?>">
+                      <?php echo htmlspecialchars($partyLine, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>
+                    </div>
+                  <?php endforeach; ?>
+                <?php endif; ?>
               </div>
             </div>
           </div>

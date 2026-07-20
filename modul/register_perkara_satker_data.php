@@ -12,7 +12,8 @@ $searchQuery = isset($_GET["searchQuery"]) ? $_GET["searchQuery"] : "";
 $search = empty($searchQuery) || $searchQuery === "null" ? "" : mysqli_real_escape_string($koneksi, $searchQuery);
 $satkerIdInput = filter_input(INPUT_GET, "satker_id", FILTER_SANITIZE_NUMBER_INT);
 $satkerId = $satkerIdInput !== null && $satkerIdInput !== false ? (int) $satkerIdInput : 0;
-$sortColumnIndex = filter_input(INPUT_GET, "sortColumn", FILTER_SANITIZE_NUMBER_INT);
+$sortColumnRaw = isset($_GET["sortColumn"]) ? trim((string) $_GET["sortColumn"]) : "";
+$sortColumnIndex = preg_match('/^\d+$/', $sortColumnRaw) ? (int) $sortColumnRaw : null;
 $sortDirectionInput = isset($_GET["sortDirection"]) ? strtoupper($_GET["sortDirection"]) : "";
 $sortDirection = $sortDirectionInput === "ASC" ? "ASC" : "DESC";
 

@@ -105,7 +105,10 @@ function register_banding_status_class($text) {
   var table = new JSTable("#datane_result", {
     serverSide: true,
     deferLoading: <?php echo $totalBanding ?>,
-    ajax: "register_perkara_data"
+    ajax: "register_perkara_data",
+    columns: [
+      { select: 4, sort: "desc" }
+    ]
   });
 </script>
 

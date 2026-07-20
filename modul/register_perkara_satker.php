@@ -4,6 +4,8 @@ $nama_halaman = "Register Perkara Satker";
 include_once("sys/header.php");
 
 $totalPerkaraSatker = 0;
+$selectedSatkerId = filter_input(INPUT_GET, 'satker_id', FILTER_VALIDATE_INT);
+$selectedSatkerId = $selectedSatkerId && $selectedSatkerId > 0 ? (int) $selectedSatkerId : 0;
 $totalPerkaraSatkerResult = mysqli_query($koneksi, "SELECT COUNT(*) AS total FROM perkara");
 if ($totalPerkaraSatkerResult) {
   $totalPerkaraSatkerRow = mysqli_fetch_assoc($totalPerkaraSatkerResult);
@@ -72,7 +74,7 @@ function satker_type_class($text) {
             <select class="form-select" id="satker_filter">
               <option value="">Semua Satker (<?php echo number_format($totalPerkaraSatker, 0, ',', '.'); ?>)</option>
               <?php foreach ($satkerOptions as $satkerOption) { ?>
-                <option value="<?php echo (int) $satkerOption['id']; ?>">
+                <option value="<?php echo (int) $satkerOption['id']; ?>" <?php echo $selectedSatkerId === (int) $satkerOption['id'] ? 'selected' : ''; ?>>
                   <?php echo htmlspecialchars($satkerOption['nama'], ENT_QUOTES, 'UTF-8'); ?>
                   (<?php echo number_format((int) $satkerOption['jumlah_perkara'], 0, ',', '.'); ?>)
                 </option>
@@ -166,9 +168,16 @@ function satker_type_class($text) {
     deferLoading: <?php echo $totalPerkaraSatker ?>,
     ajax: "register_perkara_satker_data",
     ajaxParams: {
-      satker_id: ""
-    }
+      satker_id: "<?php echo $selectedSatkerId > 0 ? $selectedSatkerId : ''; ?>"
+    },
+    columns: [
+      { select: 4, sort: "desc" }
+    ]
   });
+
+  <?php if ($selectedSatkerId > 0): ?>
+  table.paginate(1);
+  <?php endif; ?>
 
   document.getElementById("satker_filter").addEventListener("change", function () {
     table.config.ajaxParams.satker_id = this.value;

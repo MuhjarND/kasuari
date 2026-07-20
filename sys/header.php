@@ -235,6 +235,14 @@ $isMenu = function ($items) use ($currentModule) {
               </ul>
             </li>
 
+            <!-- Monitoring Sinkronisasi -->
+            <li class="nav-item">
+              <a href="monitoring_sinkronisasi" class="nav-link <?php echo $isMenu('monitoring_sinkronisasi') ? 'active' : ''; ?>">
+                <i class="nav-icon bi bi-arrow-repeat"></i>
+                <p>Monitoring Sinkronisasi</p>
+              </a>
+            </li>
+
             <!-- Hatibinwasda -->
             <li class="nav-item">
               <a href="hatibinwasda" class="nav-link <?php echo $isMenu('hatibinwasda') ? 'active' : ''; ?>">

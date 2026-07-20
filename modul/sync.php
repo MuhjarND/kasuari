@@ -4,6 +4,7 @@ error_reporting(E_ALL);
 mysqli_report(MYSQLI_REPORT_OFF);
 
 include_once("sys/sys_config.php");
+include_once("sys/sys_monitoring.php");
 
 header('Content-Type: text/plain; charset=UTF-8');
 ini_set('display_errors', '0');
@@ -90,7 +91,7 @@ function kasuari_sync_max_query_bytes($connection)
 function kasuari_sync_schema_issues($connection)
 {
   $issues = array();
-  $requiredTables = array('perkara', 'perkara_banding', 'perkara_banding_detil', 'perkara_putusan', 'pihak');
+  $requiredTables = array('perkara', 'perkara_banding', 'perkara_banding_detil', 'perkara_putusan', 'pihak', 'sync_monitoring');
   $escapedTables = array();
   foreach ($requiredTables as $table) {
     $escapedTables[] = "'" . mysqli_real_escape_string($connection, $table) . "'";
@@ -209,6 +210,7 @@ function kasuari_sync_validate_identity()
 
 $action = isset($_POST['action']) ? strtolower(trim((string) $_POST['action'])) : '';
 $protocol = isset($_POST['protocol']) ? (int) $_POST['protocol'] : 0;
+$monitoringReady = $action === 'batch' ? true : kasuari_monitoring_ensure_schema($koneksi);
 
 if ($action === 'health') {
   header('Content-Type: application/json; charset=UTF-8');
@@ -229,6 +231,117 @@ if ($action === 'health') {
 
 if ($protocol !== 2) {
   kasuari_sync_error('Versi Kasuari Satker perlu diperbarui sebelum sinkronisasi.', 426);
+}
+
+if ($action === 'status') {
+  header('Content-Type: application/json; charset=UTF-8');
+  if (!$monitoringReady) {
+    kasuari_sync_error('Tabel monitoring sinkronisasi belum tersedia di pusat.', 500);
+  }
+
+  $statusPnId = isset($_POST['pn_id']) ? trim((string) $_POST['pn_id']) : '';
+  $localCount = isset($_POST['local_perkara_count']) ? trim((string) $_POST['local_perkara_count']) : '';
+  $localChangedAt = isset($_POST['local_data_changed_at']) ? trim((string) $_POST['local_data_changed_at']) : '';
+  $localSignature = isset($_POST['local_signature']) ? strtolower(trim((string) $_POST['local_signature'])) : '';
+  $appVersion = isset($_POST['app_version']) ? trim((string) $_POST['app_version']) : '';
+
+  if (!preg_match('/^\d+$/', $statusPnId) || (int) $statusPnId <= 0) {
+    kasuari_sync_error('Kode satker tidak valid.', 400);
+  }
+  if (!preg_match('/^\d+$/', $localCount)) {
+    kasuari_sync_error('Jumlah perkara lokal tidak valid.', 400);
+  }
+  if (!preg_match('/^[a-f0-9]{64}$/', $localSignature)) {
+    kasuari_sync_error('Jejak perubahan data lokal tidak valid.', 400);
+  }
+  if ($localChangedAt !== '' && (!preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $localChangedAt) || strtotime($localChangedAt) === false)) {
+    kasuari_sync_error('Waktu perubahan data lokal tidak valid.', 400);
+  }
+  $appVersion = substr($appVersion, 0, 30);
+  $statusPnId = (int) $statusPnId;
+  $localCount = (int) $localCount;
+
+  $satkerCheck = mysqli_prepare($koneksi, "SELECT id FROM pengadilan_agama WHERE id=? AND aktif='Y' LIMIT 1");
+  if (!$satkerCheck) {
+    kasuari_sync_db_failure($koneksi, 'pemeriksaan identitas satker');
+  }
+  mysqli_stmt_bind_param($satkerCheck, 'i', $statusPnId);
+  mysqli_stmt_execute($satkerCheck);
+  mysqli_stmt_store_result($satkerCheck);
+  $satkerExists = mysqli_stmt_num_rows($satkerCheck) > 0;
+  mysqli_stmt_close($satkerCheck);
+  if (!$satkerExists) {
+    kasuari_sync_error('Satker tidak terdaftar atau tidak aktif di Kasuari Pusat.', 403);
+  }
+
+  $seenAt = date('Y-m-d H:i:s');
+  $statusStatement = mysqli_prepare(
+    $koneksi,
+    "INSERT INTO sync_monitoring
+      (pn_id, last_seen_at, local_perkara_count, local_data_changed_at, local_signature, app_version)
+     VALUES (?, ?, ?, NULLIF(?, ''), ?, ?)
+     ON DUPLICATE KEY UPDATE
+      last_seen_at=VALUES(last_seen_at),
+      local_perkara_count=VALUES(local_perkara_count),
+      local_data_changed_at=VALUES(local_data_changed_at),
+      local_signature=VALUES(local_signature),
+      app_version=VALUES(app_version)"
+  );
+  if (!$statusStatement) {
+    kasuari_sync_db_failure($koneksi, 'status monitoring satker');
+  }
+  mysqli_stmt_bind_param($statusStatement, 'isisss', $statusPnId, $seenAt, $localCount, $localChangedAt, $localSignature, $appVersion);
+  if (!mysqli_stmt_execute($statusStatement)) {
+    $statementError = mysqli_stmt_error($statusStatement);
+    mysqli_stmt_close($statusStatement);
+    error_log('Kasuari sync gagal menyimpan heartbeat: ' . $statementError);
+    kasuari_sync_error('Gagal menyimpan status monitoring satker.', 500);
+  }
+  mysqli_stmt_close($statusStatement);
+
+  // Bentuk baseline pertama untuk riwayat lama jika data belum berubah sejak sinkronisasi terakhir.
+  $baselineStatement = mysqli_prepare(
+    $koneksi,
+    "UPDATE sync_monitoring
+     SET last_sync_signature=local_signature
+     WHERE pn_id=?
+       AND last_sync_at IS NOT NULL
+       AND last_sync_signature IS NULL
+       AND local_perkara_count=last_sync_count
+       AND (local_data_changed_at IS NULL OR local_data_changed_at<=last_sync_at)"
+  );
+  if ($baselineStatement) {
+    mysqli_stmt_bind_param($baselineStatement, 'i', $statusPnId);
+    if (!mysqli_stmt_execute($baselineStatement)) {
+      error_log('Kasuari sync gagal membentuk baseline monitoring: ' . mysqli_stmt_error($baselineStatement));
+    }
+    mysqli_stmt_close($baselineStatement);
+  }
+
+  $monitorResult = mysqli_query(
+    $koneksi,
+    "SELECT last_sync_at, last_sync_count, last_sync_signature
+     FROM sync_monitoring WHERE pn_id=" . $statusPnId . " LIMIT 1"
+  );
+  $monitorRow = $monitorResult ? mysqli_fetch_assoc($monitorResult) : array();
+  $syncState = 'belum_sinkron';
+  if (!empty($monitorRow['last_sync_at'])) {
+    $syncState = 'sinkron';
+    $signatureChanged = !empty($monitorRow['last_sync_signature'])
+      ? !hash_equals($monitorRow['last_sync_signature'], $localSignature)
+      : ($localChangedAt !== '' && $localChangedAt > $monitorRow['last_sync_at']);
+    if ((int) $monitorRow['last_sync_count'] !== $localCount || $signatureChanged) {
+      $syncState = 'perlu_sinkronisasi';
+    }
+  }
+
+  echo json_encode(array(
+    'status' => 'ok',
+    'sync_state' => $syncState,
+    'last_seen_at' => $seenAt,
+    'last_sync_at' => isset($monitorRow['last_sync_at']) ? $monitorRow['last_sync_at'] : null
+  ));
+  exit;
 }
 
 list($pnId, $requestId) = kasuari_sync_validate_identity();
@@ -327,6 +440,18 @@ if ($action === 'finalize') {
   $countRow = mysqli_fetch_assoc($countResult);
   $jumlahPerkara = isset($countRow['jumlah']) ? (int) $countRow['jumlah'] : 0;
   $tanggal = date('Y-m-d H:i:s');
+  $localCount = isset($_POST['local_perkara_count']) && preg_match('/^\d+$/', (string) $_POST['local_perkara_count'])
+    ? (int) $_POST['local_perkara_count']
+    : $jumlahPerkara;
+  $localChangedAt = isset($_POST['local_data_changed_at']) ? trim((string) $_POST['local_data_changed_at']) : '';
+  if ($localChangedAt !== '' && (!preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $localChangedAt) || strtotime($localChangedAt) === false)) {
+    $localChangedAt = '';
+  }
+  $localSignature = isset($_POST['local_signature']) ? strtolower(trim((string) $_POST['local_signature'])) : '';
+  if (!preg_match('/^[a-f0-9]{64}$/', $localSignature)) {
+    $localSignature = '';
+  }
+  $appVersion = isset($_POST['app_version']) ? substr(trim((string) $_POST['app_version']), 0, 30) : '';
 
   $requestStatement = mysqli_prepare(
     $koneksi,
@@ -360,6 +485,49 @@ if ($action === 'finalize') {
     kasuari_sync_error('Gagal menyimpan pencatatan riwayat. ' . kasuari_sync_database_message($statementError, $statementCode));
   }
   mysqli_stmt_close($logStatement);
+
+  if ($monitoringReady) {
+    $monitorStatement = mysqli_prepare(
+      $koneksi,
+      "INSERT INTO sync_monitoring
+        (pn_id, last_seen_at, local_perkara_count, local_data_changed_at, local_signature,
+         last_sync_at, last_sync_count, last_sync_signature, app_version)
+       VALUES (?, ?, ?, NULLIF(?, ''), NULLIF(?, ''), ?, ?, NULLIF(?, ''), ?)
+       ON DUPLICATE KEY UPDATE
+        last_seen_at=VALUES(last_seen_at),
+        local_perkara_count=VALUES(local_perkara_count),
+        local_data_changed_at=VALUES(local_data_changed_at),
+        local_signature=COALESCE(VALUES(local_signature), sync_monitoring.local_signature),
+        last_sync_at=VALUES(last_sync_at),
+        last_sync_count=VALUES(last_sync_count),
+        last_sync_signature=COALESCE(VALUES(last_sync_signature), sync_monitoring.last_sync_signature),
+        app_version=COALESCE(NULLIF(VALUES(app_version), ''), sync_monitoring.app_version)"
+    );
+    if (!$monitorStatement) {
+      kasuari_sync_db_failure($koneksi, 'monitoring sinkronisasi');
+    }
+    mysqli_stmt_bind_param(
+      $monitorStatement,
+      'isisssiss',
+      $pnId,
+      $tanggal,
+      $localCount,
+      $localChangedAt,
+      $localSignature,
+      $tanggal,
+      $localCount,
+      $localSignature,
+      $appVersion
+    );
+    if (!mysqli_stmt_execute($monitorStatement)) {
+      $statementError = mysqli_stmt_error($monitorStatement);
+      mysqli_stmt_close($monitorStatement);
+      @mysqli_rollback($koneksi);
+      error_log('Kasuari sync gagal menyimpan monitoring: ' . $statementError);
+      kasuari_sync_error('Gagal menyimpan monitoring sinkronisasi.', 500);
+    }
+    mysqli_stmt_close($monitorStatement);
+  }
 
   if (!mysqli_commit($koneksi)) {
     kasuari_sync_db_failure($koneksi, 'finalisasi sinkronisasi');

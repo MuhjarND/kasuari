@@ -26,7 +26,7 @@ function kasuari_monitoring_short_name($name)
 
 $schemaReady = kasuari_monitoring_ensure_schema($koneksi);
 $monitoringRows = array();
-$summary = array('total' => 0, 'sinkron' => 0, 'pending' => 0, 'belum' => 0);
+$summary = array('total' => 0, 'sinkron' => 0, 'pending' => 0, 'unknown' => 0);
 $monitoredSatkerIds = array(429, 431, 439, 844);
 $monitoredSatkerSql = implode(',', array_map('intval', $monitoredSatkerIds));
 
@@ -51,6 +51,8 @@ if ($schemaReady) {
     while ($row = mysqli_fetch_assoc($monitoringResult)) {
       $hasSync = !empty($row['last_sync_at']);
       $hasHeartbeat = !empty($row['last_seen_at']);
+      $secondsSinceSeen = $hasHeartbeat ? max(0, time() - strtotime($row['last_seen_at'])) : null;
+      $heartbeatFresh = $hasHeartbeat && $secondsSinceSeen <= 2700;
       $hasSignaturePair = !empty($row['local_signature']) && !empty($row['last_sync_signature']);
       $signatureChanged = $hasSignaturePair
         ? !hash_equals($row['last_sync_signature'], $row['local_signature'])
@@ -60,11 +62,22 @@ if ($schemaReady) {
         $signatureChanged
       );
 
-      if (!$hasSync) {
+      if (!$heartbeatFresh) {
+        $row['status_key'] = 'unknown';
+        $row['status_label'] = $hasHeartbeat ? 'Pantauan kedaluwarsa' : 'Belum terpantau';
+        if ($hasHeartbeat) {
+          $row['status_note'] = 'Status SIPP tidak diperbarui lebih dari 45 menit';
+        } else {
+          $row['status_note'] = $hasSync
+            ? 'Riwayat lama belum diverifikasi dengan SIPP'
+            : 'Aplikasi satker belum mengirim status';
+        }
+        $summary['unknown']++;
+      } elseif (!$hasSync) {
         $row['status_key'] = 'belum';
         $row['status_label'] = 'Belum sinkron';
         $row['status_note'] = 'Belum ada riwayat pengiriman';
-        $summary['belum']++;
+        $summary['pending']++;
       } elseif ($hasPendingChanges) {
         $row['status_key'] = 'pending';
         $row['status_label'] = 'Perlu sinkronisasi';
@@ -73,7 +86,7 @@ if ($schemaReady) {
       } else {
         $row['status_key'] = 'sinkron';
         $row['status_label'] = 'Sudah sinkron';
-        $row['status_note'] = $hasHeartbeat ? 'Tidak ada perubahan tertunda' : 'Pemeriksaan perubahan belum aktif';
+        $row['status_note'] = 'Tidak ada perubahan tertunda';
         $summary['sinkron']++;
       }
 
@@ -81,7 +94,6 @@ if ($schemaReady) {
         $row['connection_key'] = 'unknown';
         $row['connection_label'] = 'Belum terpantau';
       } else {
-        $secondsSinceSeen = time() - strtotime($row['last_seen_at']);
         if ($secondsSinceSeen <= 600) {
           $row['connection_key'] = 'online';
           $row['connection_label'] = 'Aktif';
@@ -104,7 +116,7 @@ if ($schemaReady) {
   }
 }
 
-$statusPriority = array('pending' => 0, 'belum' => 1, 'sinkron' => 2);
+$statusPriority = array('unknown' => 0, 'pending' => 1, 'belum' => 1, 'sinkron' => 2);
 usort($monitoringRows, function ($left, $right) use ($statusPriority) {
   $statusOrder = $statusPriority[$left['status_key']] - $statusPriority[$right['status_key']];
   return $statusOrder !== 0 ? $statusOrder : strcasecmp($left['nama'], $right['nama']);
@@ -140,15 +152,15 @@ usort($monitoringRows, function ($left, $right) use ($statusPriority) {
         </article>
         <article class="ks-monitoring-stat synced">
           <span class="ks-monitoring-stat-icon"><i class="bi bi-cloud-check" aria-hidden="true"></i></span>
-          <div><strong><?php echo number_format($summary['sinkron'], 0, ',', '.'); ?></strong><span>Sudah Sinkron</span></div>
+          <div><strong><?php echo number_format($summary['sinkron'], 0, ',', '.'); ?></strong><span>Sinkron Terverifikasi</span></div>
         </article>
         <article class="ks-monitoring-stat pending">
           <span class="ks-monitoring-stat-icon"><i class="bi bi-cloud-arrow-up" aria-hidden="true"></i></span>
-          <div><strong><?php echo number_format($summary['pending'], 0, ',', '.'); ?></strong><span>Ada Perubahan</span></div>
+          <div><strong><?php echo number_format($summary['pending'], 0, ',', '.'); ?></strong><span>Perlu Sinkronisasi</span></div>
         </article>
-        <article class="ks-monitoring-stat never">
+        <article class="ks-monitoring-stat unmonitored">
           <span class="ks-monitoring-stat-icon"><i class="bi bi-cloud-slash" aria-hidden="true"></i></span>
-          <div><strong><?php echo number_format($summary['belum'], 0, ',', '.'); ?></strong><span>Belum Sinkron</span></div>
+          <div><strong><?php echo number_format($summary['unknown'], 0, ',', '.'); ?></strong><span>Belum Terpantau</span></div>
         </article>
       </div>
 
@@ -156,7 +168,7 @@ usort($monitoringRows, function ($left, $right) use ($statusPriority) {
         <div class="ks-monitoring-toolbar">
           <div>
             <h2>Status Satker</h2>
-            <p>Status perubahan tersedia setelah satker memperbarui aplikasi dan membuka dashboard sinkronisasi.</p>
+            <p>Status diperbarui ketika satker membuka dashboard dan memeriksa perubahan SIPP.</p>
           </div>
           <div class="ks-monitoring-filters">
             <label class="visually-hidden" for="monitoringStatusFilter">Filter status</label>
@@ -164,6 +176,7 @@ usort($monitoringRows, function ($left, $right) use ($statusPriority) {
               <option value="">Semua status</option>
               <option value="pending">Perlu sinkronisasi</option>
               <option value="belum">Belum sinkron</option>
+              <option value="unknown">Belum terpantau</option>
               <option value="sinkron">Sudah sinkron</option>
             </select>
             <label class="ks-monitoring-search" for="monitoringSearch">

@@ -119,12 +119,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $editFullname = trim(isset($_POST['edit_fullname']) ? $_POST['edit_fullname'] : '');
       $editUsername = strtolower(trim(isset($_POST['edit_username']) ? $_POST['edit_username'] : ''));
       $editEmail = strtolower(trim(isset($_POST['edit_email']) ? $_POST['edit_email'] : ''));
+      $editStatusRaw = isset($_POST['edit_status']) ? (string) $_POST['edit_status'] : '0';
+      $editBlock = $editStatusRaw === '1' ? 1 : 0;
       $targetGroup = kasuari_managed_user_group($koneksi, $targetUserId);
 
       if ($targetUserId <= 0 || $targetGroup === null || ((int) $targetGroup === 0 && $targetUserId !== $currentUserId)) {
         $errors[] = 'Administrator hanya dapat mengubah akun miliknya sendiri.';
       } else {
         $errors = array_merge($errors, kasuari_user_identity_errors($editFullname, $editUsername, $editEmail));
+      }
+      if (!in_array($editStatusRaw, array('0', '1'), true)) {
+        $errors[] = 'Status pengguna tidak valid.';
+      }
+      if ((int) $targetGroup === 0 || $targetUserId === $currentUserId) {
+        $editBlock = 0;
       }
 
       if (empty($errors)) {
@@ -146,10 +154,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $update = mysqli_prepare(
           $koneksi,
           "UPDATE sys_users
-           SET fullname = ?, username = ?, email = ?, diedit_oleh = ?, diedit_tanggal = NOW()
+           SET fullname = ?, username = ?, email = ?, block = ?, diedit_oleh = ?, diedit_tanggal = NOW()
            WHERE userid = ?"
         );
-        mysqli_stmt_bind_param($update, 'ssssi', $editFullname, $editUsername, $editEmail, $editedBy, $targetUserId);
+        mysqli_stmt_bind_param($update, 'sssisi', $editFullname, $editUsername, $editEmail, $editBlock, $editedBy, $targetUserId);
         if (mysqli_stmt_execute($update)) {
           $_SESSION['pengguna_flash'] = array('type' => 'success', 'message' => 'Data pengguna berhasil diperbarui.');
           mysqli_stmt_close($update);
@@ -269,6 +277,16 @@ $userQuery = mysqli_query(
 if ($userQuery) {
   while ($user = mysqli_fetch_assoc($userQuery)) {
     $users[] = $user;
+  }
+}
+
+$activeUserCount = 0;
+$inactiveUserCount = 0;
+foreach ($users as $user) {
+  if ((int) $user['block'] === 1) {
+    $inactiveUserCount++;
+  } else {
+    $activeUserCount++;
   }
 }
 
@@ -392,6 +410,10 @@ include_once("sys/header.php");
               <span class="kasuari-section-kicker">Akses Aplikasi</span>
               <h3>Daftar Pengguna</h3>
             </div>
+            <div class="kasuari-user-status-summary" aria-label="Ringkasan status pengguna">
+              <span class="active"><i class="bi bi-check-circle-fill" aria-hidden="true"></i><?php echo $activeUserCount; ?> aktif</span>
+              <span class="inactive"><i class="bi bi-slash-circle-fill" aria-hidden="true"></i><?php echo $inactiveUserCount; ?> nonaktif</span>
+            </div>
           </div>
 
           <div class="table-responsive">
@@ -433,9 +455,13 @@ include_once("sys/header.php");
                       </span>
                     </td>
                     <td>
-                      <span class="kasuari-account-status <?php echo $isBlocked ? 'inactive' : 'active'; ?>">
-                        <?php echo $isBlocked ? 'Nonaktif' : 'Aktif'; ?>
-                      </span>
+                      <div class="kasuari-account-status-wrap">
+                        <span class="kasuari-account-status <?php echo $isBlocked ? 'inactive' : 'active'; ?>">
+                          <i class="bi <?php echo $isBlocked ? 'bi-slash-circle-fill' : 'bi-check-circle-fill'; ?>" aria-hidden="true"></i>
+                          <?php echo $isBlocked ? 'Nonaktif' : 'Aktif'; ?>
+                        </span>
+                        <small><?php echo $isBlocked ? 'Akses masuk diblokir' : 'Dapat masuk aplikasi'; ?></small>
+                      </div>
                     </td>
                     <td><span class="kasuari-user-date"><?php echo htmlspecialchars($createdDate, ENT_QUOTES, 'UTF-8'); ?></span></td>
                     <td class="text-end">
@@ -447,12 +473,14 @@ include_once("sys/header.php");
                             data-user-id="<?php echo (int) $user['userid']; ?>"
                             data-user-fullname="<?php echo htmlspecialchars($user['fullname'], ENT_QUOTES, 'UTF-8'); ?>"
                             data-user-username="<?php echo htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8'); ?>"
-                            data-user-email="<?php echo htmlspecialchars($user['email'], ENT_QUOTES, 'UTF-8'); ?>">
+                            data-user-email="<?php echo htmlspecialchars($user['email'], ENT_QUOTES, 'UTF-8'); ?>"
+                            data-user-status="<?php echo $isBlocked ? '1' : '0'; ?>"
+                            data-user-is-admin="<?php echo $isAdminUser ? '1' : '0'; ?>">
                             <i class="bi bi-pencil" aria-hidden="true"></i>
                           </button>
 
-                          <button type="button" class="kasuari-icon-action password" title="Reset password"
-                            aria-label="Reset password"
+                          <button type="button" class="kasuari-icon-action password" title="Ubah password"
+                            aria-label="Ubah password"
                             data-bs-toggle="modal" data-bs-target="#resetPasswordModal"
                             data-user-id="<?php echo (int) $user['userid']; ?>"
                             data-user-name="<?php echo htmlspecialchars($user['fullname'], ENT_QUOTES, 'UTF-8'); ?>">
@@ -521,9 +549,17 @@ include_once("sys/header.php");
             <label for="edit_username" class="form-label">Nama Pengguna</label>
             <input type="text" class="form-control" id="edit_username" name="edit_username" maxlength="30" required>
           </div>
-          <div>
+          <div class="mb-3">
             <label for="edit_email" class="form-label">Email</label>
             <input type="email" class="form-control" id="edit_email" name="edit_email" maxlength="100" required>
+          </div>
+          <div>
+            <label for="edit_status" class="form-label">Status Pengguna</label>
+            <select class="form-select" id="edit_status" name="edit_status" required>
+              <option value="0">Aktif - dapat masuk aplikasi</option>
+              <option value="1">Nonaktif - akses masuk diblokir</option>
+            </select>
+            <small class="kasuari-status-field-note" id="edit_status_note">Perubahan status berlaku pada proses masuk berikutnya.</small>
           </div>
         </div>
         <div class="modal-footer">
@@ -542,7 +578,7 @@ include_once("sys/header.php");
         <div class="modal-header">
           <div>
             <span class="kasuari-section-kicker">Keamanan Akun</span>
-            <h2 class="modal-title" id="resetPasswordModalLabel">Reset Password</h2>
+            <h2 class="modal-title" id="resetPasswordModalLabel">Ubah Password</h2>
           </div>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
         </div>
@@ -551,19 +587,30 @@ include_once("sys/header.php");
           <input type="hidden" name="action" value="reset_password">
           <input type="hidden" name="userid" id="reset_userid">
 
-          <p class="kasuari-reset-target">Password baru untuk <strong id="reset_user_name">pengguna</strong></p>
+          <p class="kasuari-reset-target">Ubah password akun <strong id="reset_user_name">pengguna</strong></p>
           <div class="mb-3">
             <label for="reset_new_password" class="form-label">Password Baru</label>
-            <input type="password" class="form-control" id="reset_new_password" name="new_password" minlength="8" required autocomplete="new-password">
+            <div class="input-group kasuari-password-input">
+              <input type="password" class="form-control" id="reset_new_password" name="new_password" minlength="8" required autocomplete="new-password">
+              <button class="btn btn-outline-secondary" type="button" data-password-toggle="reset_new_password" title="Tampilkan password" aria-label="Tampilkan password">
+                <i class="bi bi-eye" aria-hidden="true"></i>
+              </button>
+            </div>
           </div>
           <div>
             <label for="reset_password_confirmation" class="form-label">Konfirmasi Password</label>
-            <input type="password" class="form-control" id="reset_password_confirmation" name="new_password_confirmation" minlength="8" required autocomplete="new-password">
+            <div class="input-group kasuari-password-input">
+              <input type="password" class="form-control" id="reset_password_confirmation" name="new_password_confirmation" minlength="8" required autocomplete="new-password">
+              <button class="btn btn-outline-secondary" type="button" data-password-toggle="reset_password_confirmation" title="Tampilkan password" aria-label="Tampilkan password">
+                <i class="bi bi-eye" aria-hidden="true"></i>
+              </button>
+            </div>
+            <small class="kasuari-password-hint">Gunakan minimal 8 karakter.</small>
           </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
-          <button type="submit" class="btn btn-primary"><i class="bi bi-key" aria-hidden="true"></i> Perbarui Password</button>
+          <button type="submit" class="btn btn-primary"><i class="bi bi-key" aria-hidden="true"></i> Simpan Password</button>
         </div>
       </form>
     </div>
@@ -582,6 +629,14 @@ document.addEventListener('DOMContentLoaded', function () {
       document.getElementById('edit_fullname').value = button.getAttribute('data-user-fullname') || '';
       document.getElementById('edit_username').value = button.getAttribute('data-user-username') || '';
       document.getElementById('edit_email').value = button.getAttribute('data-user-email') || '';
+      var statusField = document.getElementById('edit_status');
+      var statusNote = document.getElementById('edit_status_note');
+      var isAdmin = button.getAttribute('data-user-is-admin') === '1';
+      statusField.value = isAdmin ? '0' : (button.getAttribute('data-user-status') || '0');
+      statusField.disabled = isAdmin;
+      statusNote.textContent = isAdmin
+        ? 'Status administrator dikunci aktif untuk menjaga akses pengelolaan.'
+        : 'Perubahan status berlaku pada proses masuk berikutnya.';
     });
   }
 
@@ -594,6 +649,21 @@ document.addEventListener('DOMContentLoaded', function () {
       document.getElementById('reset_password_confirmation').value = '';
     });
   }
+
+  document.querySelectorAll('[data-password-toggle]').forEach(function (button) {
+    button.addEventListener('click', function () {
+      var input = document.getElementById(button.getAttribute('data-password-toggle'));
+      if (!input) return;
+      var showPassword = input.type === 'password';
+      input.type = showPassword ? 'text' : 'password';
+      button.setAttribute('title', showPassword ? 'Sembunyikan password' : 'Tampilkan password');
+      button.setAttribute('aria-label', showPassword ? 'Sembunyikan password' : 'Tampilkan password');
+      var icon = button.querySelector('i');
+      if (icon) {
+        icon.className = showPassword ? 'bi bi-eye-slash' : 'bi bi-eye';
+      }
+    });
+  });
 });
 </script>
 

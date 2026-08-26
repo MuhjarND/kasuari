@@ -1059,7 +1059,7 @@ a:hover { color: var(--indigo-dark); }
 .ks-monitoring-stat.total .ks-monitoring-stat-icon { color: #2563eb; background: #dbeafe; }
 .ks-monitoring-stat.synced .ks-monitoring-stat-icon { color: #047857; background: #d1fae5; }
 .ks-monitoring-stat.pending .ks-monitoring-stat-icon { color: #b45309; background: #fef3c7; }
-.ks-monitoring-stat.never .ks-monitoring-stat-icon { color: #be123c; background: #ffe4e6; }
+.ks-monitoring-stat.unmonitored .ks-monitoring-stat-icon { color: #64748b; background: #e2e8f0; }
 
 .ks-monitoring-stat strong {
   display: block;
@@ -1203,6 +1203,7 @@ a:hover { color: var(--indigo-dark); }
 .ks-monitoring-status.sinkron { color: #047857; background: #d1fae5; }
 .ks-monitoring-status.pending { color: #a65308; background: #fef3c7; }
 .ks-monitoring-status.belum { color: #be123c; background: #ffe4e6; }
+.ks-monitoring-status.unknown { color: #475569; background: #e2e8f0; }
 
 .ks-monitoring-connection i { font-size: .42rem; }
 .ks-monitoring-connection.online { color: #059669; }
@@ -3415,6 +3416,26 @@ body,
   border-color: #e3e7ef;
 }
 
+.kasuari-user-modal .form-select {
+  min-height: 42px;
+  color: #3d4658;
+  border-color: #e3e7ef;
+  background-color: #fff;
+}
+
+.kasuari-user-modal .form-select:disabled {
+  color: #657086;
+  background-color: #f3f5f9;
+}
+
+.kasuari-status-field-note {
+  display: block;
+  margin-top: 7px;
+  color: #7a8498;
+  font-size: .7rem;
+  line-height: 1.45;
+}
+
 .kasuari-reset-target {
   margin: 0 0 17px;
   padding: 10px 12px;
@@ -3427,6 +3448,29 @@ body,
 
 .kasuari-reset-target strong {
   color: #3f36bd;
+}
+
+.kasuari-password-input .btn {
+  width: 44px;
+  padding: 0;
+  color: #657086;
+  border-color: #e3e7ef;
+  background: #f8f9fc;
+  box-shadow: none;
+}
+
+.kasuari-password-input .btn:hover,
+.kasuari-password-input .btn:focus {
+  color: #4338ca;
+  border-color: #c7d2fe;
+  background: #eef2ff;
+}
+
+.kasuari-password-hint {
+  display: block;
+  margin-top: 7px;
+  color: #7a8498;
+  font-size: .7rem;
 }
 
 /* User administration */
@@ -3651,28 +3695,66 @@ body,
   background: rgba(14,165,233,.07);
 }
 
-.kasuari-account-status {
-  position: relative;
+.kasuari-user-status-summary {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  font-size: .73rem;
-  font-weight: 700;
+}
+
+.kasuari-user-status-summary span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 9px;
+  border-radius: 6px;
+  font-size: .69rem;
+  font-weight: 750;
   white-space: nowrap;
 }
 
-.kasuari-account-status::before {
-  content: "";
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: currentColor;
-  box-shadow: 0 0 0 3px currentColor;
-  opacity: .78;
+.kasuari-user-status-summary .active {
+  color: #08785b;
+  background: #d1fae5;
 }
 
-.kasuari-account-status.active { color: #138765; }
-.kasuari-account-status.inactive { color: #a15c65; }
+.kasuari-user-status-summary .inactive {
+  color: #a33e55;
+  background: #ffe4e6;
+}
+
+.kasuari-account-status-wrap {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.kasuari-account-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  border-radius: 6px;
+  font-size: .73rem;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.kasuari-account-status-wrap small {
+  color: #8b93a5;
+  font-size: .65rem;
+  white-space: nowrap;
+}
+
+.kasuari-account-status.active {
+  color: #08785b;
+  background: #d1fae5;
+}
+
+.kasuari-account-status.inactive {
+  color: #a33e55;
+  background: #ffe4e6;
+}
 
 .kasuari-user-date {
   color: #7a8498;

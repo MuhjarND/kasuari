@@ -2,6 +2,7 @@
 ob_start();
 include_once(__DIR__ . '/../sys/sys_session.php');
 include_once(__DIR__ . '/../sys/sys_authorization.php');
+include_once(__DIR__ . '/../sys/sys_fungsi.php');
 include_once(__DIR__ . '/../sys/sys_laporan_pdf.php');
 if (!kasuari_is_admin()) {
     while (ob_get_level() > 0) ob_end_clean();

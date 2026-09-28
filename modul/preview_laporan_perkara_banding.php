@@ -23,7 +23,8 @@ $reportNames = array(
 );
 $query = array('jenis' => $type, 'mode' => $mode, 'bulan' => $month, 'tahun' => $year);
 if ($mode === 'rentang') { $query['dari'] = $dari; $query['sampai'] = $sampai; }
-$pdfUrl = 'laporan_perkara_banding?' . http_build_query($query);
+$reportQuery = array_merge(array('modul' => 'laporan_perkara_banding'), $query);
+$pdfUrl = 'index.php?' . http_build_query($reportQuery);
 $downloadUrl = $pdfUrl . '&download=1';
 $periodLabel = $mode === 'rentang' ? $dari . ' sampai ' . $sampai : $months[$month] . ' ' . $year;
 ?>
@@ -61,17 +62,26 @@ $periodLabel = $mode === 'rentang' ? $dari . ' sampai ' . $sampai : $months[$mon
     var loading = document.getElementById('reportPreviewLoading');
     var errorBox = document.getElementById('reportPreviewError');
     var errorText = document.getElementById('reportPreviewErrorText');
-    fetch(frame.getAttribute('data-pdf-url'), { credentials: 'same-origin' })
+    fetch(frame.getAttribute('data-pdf-url'), { credentials: 'same-origin', cache: 'no-store' })
       .then(function (response) {
-        if (!response.ok) return response.text().then(function (text) { throw new Error(text || ('HTTP ' + response.status)); });
-        return response.blob();
+        if (!response.ok) return response.text().then(function (text) {
+          throw new Error('HTTP ' + response.status + ' - ' + (text || 'Server menolak permintaan laporan.'));
+        });
+        var contentType = (response.headers.get('content-type') || '').toLowerCase();
+        return response.blob().then(function (blob) {
+          return blob.slice(0, 5).text().then(function (signature) {
+            if (signature !== '%PDF-') {
+              return blob.text().then(function (text) {
+                throw new Error('Server tidak mengembalikan PDF (Content-Type: ' + (contentType || 'tidak tersedia') + '). ' + text);
+              });
+            }
+            return blob;
+          });
+        });
       })
       .then(function (blob) {
         if (!blob || blob.size < 20) throw new Error('File PDF kosong.');
-        return blob.slice(0, 5).text().then(function (signature) {
-          if (signature !== '%PDF-') throw new Error('Respons server bukan file PDF yang valid.');
-          return blob;
-        });
+        return blob;
       })
       .then(function (blob) {
         frame.src = URL.createObjectURL(blob);
@@ -80,7 +90,7 @@ $periodLabel = $mode === 'rentang' ? $dari . ' sampai ' . $sampai : $months[$mon
       })
       .catch(function (error) {
         loading.classList.add('d-none');
-        errorText.textContent = error && error.message ? error.message.replace(/<[^>]+>/g, ' ').trim() : 'Terjadi kesalahan saat membuat PDF.';
+        errorText.textContent = error && error.message ? error.message.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 500) : 'Terjadi kesalahan saat membuat PDF.';
         errorBox.classList.remove('d-none');
       });
   }());

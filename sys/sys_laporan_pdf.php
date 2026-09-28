@@ -5,16 +5,18 @@
  */
 class KasuariLaporanPdf
 {
-    private $width = 1008;
-    private $height = 612;
+    private $width;
+    private $height;
     private $pages = array();
     private $page = '';
     private $jpeg = null;
     private $fill = array(0, 0, 0);
     private $stroke = array(0, 0, 0);
 
-    public function __construct($kopPath)
+    public function __construct($kopPath, $width = 1008, $height = 612)
     {
+        $this->width = (float) $width;
+        $this->height = (float) $height;
         if (function_exists('imagecreatefrompng') && is_file($kopPath)) {
             $image = @imagecreatefrompng($kopPath);
             if ($image) {
@@ -125,6 +127,16 @@ class KasuariLaporanPdf
         return $this->wrap($text, $width, $size);
     }
 
+    public function pageWidth()
+    {
+        return $this->width;
+    }
+
+    public function pageHeight()
+    {
+        return $this->height;
+    }
+
     public function setFillForReport($color)
     {
         $this->setFill($color);
@@ -162,7 +174,12 @@ class KasuariLaporanPdf
 
     private function wrap($text, $width, $size)
     {
-        $text = trim(preg_replace('/\s+/', ' ', strip_tags((string) $text)));
+        $text = strip_tags((string) $text);
+        $text = str_replace(array("\r\n", "\r"), "\n", $text);
+        $text = preg_replace('/[ \t]+/', ' ', $text);
+        $text = preg_replace('/\n[ \t]+/', "\n", $text);
+        $text = preg_replace('/[ \t]+\n/', "\n", $text);
+        $text = trim($text);
         if ($text === '') return array('-');
         $lines = array();
         $paragraphs = preg_split('/\r\n|\r|\n/', $text);

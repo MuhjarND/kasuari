@@ -71,7 +71,7 @@ $specs = array(
         'filename' => 'register_perkara_pengadilan_tinggi_agama_papua_barat',
         'filter' => $dateFilter('pb.tanggal_pendaftaran_banding'),
         'columns' => array('#', 'Asal Pengadilan', 'Nama Pemohon Banding', 'Nomor Perkara Tk. I', 'Jenis Perkara', 'Tgl Register', 'Nomor Perkara Banding', 'Lama Proses', 'Status Perkara', 'link'),
-        'widths' => array(30, 84, 178, 100, 74, 76, 100, 62, 136, 120),
+        'widths' => array(24, 54, 116, 52, 40, 48, 54, 42, 78, 30),
         'grouped' => false,
         'register' => true,
     ),
@@ -165,10 +165,15 @@ function laporan_pdf_rows($rows, $type)
 
 function laporan_pdf_draw_header($pdf, $spec, $periodTitle)
 {
-    $pdf->kop(54, 18, 900, 170.2);
-    $pdf->text(504, 217, $spec['title'], 13, true, 'center');
-    $pdf->text(504, 235, $periodTitle, 11, true, 'center');
-    $pdf->line(24, 249, 984, 249, 0.75);
+    if (!empty($spec['register'])) {
+        $pdf->text($pdf->pageWidth() / 2, 38, $spec['title'], 10.5, false, 'center');
+        return;
+    }
+    // Ukuran kop mengikuti komposisi laporan acuan: lebar penuh dengan tinggi ringkas.
+    $pdf->kop(54, 18, 900, 110);
+    $pdf->text(504, 145, $spec['title'], 13, true, 'center');
+    $pdf->text(504, 163, $periodTitle, 11, true, 'center');
+    $pdf->line(24, 183, 984, 183, 0.75);
 }
 
 function laporan_pdf_draw_table_header($pdf, $spec, $top)
@@ -199,8 +204,8 @@ function laporan_pdf_draw_table_header($pdf, $spec, $top)
 
 function laporan_pdf_draw_register_header($pdf, $spec, $top)
 {
-    $x = 24; $height = 44;
-    $pdf->fillRect(24, $top, 960, $height, array(37, 58, 81));
+    $x0 = 40; $tableWidth = array_sum($spec['widths']); $x = $x0; $height = 44;
+    $pdf->fillRect($x0, $top, $tableWidth, $height, array(37, 58, 81));
     $pdf->setFillForReport(array(255, 255, 255));
     foreach ($spec['widths'] as $i => $width) {
         $pdf->rect($x, $top, $width, $height);
@@ -213,10 +218,10 @@ function laporan_pdf_draw_register_header($pdf, $spec, $top)
 
 function laporan_pdf_draw_register_rows($pdf, $spec, $rows, $top, $pageBottom, $periodTitle)
 {
-    $widths = $spec['widths']; $x0 = 24; $headerHeight = laporan_pdf_draw_register_header($pdf, $spec, $top); $y = $top + $headerHeight; $rowNumber = 0;
+    $widths = $spec['widths']; $x0 = 40; $tableWidth = array_sum($widths); $headerHeight = laporan_pdf_draw_register_header($pdf, $spec, $top); $y = $top + $headerHeight; $rowNumber = 0;
     if (count($rows) === 0) {
-        $pdf->rect($x0, $y, 960, 30);
-        $pdf->text(504, $y + 10, 'Tidak ada data untuk periode yang dipilih.', 8, false, 'center');
+        $pdf->rect($x0, $y, $tableWidth, 30);
+        $pdf->text($pdf->pageWidth() / 2, $y + 10, 'Tidak ada data untuk periode yang dipilih.', 8, false, 'center');
         return $y + 30;
     }
     foreach ($rows as $row) {
@@ -226,8 +231,8 @@ function laporan_pdf_draw_register_rows($pdf, $spec, $rows, $top, $pageBottom, $
         if ($y + $rowHeight > $pageBottom) {
             $pdf->addPage();
             laporan_pdf_draw_header($pdf, $spec, $periodTitle);
-            $headerHeight = laporan_pdf_draw_register_header($pdf, $spec, 258);
-            $y = 258 + $headerHeight;
+            $headerHeight = laporan_pdf_draw_register_header($pdf, $spec, 70);
+            $y = 70 + $headerHeight;
         }
         $rowNumber++;
         $x = $x0;
@@ -256,7 +261,7 @@ function laporan_pdf_draw_rows($pdf, $spec, $rows, $top, $pageBottom, $periodTit
     foreach ($rows as $row) {
         $lineCount = 1; foreach ($row as $i => $value) $lineCount = max($lineCount, count($pdf->wrapForReport($value, $widths[$i] - 8, 6.7)));
         $rowHeight = max(20, min(48, $lineCount * 8 + 8));
-        if ($y + $rowHeight > $pageBottom) { $pdf->addPage(); laporan_pdf_draw_header($pdf, $spec, $periodTitle); $headerHeight = laporan_pdf_draw_table_header($pdf, $spec, 258); $y = 258 + $headerHeight; }
+        if ($y + $rowHeight > $pageBottom) { $pdf->addPage(); laporan_pdf_draw_header($pdf, $spec, $periodTitle); $headerHeight = laporan_pdf_draw_table_header($pdf, $spec, 194); $y = 194 + $headerHeight; }
         $x = $x0;
         foreach ($widths as $i => $w) {
             $pdf->rect($x, $y, $w, $rowHeight); $value = $row[$i] ?? '-'; $lines = $pdf->wrapForReport($value, $w - 8, 6.7); $lineY = $y + (($rowHeight - (count($lines) * 8)) / 2) + 2;
@@ -280,9 +285,10 @@ $config = array('nama_ketua' => '', 'nama_panitera' => '');
 $configResult = @mysqli_query($koneksi, 'SELECT nama_ketua, nama_panitera FROM sys_konfig ORDER BY id ASC LIMIT 1');
 if ($configResult && ($configRow = mysqli_fetch_assoc($configResult))) $config = array_merge($config, $configRow);
 
-$pdf = new KasuariLaporanPdf(__DIR__ . '/../assets/kop_undangan.png');
+$isRegister = !empty($spec['register']);
+$pdf = new KasuariLaporanPdf(__DIR__ . '/../assets/kop_undangan.png', $isRegister ? 595.28 : 1008, $isRegister ? 841.89 : 612);
 $pdf->addPage(); laporan_pdf_draw_header($pdf, $spec, $periodTitle);
-$lastY = laporan_pdf_draw_rows($pdf, $spec, $rows, 258, 485, $periodTitle);
-laporan_pdf_draw_signatures($pdf, $config, $lastY, $periodTitle);
+$lastY = laporan_pdf_draw_rows($pdf, $spec, $rows, $isRegister ? 70 : 194, $isRegister ? 810 : 485, $periodTitle);
+if (!$isRegister) laporan_pdf_draw_signatures($pdf, $config, $lastY, $periodTitle);
 $periodFilename = $mode === 'rentang' ? date('Ymd', strtotime($start)) . '_' . date('Ymd', strtotime($end)) : strtolower($monthTitle) . '_' . $year;
 $pdf->output($spec['filename'] . '_' . $periodFilename . '.pdf', $download);

@@ -50,6 +50,13 @@ $dicabut = $cnt("SELECT id FROM perkara_banding
 /* â”€â”€â”€ Perkara banding terbaru (sudah terdaftar) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 $sql_new = "SELECT pb.id, pb.nomor_perkara_banding, pb.nomor_perkara_pn,
   pb.status_banding_text,
+  pb.putusan_banding,
+  pb.tgl_kirim_salinan_putusan,
+  pb.tgl_minutasi,
+  pb.minutasi_banding,
+  pb.pemberitahuan_putusan_banding,
+  pb.tgl_pemberitahuan_putusan,
+  pb.tanggal_cabut,
   pb.tanggal_pendaftaran_banding AS tgl_daftar,
   pa.nama AS pengaju
   FROM perkara_banding pb
@@ -240,10 +247,10 @@ $greetingIcon = $jam < 12 ? 'bi-brightness-alt-high' : ($jam < 18 ? 'bi-hand-ind
                   foreach ($recentRows as $row):
                     $pengaju = str_replace('PENGADILAN AGAMA ', 'PA ', $row['pengaju'] ?? '');
                     $color = $iconColors[$ic % count($iconColors)]; $ic++;
-                    $statusText = $row['status_banding_text'] ?? '';
+                    $statusText = kasuari_status_banding_tampil($row);
                     // determine badge class
                     if (stripos($statusText,'proses') !== false || stripos($statusText,'register') !== false) $bc = 'proses';
-                    elseif (stripos($statusText,'putusan') !== false || stripos($statusText,'selesai') !== false) $bc = 'selesai';
+                    elseif (stripos($statusText,'putus') !== false || stripos($statusText,'putusan') !== false || stripos($statusText,'minutasi') !== false || stripos($statusText,'selesai') !== false) $bc = 'selesai';
                     else $bc = 'proses';
                   ?>
                   <a class="ks-perkara-item" href="perkara_detil_banding&id=<?php echo $row['id']; ?>">

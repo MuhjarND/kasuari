@@ -32,6 +32,12 @@ $sql = "SELECT
           perkara_banding.nomor_perkara_pn,
           perkara_banding.tanggal_pendaftaran_banding AS tanggalpendaftaranbanding,
           perkara_banding.putusan_banding AS putusanbanding,
+          perkara_banding.tgl_kirim_salinan_putusan,
+          perkara_banding.tgl_minutasi,
+          perkara_banding.minutasi_banding,
+          perkara_banding.pemberitahuan_putusan_banding,
+          perkara_banding.tgl_pemberitahuan_putusan,
+          perkara_banding.tanggal_cabut,
           perkara_banding.status_banding_text,
           pengadilan_agama.nama AS pengaju
         FROM perkara_banding
@@ -98,9 +104,10 @@ while($row=mysqli_fetch_assoc($result)){
 	$sub_array[] = htmlspecialchars((string) ($row['nomor_perkara_pn'] ?? ''), ENT_QUOTES, 'UTF-8');
 	$sub_array[] = htmlspecialchars(kasuari_tanggal_indonesia($row['tanggalpendaftaranbanding'] ?? ''), ENT_QUOTES, 'UTF-8');
 	$sub_array[] = htmlspecialchars(kasuari_tanggal_indonesia($row['putusanbanding'] ?? ''), ENT_QUOTES, 'UTF-8');
-	$statusBanding = htmlspecialchars($row['status_banding_text'] ?? "", ENT_QUOTES, 'UTF-8');
-	$statusBandingClass = register_banding_status_class($row['status_banding_text'] ?? "");
-	$sub_array[] = "<span class='ks-banding-status " . $statusBandingClass . "'>" . ($statusBanding !== '' ? $statusBanding : 'Belum ada status') . "</span>";
+	$statusBandingText = kasuari_status_banding_tampil($row);
+	$statusBanding = htmlspecialchars($statusBandingText, ENT_QUOTES, 'UTF-8');
+	$statusBandingClass = register_banding_status_class($statusBandingText);
+	$sub_array[] = "<span class='ks-banding-status " . $statusBandingClass . "'>" . $statusBanding . "</span>";
 	$sub_array[] = "<a class='kasuari-action-link' href='perkara_detil_banding&id=".$row["id"]."' title='Detail Perkara'><i class='bi bi-eye' aria-hidden='true'></i> Detail</a>";
 	$data[] = $sub_array;
 }

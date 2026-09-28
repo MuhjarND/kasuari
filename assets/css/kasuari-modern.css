@@ -4749,6 +4749,78 @@ body,
   object-fit: contain;
 }
 
+/* Monthly report picker */
+.kasuari-report-modal .modal-header {
+  background: linear-gradient(135deg, #172b68, #3f52d9) !important;
+  border-bottom: 0;
+}
+
+.kasuari-report-modal .modal-title {
+  font-size: 1.08rem !important;
+}
+
+.kasuari-report-modal .kasuari-section-kicker {
+  color: rgba(255,255,255,.72);
+  font-size: .64rem;
+  letter-spacing: .12em;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.kasuari-report-list {
+  display: grid;
+  gap: 10px;
+}
+
+.kasuari-report-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  padding: 10px 14px 10px 10px;
+  color: #17233f;
+  text-decoration: none;
+  border: 1px solid #e3e9f4;
+  border-radius: 12px;
+  background: #fff;
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+
+.kasuari-report-option:hover,
+.kasuari-report-option:focus-visible {
+  color: #17233f;
+  border-color: #9eafff;
+  box-shadow: 0 8px 22px rgba(51, 76, 190, .12);
+  transform: translateY(-1px);
+}
+
+.kasuari-report-option > span:nth-child(2) {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.kasuari-report-option strong { font-size: .86rem; }
+.kasuari-report-option small { color: #71809a; font-size: .75rem; }
+.kasuari-report-option > .bi-arrow-up-right { color: #6879e8; }
+
+.kasuari-report-icon {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 11px;
+  font-size: 1.05rem;
+}
+
+.kasuari-report-icon.blue { background: #e9efff; color: #4162df; }
+.kasuari-report-icon.violet { background: #f0eaff; color: #7342dc; }
+.kasuari-report-icon.green { background: #e4f8ee; color: #16865d; }
+.kasuari-report-icon.orange { background: #fff0dc; color: #bc6a07; }
+
 .ks-legacy-brand-logo {
   width: 21px;
   height: 28px;

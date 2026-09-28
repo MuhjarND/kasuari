@@ -20,6 +20,12 @@ $sql = "SELECT
           perkara_banding.putusan_banding AS putusanbanding,
           perkara_banding.putusan_pn AS putusanpn,
           perkara_banding.status_banding_text,
+          perkara_banding.tgl_kirim_salinan_putusan,
+          perkara_banding.tgl_minutasi,
+          perkara_banding.minutasi_banding,
+          perkara_banding.pemberitahuan_putusan_banding,
+          perkara_banding.tgl_pemberitahuan_putusan,
+          perkara_banding.tanggal_cabut,
           pengadilan_agama.nama AS pengaju,
           perkara_banding.penerimaan_memori_banding,
           perkara_banding.penerimaan_kontra_banding,
@@ -49,6 +55,7 @@ if (!$data) {
 foreach ($data as $key => $value) {
     $$key = $value;
 }
+$status_banding_text = kasuari_status_banding_tampil($data);
 $permohonanbanding = kasuari_tanggal_indonesia($permohonanbanding ?? '');
 $pengirimanberkasbanding = kasuari_tanggal_indonesia($pengirimanberkasbanding ?? '');
 $tanggalpendaftaranbanding = kasuari_tanggal_indonesia($tanggalpendaftaranbanding ?? '');

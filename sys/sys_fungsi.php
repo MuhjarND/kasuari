@@ -53,6 +53,37 @@ if (!function_exists('kasuari_tanggal_indonesia')) {
     return date('j', $timestamp) . ' ' . $bulan[(int) date('n', $timestamp)] . ' ' . date('Y', $timestamp);
   }
 }
+if (!function_exists('kasuari_status_banding_tampil')) {
+  function kasuari_status_banding_tampil($perkara) {
+    $perkara = is_array($perkara) ? $perkara : array();
+    $hasDate = function ($field) use ($perkara) {
+      $value = trim((string) ($perkara[$field] ?? ''));
+      return $value !== '' && strpos($value, '0000-00-00') !== 0;
+    };
+
+    if ($hasDate('tanggal_cabut')) {
+      return 'Dicabut';
+    }
+    if ($hasDate('tgl_minutasi') || $hasDate('minutasi_banding')) {
+      return 'Minutasi';
+    }
+    if ($hasDate('tgl_kirim_salinan_putusan')) {
+      return 'Salinan Putusan Dikirim';
+    }
+    if ($hasDate('tgl_pemberitahuan_putusan') || $hasDate('pemberitahuan_putusan_banding')) {
+      return 'Pemberitahuan Putusan';
+    }
+    if ($hasDate('putusan_banding') || $hasDate('putusanbanding')) {
+      return 'Putus';
+    }
+
+    $status = trim((string) ($perkara['status_banding_text'] ?? ''));
+    if ($status !== '' && $status !== '-' && strtolower($status) !== 'belum ada status') {
+      return $status;
+    }
+    return 'Belum ada status';
+  }
+}
 function arr2md5($arrinput){ $hasil=''; foreach($arrinput as $val){ if($hasil==''){ $hasil=md5($val); } else { $code=md5($val); for($hit=0;$hit<min(array(strlen($code),strlen($hasil)));$hit++){ $hasil[$hit]=chr(ord($hasil[$hit]) ^ ord($code[$hit])); } } } return(md5($hasil)); } function getPassword($pase){ $pass = arr2md5($pase); return $pass; }
 function kukurl($url, $datanya){
   $ch = curl_init(); 

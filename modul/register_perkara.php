@@ -33,10 +33,16 @@ function register_banding_status_class($text) {
           <h3 class="mb-1 fw-bold fs-5">Perkara Banding</h3>
           <p class="text-secondary mb-0">Gunakan pencarian tabel untuk nomor perkara, satker pengaju, atau status banding.</p>
         </div>
-        <a href="register_perkara_satker" class="btn btn-outline-primary">
-          <i class="bi bi-folder2-open me-1" aria-hidden="true"></i>
-          Perkara Satker
-        </a>
+        <div class="d-flex flex-wrap gap-2 justify-content-end">
+          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalLaporanBulanan">
+            <i class="bi bi-file-earmark-pdf me-1" aria-hidden="true"></i>
+            Laporan Bulanan
+          </button>
+          <a href="register_perkara_satker" class="btn btn-outline-primary">
+            <i class="bi bi-folder2-open me-1" aria-hidden="true"></i>
+            Perkara Satker
+          </a>
+        </div>
       </div>
 
       <div id="results_content" class="kasuari-table-wrap table-responsive">
@@ -58,6 +64,12 @@ function register_banding_status_class($text) {
                   perkara_banding.nomor_perkara_pn,
                   perkara_banding.tanggal_pendaftaran_banding AS tanggalpendaftaranbanding,
                   perkara_banding.putusan_banding AS putusanbanding,
+                  perkara_banding.tgl_kirim_salinan_putusan,
+                  perkara_banding.tgl_minutasi,
+                  perkara_banding.minutasi_banding,
+                  perkara_banding.pemberitahuan_putusan_banding,
+                  perkara_banding.tgl_pemberitahuan_putusan,
+                  perkara_banding.tanggal_cabut,
                   perkara_banding.status_banding_text,
                   pengadilan_agama.nama AS pengaju
                 FROM perkara_banding
@@ -72,8 +84,9 @@ function register_banding_status_class($text) {
         }
         while ($query && ($data = mysqli_fetch_assoc($query))) {
           $no++;
-          $statusBanding = htmlspecialchars($data["status_banding_text"] ?? "", ENT_QUOTES, 'UTF-8');
-          $statusBandingClass = register_banding_status_class($data["status_banding_text"] ?? "");
+          $statusBandingText = kasuari_status_banding_tampil($data);
+          $statusBanding = htmlspecialchars($statusBandingText, ENT_QUOTES, 'UTF-8');
+          $statusBandingClass = register_banding_status_class($statusBandingText);
           $nomorBanding = htmlspecialchars((string) ($data["nomor_perkara_banding"] ?? ""), ENT_QUOTES, 'UTF-8');
           $satker = htmlspecialchars(str_replace("PENGADILAN AGAMA", "PA", (string) ($data["pengaju"] ?? "")), ENT_QUOTES, 'UTF-8');
           $nomorPerkaraPn = htmlspecialchars((string) ($data["nomor_perkara_pn"] ?? ""), ENT_QUOTES, 'UTF-8');
@@ -86,7 +99,7 @@ function register_banding_status_class($text) {
             <td>' . $nomorPerkaraPn . '</td>
             <td>' . ($tanggalPendaftaran !== '' ? $tanggalPendaftaran : '-') . '</td>
             <td>' . ($tanggalPutusan !== '' ? $tanggalPutusan : '-') . '</td>
-            <td><span class="ks-banding-status ' . $statusBandingClass . '">' . ($statusBanding !== '' ? $statusBanding : 'Belum ada status') . '</span></td>
+            <td><span class="ks-banding-status ' . $statusBandingClass . '">' . $statusBanding . '</span></td>
             <td class="text-center"><a class="kasuari-action-link" href="perkara_detil_banding&id=' . $data["id"] . '" title="Detail Perkara"><i class="bi bi-eye" aria-hidden="true"></i> Detail</a></td>
           </tr>';
         }
@@ -110,6 +123,75 @@ function register_banding_status_class($text) {
       { select: 4, sort: "desc" }
     ]
   });
+</script>
+
+<div class="modal fade" id="modalLaporanBulanan" tabindex="-1" aria-labelledby="modalLaporanBulananLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content kasuari-report-modal">
+      <div class="modal-header">
+        <div>
+          <div class="kasuari-section-kicker">CETAK DOKUMEN</div>
+          <h5 class="modal-title" id="modalLaporanBulananLabel">Laporan Perkara Bulanan</h5>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-secondary mb-3">Pilih bulan dan tahun, kemudian pilih laporan yang akan dicetak dalam format PDF.</p>
+        <div class="row g-3 mb-4">
+          <div class="col-sm-7">
+            <label for="laporanBulan" class="form-label">Bulan laporan</label>
+            <select class="form-select" id="laporanBulan">
+              <?php foreach (array(1=>'Januari',2=>'Februari',3=>'Maret',4=>'April',5=>'Mei',6=>'Juni',7=>'Juli',8=>'Agustus',9=>'September',10=>'Oktober',11=>'November',12=>'Desember') as $bulanNo => $bulanNama): ?>
+                <option value="<?php echo $bulanNo; ?>" <?php echo ((int) date('n') === $bulanNo ? 'selected' : ''); ?>><?php echo $bulanNama; ?></option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+          <div class="col-sm-5">
+            <label for="laporanTahun" class="form-label">Tahun laporan</label>
+            <input type="number" class="form-control" id="laporanTahun" min="2000" max="2100" value="<?php echo (int) date('Y'); ?>">
+          </div>
+        </div>
+        <div class="kasuari-report-list">
+          <a class="kasuari-report-option" data-report-type="1" target="_blank" rel="noopener">
+            <span class="kasuari-report-icon blue"><i class="bi bi-journal-text"></i></span>
+            <span><strong>Laporan perkara banding</strong><small>Rekap penerimaan, PMH, sidang, putusan, dan sisa perkara.</small></span>
+            <i class="bi bi-arrow-up-right ms-auto"></i>
+          </a>
+          <a class="kasuari-report-option" data-report-type="2" target="_blank" rel="noopener">
+            <span class="kasuari-report-icon violet"><i class="bi bi-send-check"></i></span>
+            <span><strong>Laporan pengiriman salinan putusan</strong><small>Salinan putusan PTA Papua Barat ke PA pengaju.</small></span>
+            <i class="bi bi-arrow-up-right ms-auto"></i>
+          </a>
+          <a class="kasuari-report-option" data-report-type="3" target="_blank" rel="noopener">
+            <span class="kasuari-report-icon green"><i class="bi bi-globe2"></i></span>
+            <span><strong>Laporan publikasi putusan</strong><small>Putusan yang telah masuk proses publikasi/minutasi.</small></span>
+            <i class="bi bi-arrow-up-right ms-auto"></i>
+          </a>
+          <a class="kasuari-report-option" data-report-type="4" target="_blank" rel="noopener">
+            <span class="kasuari-report-icon orange"><i class="bi bi-list-columns-reverse"></i></span>
+            <span><strong>Register perkara PTA Papua Barat</strong><small>Register perkara banding berdasarkan tanggal pendaftaran.</small></span>
+            <i class="bi bi-arrow-up-right ms-auto"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    function updateReportLinks() {
+      var month = document.getElementById('laporanBulan').value;
+      var year = document.getElementById('laporanTahun').value;
+      document.querySelectorAll('.kasuari-report-option').forEach(function (link) {
+        link.href = 'laporan_perkara_banding?jenis=' + encodeURIComponent(link.getAttribute('data-report-type')) + '&bulan=' + encodeURIComponent(month) + '&tahun=' + encodeURIComponent(year);
+      });
+    }
+    document.getElementById('laporanBulan').addEventListener('change', updateReportLinks);
+    document.getElementById('laporanTahun').addEventListener('input', updateReportLinks);
+    document.getElementById('modalLaporanBulanan').addEventListener('show.bs.modal', updateReportLinks);
+    updateReportLinks();
+  }());
 </script>
 
 <?php include_once("sys/footer.php"); ?>

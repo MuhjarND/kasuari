@@ -4833,10 +4833,21 @@ body,
 
 .kasuari-report-preview-panel { min-height: calc(100vh - 150px); }
 .kasuari-report-preview-frame-wrap {
+  position: relative;
   min-height: 720px;
   padding: 12px;
   background: #e9eef7;
   border-top: 1px solid #e3e9f4;
+}
+.kasuari-report-preview-loading {
+  min-height: 650px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #65728a;
+  font-size: .86rem;
+  font-weight: 700;
 }
 .kasuari-report-preview-frame {
   display: block;

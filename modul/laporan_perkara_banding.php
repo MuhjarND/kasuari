@@ -1,7 +1,13 @@
 <?php
 ob_start();
 include_once(__DIR__ . '/../sys/sys_session.php');
+include_once(__DIR__ . '/../sys/sys_authorization.php');
 include_once(__DIR__ . '/../sys/sys_laporan_pdf.php');
+if (!kasuari_is_admin()) {
+    while (ob_get_level() > 0) ob_end_clean();
+    http_response_code(403);
+    exit('Laporan hanya dapat diakses oleh administrator.');
+}
 
 $mode = isset($_GET['mode']) && $_GET['mode'] === 'rentang' ? 'rentang' : 'bulanan';
 $month = isset($_GET['bulan']) ? (int) $_GET['bulan'] : (int) date('n');
@@ -159,7 +165,7 @@ function laporan_pdf_rows($rows, $type)
 
 function laporan_pdf_draw_header($pdf, $spec, $periodTitle)
 {
-    $pdf->kop(24, 18, 960, 181.3);
+    $pdf->kop(54, 18, 900, 170.2);
     $pdf->text(504, 217, $spec['title'], 13, true, 'center');
     $pdf->text(504, 235, $periodTitle, 11, true, 'center');
     $pdf->line(24, 249, 984, 249, 0.75);
@@ -265,8 +271,8 @@ function laporan_pdf_draw_rows($pdf, $spec, $rows, $top, $pageBottom, $periodTit
 function laporan_pdf_draw_signatures($pdf, $config, $y, $periodTitle)
 {
     $base = min(548, max($y + 18, 500)); $ketua = laporan_pdf_value($config['nama_ketua'] ?? ''); $panitera = laporan_pdf_value($config['nama_panitera'] ?? '');
-    $pdf->text(190, $base, 'Mengetahui,', 8.5, false, 'center'); $pdf->text(190, $base + 12, 'Ketua PTA Papua Barat', 8.5, false, 'center'); $pdf->text(190, $base + 55, $ketua, 8.5, true, 'center'); $pdf->line(115, $base + 57, 265, $base + 57, 0.45); $pdf->text(190, $base + 68, 'NIP. ........................................', 7.5, false, 'center');
-    $pdf->text(785, $base, 'Manokwari, ' . $periodTitle, 8.5, false, 'center'); $pdf->text(785, $base + 12, 'Panitera PTA Papua Barat', 8.5, false, 'center'); $pdf->text(785, $base + 55, $panitera, 8.5, true, 'center'); $pdf->line(710, $base + 57, 860, $base + 57, 0.45); $pdf->text(785, $base + 68, 'NIP. ........................................', 7.5, false, 'center');
+    $pdf->text(190, $base, 'Mengetahui,', 8.5, false, 'center'); $pdf->text(190, $base + 12, 'Ketua PTA Papua Barat', 8.5, false, 'center'); $pdf->text(190, $base + 55, $ketua, 8.5, true, 'center');
+    $pdf->text(785, $base, 'Manokwari, ' . $periodTitle, 8.5, false, 'center'); $pdf->text(785, $base + 12, 'Panitera PTA Papua Barat', 8.5, false, 'center'); $pdf->text(785, $base + 55, $panitera, 8.5, true, 'center');
 }
 
 $rows = laporan_pdf_rows(laporan_pdf_query_rows($koneksi, $type, $spec['filter']), $type);

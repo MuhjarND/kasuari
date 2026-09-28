@@ -34,10 +34,12 @@ function register_banding_status_class($text) {
           <p class="text-secondary mb-0">Gunakan pencarian tabel untuk nomor perkara, satker pengaju, atau status banding.</p>
         </div>
         <div class="d-flex flex-wrap gap-2 justify-content-end">
+          <?php if (!empty($isAdministrator)): ?>
           <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalLaporanBulanan">
             <i class="bi bi-file-earmark-pdf me-1" aria-hidden="true"></i>
             Laporan Bulanan
           </button>
+          <?php endif; ?>
           <a href="register_perkara_satker" class="btn btn-outline-primary">
             <i class="bi bi-folder2-open me-1" aria-hidden="true"></i>
             Perkara Satker
@@ -125,6 +127,7 @@ function register_banding_status_class($text) {
   });
 </script>
 
+<?php if (!empty($isAdministrator)): ?>
 <div class="modal fade" id="modalLaporanBulanan" tabindex="-1" aria-labelledby="modalLaporanBulananLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content kasuari-report-modal">
@@ -223,5 +226,6 @@ function register_banding_status_class($text) {
     updateReportLinks();
   }());
 </script>
+<?php endif; ?>
 
 <?php include_once("sys/footer.php"); ?>

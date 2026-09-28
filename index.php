@@ -13,7 +13,7 @@ ini_set('log_errors', '1');
 error_reporting(E_ALL);
 foreach($_GET as $key=>$value){$$key=$value;}
 if(isset($modul)){
-	$adminModules = array('pengguna', 'blangko', 'jenis_blangko', 'variabel', 'identitas_satker');
+	$adminModules = array('pengguna', 'blangko', 'jenis_blangko', 'variabel', 'identitas_satker', 'laporan_perkara_banding', 'preview_laporan_perkara_banding');
 	if (isset($_SESSION['userid']) && in_array($modul, $adminModules, true) && !kasuari_is_admin()) {
 		http_response_code(403);
 		include "modul/akses_ditolak.php";

@@ -1,5 +1,7 @@
 <?php
 include_once(__DIR__ . '/../sys/sys_session.php');
+include_once(__DIR__ . '/../sys/sys_authorization.php');
+kasuari_require_admin();
 $nama_halaman = 'Preview Laporan Perkara';
 include_once(__DIR__ . '/../sys/header.php');
 
@@ -40,9 +42,47 @@ $periodLabel = $mode === 'rentang' ? $dari . ' sampai ' . $sampai : $months[$mon
         </div>
       </div>
       <div class="kasuari-report-preview-frame-wrap">
-        <iframe class="kasuari-report-preview-frame" src="<?php echo htmlspecialchars($pdfUrl, ENT_QUOTES, 'UTF-8'); ?>" title="Preview PDF laporan"></iframe>
+        <div class="kasuari-report-preview-loading" id="reportPreviewLoading">
+          <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+          <span>Menyiapkan preview PDF...</span>
+        </div>
+        <div class="alert alert-danger d-none" id="reportPreviewError" role="alert">
+          <strong>Preview PDF belum dapat ditampilkan.</strong>
+          <span id="reportPreviewErrorText">Periksa data laporan lalu coba kembali.</span>
+        </div>
+        <iframe class="kasuari-report-preview-frame d-none" id="reportPreviewFrame" data-pdf-url="<?php echo htmlspecialchars($pdfUrl, ENT_QUOTES, 'UTF-8'); ?>" title="Preview PDF laporan"></iframe>
       </div>
     </div>
   </div>
 </div>
+<script>
+  (function () {
+    var frame = document.getElementById('reportPreviewFrame');
+    var loading = document.getElementById('reportPreviewLoading');
+    var errorBox = document.getElementById('reportPreviewError');
+    var errorText = document.getElementById('reportPreviewErrorText');
+    fetch(frame.getAttribute('data-pdf-url'), { credentials: 'same-origin' })
+      .then(function (response) {
+        if (!response.ok) return response.text().then(function (text) { throw new Error(text || ('HTTP ' + response.status)); });
+        return response.blob();
+      })
+      .then(function (blob) {
+        if (!blob || blob.size < 20) throw new Error('File PDF kosong.');
+        return blob.slice(0, 5).text().then(function (signature) {
+          if (signature !== '%PDF-') throw new Error('Respons server bukan file PDF yang valid.');
+          return blob;
+        });
+      })
+      .then(function (blob) {
+        frame.src = URL.createObjectURL(blob);
+        frame.classList.remove('d-none');
+        loading.classList.add('d-none');
+      })
+      .catch(function (error) {
+        loading.classList.add('d-none');
+        errorText.textContent = error && error.message ? error.message.replace(/<[^>]+>/g, ' ').trim() : 'Terjadi kesalahan saat membuat PDF.';
+        errorBox.classList.remove('d-none');
+      });
+  }());
+</script>
 <?php include_once(__DIR__ . '/../sys/footer.php'); ?>

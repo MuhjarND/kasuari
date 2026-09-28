@@ -1,7 +1,9 @@
 <?php
+ob_start();
 include_once(__DIR__ . '/../sys/sys_session.php');
 include_once(__DIR__ . '/../sys/sys_laporan_pdf.php');
 
+$mode = isset($_GET['mode']) && $_GET['mode'] === 'rentang' ? 'rentang' : 'bulanan';
 $month = isset($_GET['bulan']) ? (int) $_GET['bulan'] : (int) date('n');
 $year = isset($_GET['tahun']) ? (int) $_GET['tahun'] : (int) date('Y');
 $type = isset($_GET['jenis']) ? (int) $_GET['jenis'] : 1;
@@ -9,10 +11,28 @@ $month = ($month >= 1 && $month <= 12) ? $month : (int) date('n');
 $year = ($year >= 2000 && $year <= 2100) ? $year : (int) date('Y');
 $type = ($type >= 1 && $type <= 4) ? $type : 1;
 
+$parseReportDate = function ($value, $fallback) {
+    $value = trim((string) $value);
+    $date = DateTime::createFromFormat('!Y-m-d', $value);
+    $errors = DateTime::getLastErrors();
+    if (!$date || ($errors && ($errors['warning_count'] > 0 || $errors['error_count'] > 0))) return $fallback;
+    return $date->format('Y-m-d');
+};
+$rangeFrom = $parseReportDate(isset($_GET['dari']) ? $_GET['dari'] : '', date('Y-m-01'));
+$rangeTo = $parseReportDate(isset($_GET['sampai']) ? $_GET['sampai'] : '', date('Y-m-d'));
+if ($rangeTo < $rangeFrom) {
+    $swap = $rangeFrom;
+    $rangeFrom = $rangeTo;
+    $rangeTo = $swap;
+}
+
 $months = array(1 => 'JANUARI', 2 => 'FEBRUARI', 3 => 'MARET', 4 => 'APRIL', 5 => 'MEI', 6 => 'JUNI', 7 => 'JULI', 8 => 'AGUSTUS', 9 => 'SEPTEMBER', 10 => 'OKTOBER', 11 => 'NOVEMBER', 12 => 'DESEMBER');
 $monthTitle = $months[$month];
-$start = sprintf('%04d-%02d-01', $year, $month);
-$next = date('Y-m-d', strtotime($start . ' +1 month'));
+$start = $mode === 'rentang' ? $rangeFrom : sprintf('%04d-%02d-01', $year, $month);
+$end = $mode === 'rentang' ? $rangeTo : date('Y-m-d', strtotime($start . ' +1 month -1 day'));
+$next = date('Y-m-d', strtotime($end . ' +1 day'));
+$periodTitle = $mode === 'rentang' ? laporan_pdf_date($start) . ' S.D. ' . laporan_pdf_date($end) : $monthTitle . ' ' . $year;
+$download = isset($_GET['download']) && (string) $_GET['download'] === '1';
 $dateFilter = function ($field) use ($start, $next) { return "{$field} >= '{$start}' AND {$field} < '{$next}'"; };
 
 $specs = array(
@@ -137,11 +157,11 @@ function laporan_pdf_rows($rows, $type)
     return $output;
 }
 
-function laporan_pdf_draw_header($pdf, $spec, $monthTitle, $year)
+function laporan_pdf_draw_header($pdf, $spec, $periodTitle)
 {
     $pdf->kop(24, 18, 960, 181.3);
     $pdf->text(504, 217, $spec['title'], 13, true, 'center');
-    $pdf->text(504, 235, $monthTitle . ' ' . $year, 11, true, 'center');
+    $pdf->text(504, 235, $periodTitle, 11, true, 'center');
     $pdf->line(24, 249, 984, 249, 0.75);
 }
 
@@ -185,16 +205,21 @@ function laporan_pdf_draw_register_header($pdf, $spec, $top)
     return $height;
 }
 
-function laporan_pdf_draw_register_rows($pdf, $spec, $rows, $top, $pageBottom, $monthTitle, $year)
+function laporan_pdf_draw_register_rows($pdf, $spec, $rows, $top, $pageBottom, $periodTitle)
 {
     $widths = $spec['widths']; $x0 = 24; $headerHeight = laporan_pdf_draw_register_header($pdf, $spec, $top); $y = $top + $headerHeight; $rowNumber = 0;
+    if (count($rows) === 0) {
+        $pdf->rect($x0, $y, 960, 30);
+        $pdf->text(504, $y + 10, 'Tidak ada data untuk periode yang dipilih.', 8, false, 'center');
+        return $y + 30;
+    }
     foreach ($rows as $row) {
         $lineCount = 1;
         foreach ($row as $i => $value) $lineCount = max($lineCount, count($pdf->wrapForReport($value, $widths[$i] - 8, 6.5)));
         $rowHeight = max(28, min(86, $lineCount * 8 + 8));
         if ($y + $rowHeight > $pageBottom) {
             $pdf->addPage();
-            laporan_pdf_draw_header($pdf, $spec, $monthTitle, $year);
+            laporan_pdf_draw_header($pdf, $spec, $periodTitle);
             $headerHeight = laporan_pdf_draw_register_header($pdf, $spec, 258);
             $y = 258 + $headerHeight;
         }
@@ -213,14 +238,19 @@ function laporan_pdf_draw_register_rows($pdf, $spec, $rows, $top, $pageBottom, $
     return $y;
 }
 
-function laporan_pdf_draw_rows($pdf, $spec, $rows, $top, $pageBottom, $monthTitle, $year)
+function laporan_pdf_draw_rows($pdf, $spec, $rows, $top, $pageBottom, $periodTitle)
 {
-    if (!empty($spec['register'])) return laporan_pdf_draw_register_rows($pdf, $spec, $rows, $top, $pageBottom, $monthTitle, $year);
+    if (!empty($spec['register'])) return laporan_pdf_draw_register_rows($pdf, $spec, $rows, $top, $pageBottom, $periodTitle);
     $widths = $spec['widths']; $x0 = 24; $headerHeight = laporan_pdf_draw_table_header($pdf, $spec, $top); $y = $top + $headerHeight;
+    if (count($rows) === 0) {
+        $pdf->rect($x0, $y, 960, 30);
+        $pdf->text(504, $y + 10, 'Tidak ada data untuk periode yang dipilih.', 8, false, 'center');
+        return $y + 30;
+    }
     foreach ($rows as $row) {
         $lineCount = 1; foreach ($row as $i => $value) $lineCount = max($lineCount, count($pdf->wrapForReport($value, $widths[$i] - 8, 6.7)));
         $rowHeight = max(20, min(48, $lineCount * 8 + 8));
-        if ($y + $rowHeight > $pageBottom) { $pdf->addPage(); laporan_pdf_draw_header($pdf, $spec, $monthTitle, $year); $headerHeight = laporan_pdf_draw_table_header($pdf, $spec, 258); $y = 258 + $headerHeight; }
+        if ($y + $rowHeight > $pageBottom) { $pdf->addPage(); laporan_pdf_draw_header($pdf, $spec, $periodTitle); $headerHeight = laporan_pdf_draw_table_header($pdf, $spec, 258); $y = 258 + $headerHeight; }
         $x = $x0;
         foreach ($widths as $i => $w) {
             $pdf->rect($x, $y, $w, $rowHeight); $value = $row[$i] ?? '-'; $lines = $pdf->wrapForReport($value, $w - 8, 6.7); $lineY = $y + (($rowHeight - (count($lines) * 8)) / 2) + 2;
@@ -232,11 +262,11 @@ function laporan_pdf_draw_rows($pdf, $spec, $rows, $top, $pageBottom, $monthTitl
     return $y;
 }
 
-function laporan_pdf_draw_signatures($pdf, $config, $y, $year, $monthTitle)
+function laporan_pdf_draw_signatures($pdf, $config, $y, $periodTitle)
 {
     $base = min(548, max($y + 18, 500)); $ketua = laporan_pdf_value($config['nama_ketua'] ?? ''); $panitera = laporan_pdf_value($config['nama_panitera'] ?? '');
     $pdf->text(190, $base, 'Mengetahui,', 8.5, false, 'center'); $pdf->text(190, $base + 12, 'Ketua PTA Papua Barat', 8.5, false, 'center'); $pdf->text(190, $base + 55, $ketua, 8.5, true, 'center'); $pdf->line(115, $base + 57, 265, $base + 57, 0.45); $pdf->text(190, $base + 68, 'NIP. ........................................', 7.5, false, 'center');
-    $pdf->text(785, $base, 'Manokwari, ........................ ' . ucfirst(strtolower($monthTitle)) . ' ' . $year, 8.5, false, 'center'); $pdf->text(785, $base + 12, 'Panitera PTA Papua Barat', 8.5, false, 'center'); $pdf->text(785, $base + 55, $panitera, 8.5, true, 'center'); $pdf->line(710, $base + 57, 860, $base + 57, 0.45); $pdf->text(785, $base + 68, 'NIP. ........................................', 7.5, false, 'center');
+    $pdf->text(785, $base, 'Manokwari, ' . $periodTitle, 8.5, false, 'center'); $pdf->text(785, $base + 12, 'Panitera PTA Papua Barat', 8.5, false, 'center'); $pdf->text(785, $base + 55, $panitera, 8.5, true, 'center'); $pdf->line(710, $base + 57, 860, $base + 57, 0.45); $pdf->text(785, $base + 68, 'NIP. ........................................', 7.5, false, 'center');
 }
 
 $rows = laporan_pdf_rows(laporan_pdf_query_rows($koneksi, $type, $spec['filter']), $type);
@@ -245,7 +275,8 @@ $configResult = @mysqli_query($koneksi, 'SELECT nama_ketua, nama_panitera FROM s
 if ($configResult && ($configRow = mysqli_fetch_assoc($configResult))) $config = array_merge($config, $configRow);
 
 $pdf = new KasuariLaporanPdf(__DIR__ . '/../assets/kop_undangan.png');
-$pdf->addPage(); laporan_pdf_draw_header($pdf, $spec, $monthTitle, $year);
-$lastY = laporan_pdf_draw_rows($pdf, $spec, $rows, 258, 485, $monthTitle, $year);
-laporan_pdf_draw_signatures($pdf, $config, $lastY, $year, $monthTitle);
-$pdf->output($spec['filename'] . '_' . strtolower($monthTitle) . '_' . $year . '.pdf');
+$pdf->addPage(); laporan_pdf_draw_header($pdf, $spec, $periodTitle);
+$lastY = laporan_pdf_draw_rows($pdf, $spec, $rows, 258, 485, $periodTitle);
+laporan_pdf_draw_signatures($pdf, $config, $lastY, $periodTitle);
+$periodFilename = $mode === 'rentang' ? date('Ymd', strtotime($start)) . '_' . date('Ymd', strtotime($end)) : strtolower($monthTitle) . '_' . $year;
+$pdf->output($spec['filename'] . '_' . $periodFilename . '.pdf', $download);

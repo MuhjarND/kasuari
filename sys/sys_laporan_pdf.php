@@ -79,12 +79,16 @@ class KasuariLaporanPdf
         return $pdf;
     }
 
-    public function output($filename)
+    public function output($filename, $download = false)
     {
         $pdf = $this->finish();
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
         header('Content-Type: application/pdf');
-        header('Content-Disposition: inline; filename="' . preg_replace('/[^A-Za-z0-9_.-]+/', '_', $filename) . '"');
+        header('Content-Disposition: ' . ($download ? 'attachment' : 'inline') . '; filename="' . preg_replace('/[^A-Za-z0-9_.-]+/', '_', $filename) . '"');
         header('Content-Length: ' . strlen($pdf));
+        header('Cache-Control: private, max-age=0, must-revalidate');
         echo $pdf;
         exit;
     }

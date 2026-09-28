@@ -4805,6 +4805,16 @@ body,
 .kasuari-report-option small { color: #71809a; font-size: .75rem; }
 .kasuari-report-option > .bi-arrow-up-right { color: #6879e8; }
 
+.kasuari-report-mode {
+  display: inline-flex;
+  gap: 8px;
+}
+.kasuari-report-mode .btn {
+  border-radius: 9px !important;
+  font-size: .78rem;
+  font-weight: 700;
+}
+
 .kasuari-report-icon {
   width: 40px;
   height: 40px;
@@ -4820,6 +4830,23 @@ body,
 .kasuari-report-icon.violet { background: #f0eaff; color: #7342dc; }
 .kasuari-report-icon.green { background: #e4f8ee; color: #16865d; }
 .kasuari-report-icon.orange { background: #fff0dc; color: #bc6a07; }
+
+.kasuari-report-preview-panel { min-height: calc(100vh - 150px); }
+.kasuari-report-preview-frame-wrap {
+  min-height: 720px;
+  padding: 12px;
+  background: #e9eef7;
+  border-top: 1px solid #e3e9f4;
+}
+.kasuari-report-preview-frame {
+  display: block;
+  width: 100%;
+  height: 78vh;
+  min-height: 650px;
+  border: 1px solid #d5deed;
+  border-radius: 8px;
+  background: #fff;
+}
 
 .ks-legacy-brand-logo {
   width: 21px;

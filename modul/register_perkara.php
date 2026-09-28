@@ -137,7 +137,13 @@ function register_banding_status_class($text) {
       </div>
       <div class="modal-body">
         <p class="text-secondary mb-3">Pilih bulan dan tahun, kemudian pilih laporan yang akan dicetak dalam format PDF.</p>
-        <div class="row g-3 mb-4">
+        <div class="kasuari-report-mode mb-3" role="group" aria-label="Mode periode laporan">
+          <input type="radio" class="btn-check" name="laporanMode" id="laporanModeBulanan" value="bulanan" checked>
+          <label class="btn btn-outline-primary" for="laporanModeBulanan"><i class="bi bi-calendar3 me-1"></i>Per Bulan</label>
+          <input type="radio" class="btn-check" name="laporanMode" id="laporanModeRentang" value="rentang">
+          <label class="btn btn-outline-primary" for="laporanModeRentang"><i class="bi bi-calendar-range me-1"></i>Rentang Tanggal</label>
+        </div>
+        <div class="row g-3 mb-4" id="laporanBulananFields">
           <div class="col-sm-7">
             <label for="laporanBulan" class="form-label">Bulan laporan</label>
             <select class="form-select" id="laporanBulan">
@@ -149,6 +155,16 @@ function register_banding_status_class($text) {
           <div class="col-sm-5">
             <label for="laporanTahun" class="form-label">Tahun laporan</label>
             <input type="number" class="form-control" id="laporanTahun" min="2000" max="2100" value="<?php echo (int) date('Y'); ?>">
+          </div>
+        </div>
+        <div class="row g-3 mb-4 d-none" id="laporanRentangFields">
+          <div class="col-sm-6">
+            <label for="laporanDari" class="form-label">Tanggal dari</label>
+            <input type="date" class="form-control" id="laporanDari" value="<?php echo date('Y-m-01'); ?>">
+          </div>
+          <div class="col-sm-6">
+            <label for="laporanSampai" class="form-label">Tanggal sampai</label>
+            <input type="date" class="form-control" id="laporanSampai" value="<?php echo date('Y-m-d'); ?>">
           </div>
         </div>
         <div class="kasuari-report-list">
@@ -183,12 +199,26 @@ function register_banding_status_class($text) {
     function updateReportLinks() {
       var month = document.getElementById('laporanBulan').value;
       var year = document.getElementById('laporanTahun').value;
+      var mode = document.querySelector('input[name="laporanMode"]:checked').value;
+      var dari = document.getElementById('laporanDari').value;
+      var sampai = document.getElementById('laporanSampai').value;
       document.querySelectorAll('.kasuari-report-option').forEach(function (link) {
-        link.href = 'laporan_perkara_banding?jenis=' + encodeURIComponent(link.getAttribute('data-report-type')) + '&bulan=' + encodeURIComponent(month) + '&tahun=' + encodeURIComponent(year);
+        var url = 'preview_laporan_perkara_banding?jenis=' + encodeURIComponent(link.getAttribute('data-report-type')) + '&mode=' + encodeURIComponent(mode) + '&bulan=' + encodeURIComponent(month) + '&tahun=' + encodeURIComponent(year);
+        if (mode === 'rentang') url += '&dari=' + encodeURIComponent(dari) + '&sampai=' + encodeURIComponent(sampai);
+        link.href = url;
       });
+    }
+    function toggleReportPeriodFields() {
+      var mode = document.querySelector('input[name="laporanMode"]:checked').value;
+      document.getElementById('laporanBulananFields').classList.toggle('d-none', mode !== 'bulanan');
+      document.getElementById('laporanRentangFields').classList.toggle('d-none', mode !== 'rentang');
+      updateReportLinks();
     }
     document.getElementById('laporanBulan').addEventListener('change', updateReportLinks);
     document.getElementById('laporanTahun').addEventListener('input', updateReportLinks);
+    document.getElementById('laporanDari').addEventListener('change', updateReportLinks);
+    document.getElementById('laporanSampai').addEventListener('change', updateReportLinks);
+    document.querySelectorAll('input[name="laporanMode"]').forEach(function (radio) { radio.addEventListener('change', toggleReportPeriodFields); });
     document.getElementById('modalLaporanBulanan').addEventListener('show.bs.modal', updateReportLinks);
     updateReportLinks();
   }());

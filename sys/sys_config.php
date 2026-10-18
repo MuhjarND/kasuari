@@ -16,8 +16,8 @@ while($data=mysqli_fetch_assoc($query)){
     foreach($data as $key=>$value) {$$key=$value;}
   }*/
 $kode_perkara="PTA.Pb";
-$url_app="http://41.216.191.70:8181/kasuari/";
-$url_api="http://41.216.191.70:8181/kasuari/";
+$url_app="https://kasuari.pta-papuabarat.go.id/";
+$url_api="https://kasuari.pta-papuabarat.go.id/";
 $nama_app="KASUARI";
 $nama_panjang_app="Kanal Asisten Terintegrasi";
 $deskripsi_app="Sistem manajemen dan layanan digital terpadu untuk mendukung tupoksi Pengadilan Tinggi Agama Papua Barat";

@@ -4,3 +4,6 @@
 # Generated document previews and exports
 /hasil/*
 !/hasil/.gitkeep
+
+# Konfigurasi khusus server; jangan simpan kredensial database ke Git
+/sys/sys_koneksi.local.php

@@ -7,3 +7,7 @@
 
 # Konfigurasi khusus server; jangan simpan kredensial database ke Git
 /sys/sys_koneksi.local.php
+/sys/sys_koneksi.local.php.*
+/.env
+/.env.*
+!/.env.example

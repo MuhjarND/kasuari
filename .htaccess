@@ -1,4 +1,8 @@
 RewriteEngine On 
+RewriteRule (^|/)\.git(?:/|$) - [F,L,NC]
+<FilesMatch "^(?:sys_(?:koneksi(?:\.local(?:\.example)?)?|database_config)\.php(?:\..*)?|\.env(?:\..*)?)$">
+   Require all denied
+</FilesMatch>
 AddType application/manifest+json .webmanifest
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d

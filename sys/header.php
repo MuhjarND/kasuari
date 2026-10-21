@@ -1,6 +1,8 @@
 <?php
 include_once("sys/sys_config.php");
 include_once("sys/sys_authorization.php");
+require_once __DIR__ . '/sys_profile.php';
+$currentPhoto = isset($_SESSION['userid']) ? kasuari_profile_photo_path($koneksi, (int) $_SESSION['userid']) : null;
 $currentUserFullname = isset($_SESSION['fullname']) && $_SESSION['fullname'] !== '' ? $_SESSION['fullname'] : 'Pengguna';
 $currentUsername     = isset($_SESSION['username']) && $_SESSION['username'] !== '' ? $_SESSION['username'] : 'Operator';
 $isAdministrator    = kasuari_is_admin();
@@ -55,6 +57,7 @@ $isMenu = function ($items) use ($currentModule) {
 
   <!-- Kasuari UI -->
   <link rel="stylesheet" href="assets/css/kasuari-modern.css?v=<?php echo @filemtime('assets/css/kasuari-modern.css'); ?>" />
+  <link rel="stylesheet" href="assets/css/kasuari-profile.css?v=<?php echo @filemtime('assets/css/kasuari-profile.css'); ?>" />
 </head>
 <body class="layout-fixed sidebar-expand-lg bg-body-tertiary kasuari-app">
 
@@ -129,7 +132,7 @@ $isMenu = function ($items) use ($currentModule) {
                            display:flex;align-items:center;justify-content:center;
                            color:#fff;font-size:0.7rem;font-weight:700;
                            font-family:'Plus Jakarta Sans',sans-serif;flex-shrink:0;">
-                <?php echo $initials; ?>
+                <?php if ($currentPhoto): ?><img class="kasuari-user-avatar-image" src="<?php echo htmlspecialchars($currentPhoto, ENT_QUOTES, 'UTF-8'); ?>" alt="Foto profil"><?php else: echo htmlspecialchars($initials, ENT_QUOTES, 'UTF-8'); endif; ?>
               </span>
               <span class="d-none d-md-inline"
                     style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;
@@ -148,7 +151,7 @@ $isMenu = function ($items) use ($currentModule) {
                             margin:0 auto 10px;font-size:1.4rem;font-weight:800;
                             color:#fff;font-family:'Plus Jakarta Sans',sans-serif;
                             border:2px solid rgba(255,255,255,0.2);">
-                  <?php echo $initials; ?>
+                  <?php if ($currentPhoto): ?><img class="kasuari-user-avatar-image" src="<?php echo htmlspecialchars($currentPhoto, ENT_QUOTES, 'UTF-8'); ?>" alt="Foto profil"><?php else: echo htmlspecialchars($initials, ENT_QUOTES, 'UTF-8'); endif; ?>
                 </div>
                 <p style="font-family:'Plus Jakarta Sans',sans-serif;">
                   <?php echo htmlspecialchars($currentUserFullname, ENT_QUOTES, 'UTF-8'); ?>
@@ -159,7 +162,8 @@ $isMenu = function ($items) use ($currentModule) {
               </li>
               <!-- Footer -->
               <li class="user-footer">
-                <a href="validateAuth&aksi=keluar"
+                  <a href="profil" class="btn btn-outline-primary btn-sm d-flex align-items-center gap-2"><i class="bi bi-person-gear"></i> Profil Saya</a>
+                <a href="validateAuth?aksi=keluar"
                    class="btn btn-outline-danger btn-sm d-flex align-items-center gap-2">
                   <i class="bi bi-box-arrow-right"></i> Keluar
                 </a>
@@ -336,7 +340,7 @@ $isMenu = function ($items) use ($currentModule) {
           </div>
 
           <div class="sb-user-card">
-            <div class="sb-avatar"><?php echo htmlspecialchars($initials, ENT_QUOTES, 'UTF-8'); ?></div>
+            <a class="sb-avatar" href="profil" title="Profil Saya"><?php if ($currentPhoto): ?><img class="kasuari-user-avatar-image" src="<?php echo htmlspecialchars($currentPhoto, ENT_QUOTES, 'UTF-8'); ?>" alt="Foto profil"><?php else: echo htmlspecialchars($initials, ENT_QUOTES, 'UTF-8'); endif; ?></a>
             <div style="min-width:0;">
               <div class="sb-user-name text-truncate"><?php echo htmlspecialchars($currentUserFullname, ENT_QUOTES, 'UTF-8'); ?></div>
               <div class="sb-user-role text-truncate"><?php echo htmlspecialchars($currentUsername, ENT_QUOTES, 'UTF-8'); ?></div>

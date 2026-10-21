@@ -11,7 +11,18 @@ ini_set('display_errors', $kasuariDebugMode ? '1' : '0');
 ini_set('display_startup_errors', $kasuariDebugMode ? '1' : '0');
 ini_set('log_errors', '1');
 error_reporting(E_ALL);
-foreach($_GET as $key=>$value){$$key=$value;}
+foreach ($_GET as $key => $value) {
+    // Preserve legacy page parameters without allowing superglobal/session replacement.
+    if (preg_match('/^[A-Za-z][A-Za-z0-9_]*$/D', $key) && $key !== 'GLOBALS') {
+        $$key = $value;
+    }
+}
+$modul = isset($_GET['modul']) ? $_GET['modul'] : null;
+if ($modul !== null && (!is_string($modul) || !preg_match('/^[A-Za-z0-9_ -]+$/D', $modul))) {
+    http_response_code(404);
+    include 'modul/404.php';
+    exit;
+}
 if(isset($modul)){
 	$adminModules = array('pengguna', 'blangko', 'jenis_blangko', 'variabel', 'identitas_satker', 'laporan_perkara_banding', 'preview_laporan_perkara_banding');
 	if (isset($_SESSION['userid']) && in_array($modul, $adminModules, true) && !kasuari_is_admin()) {

@@ -1,5 +1,6 @@
 <?php
 if(!isset($_SESSION)){session_start();} 
+require_once __DIR__ . '/../sys/sys_password.php';
 function ke($url){
 	echo '<script>window.location = "'.$url.'";</script>';
 }
@@ -13,7 +14,10 @@ if(isset($_GET['aksi'])){
 } 
 //echo "mode 2<br>";
 //echo base64_encode(md5("hanoman18"));
-foreach($_POST as $key=>$value) {$$key=$value;}
+$aksi = isset($_POST['aksi']) && is_string($_POST['aksi']) ? $_POST['aksi'] : '';
+$username = isset($_POST['username']) && is_string($_POST['username']) ? $_POST['username'] : '';
+$password = isset($_POST['password']) && is_string($_POST['password']) ? $_POST['password'] : '';
+$crsf = isset($_POST['crsf']) && is_string($_POST['crsf']) ? $_POST['crsf'] : '';
 //echo "$password";
 if(!isset($_POST["aksi"])){
 	$_SESSION['pesan_error_login']= 'Error';
@@ -31,7 +35,7 @@ if(!isset($_POST["aksi"])){
 		}
 
 	//echo "mode 4<br>";
-		if(@$_SESSION['login_cek'] <> $crsf){
+		if (!isset($_SESSION['login_cek']) || !is_string($_SESSION['login_cek']) || !hash_equals($_SESSION['login_cek'], $crsf)) {
 			$_SESSION['pesan_error_login']= 'Error';
 			ke("login");
 			exit;
@@ -77,7 +81,7 @@ if(!isset($_POST["aksi"])){
 
 		$legacyPassword = base64_encode(md5($password));
 		$legacyValid = hash_equals((string) $passwordDb, $legacyPassword);
-		$passwordValid = password_verify($password, (string) $passwordDb) || $legacyValid;
+		$passwordValid = kasuari_password_matches($password, $passwordDb);
 
 		if (!$passwordValid) {
 			$_SESSION['pesan_error_login'] = "Kata Sandi Salah";

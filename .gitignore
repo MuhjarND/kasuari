@@ -11,3 +11,7 @@
 /.env
 /.env.*
 !/.env.example
+/uploads/profiles/*
+!/uploads/profiles/.htaccess
+/output/profile-tests/
+/.playwright-cli/

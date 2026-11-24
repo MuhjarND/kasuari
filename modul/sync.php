@@ -5,6 +5,8 @@ mysqli_report(MYSQLI_REPORT_OFF);
 
 include_once("sys/sys_config.php");
 include_once("sys/sys_monitoring.php");
+include_once("sys/sys_akta_cerai.php");
+include_once("sys/sys_sipp.php");
 
 header('Content-Type: text/plain; charset=UTF-8');
 ini_set('display_errors', '0');
@@ -213,12 +215,16 @@ $protocol = isset($_POST['protocol']) ? (int) $_POST['protocol'] : 0;
 $monitoringReady = $action === 'batch' ? true : kasuari_monitoring_ensure_schema($koneksi);
 
 if ($action === 'health') {
+  $aktaReady = kasuari_akta_schema_ready($koneksi, true);
+  $sippReady = kasuari_sipp_schema($koneksi, true);
   header('Content-Type: application/json; charset=UTF-8');
   $maxPacket = kasuari_sync_max_packet($koneksi);
   $issues = kasuari_sync_schema_issues($koneksi);
   echo json_encode(array(
     'status' => empty($issues) ? 'ok' : 'error',
     'protocol' => 2,
+    'akta_cerai_status' => $aktaReady ? 1 : 0,
+    'sipp_portal' => $sippReady ? 1 : 0,
     'max_allowed_packet' => $maxPacket,
     'max_query_bytes' => kasuari_sync_max_query_bytes($koneksi),
     'post_max_size' => ini_get('post_max_size'),
@@ -346,6 +352,69 @@ if ($action === 'status') {
 
 list($pnId, $requestId) = kasuari_sync_validate_identity();
 
+if ($action === 'sipp_begin') {
+  if (!kasuari_sipp_schema($koneksi) || !kasuari_sipp_auth($koneksi, $pnId, $_POST['sipp_token'] ?? '')) kasuari_sync_error('Token atau skema SIPP tidak valid.', 403);
+  mysqli_begin_transaction($koneksi);
+  try {
+    kasuari_sipp_lock_request($koneksi, $pnId, $requestId);
+    mysqli_commit($koneksi);
+  } catch (Exception $error) {
+    mysqli_rollback($koneksi);
+    kasuari_sync_error('Proses SIPP sudah ditutup. Gunakan pengiriman baru.', 409);
+  }
+  echo 'SIPP_BEGIN_OK';
+  exit;
+}
+
+if ($action === 'sipp_batch') {
+  if (!kasuari_sipp_schema($koneksi)) kasuari_sync_error('Skema portal SIPP belum tersedia.', 503);
+  $token = isset($_POST['sipp_token']) ? $_POST['sipp_token'] : '';
+  if (!kasuari_sipp_auth($koneksi, $pnId, $token)) kasuari_sync_error('Token SIPP satker tidak valid.', 403);
+  $dataset = isset($_POST['dataset']) && is_string($_POST['dataset']) ? $_POST['dataset'] : '';
+  $json = isset($_POST['rows_json']) && is_string($_POST['rows_json']) ? $_POST['rows_json'] : '';
+  $hash = isset($_POST['rows_hash']) && is_string($_POST['rows_hash']) ? $_POST['rows_hash'] : '';
+  if (strlen($json) > kasuari_sync_max_query_bytes($koneksi) || !hash_equals(hash('sha256', $json), $hash)) {
+    kasuari_sync_error('Integritas atau ukuran paket SIPP tidak valid.', 400);
+  }
+  if (!mysqli_begin_transaction($koneksi)) kasuari_sync_db_failure($koneksi, 'portal SIPP');
+  try {
+    kasuari_sipp_stage($koneksi, $pnId, $requestId, $dataset, json_decode($json, true));
+    if (!mysqli_commit($koneksi)) throw new RuntimeException(mysqli_error($koneksi));
+  } catch (Exception $error) {
+    mysqli_rollback($koneksi);
+    error_log('Paket portal SIPP gagal: ' . $error->getMessage());
+    kasuari_sync_error('Data modul SIPP tidak dapat diterima. Periksa versi paket dan log pusat.', 422);
+  }
+  echo 'SIPP_BATCH_OK';
+  exit;
+}
+
+if ($action === 'akta_cerai_batch') {
+  if (!kasuari_akta_schema_ready($koneksi)) {
+    kasuari_sync_error('Skema akta cerai pusat belum tersedia. Jalankan database/akta_cerai.sql.', 503);
+  }
+  $json = isset($_POST['akta_rows']) && is_string($_POST['akta_rows']) ? $_POST['akta_rows'] : '';
+  $hash = isset($_POST['akta_hash']) && is_string($_POST['akta_hash']) ? $_POST['akta_hash'] : '';
+  if (strlen($json) > kasuari_sync_max_query_bytes($koneksi) || !hash_equals(hash('sha256', $json), $hash)) {
+    kasuari_sync_error('Integritas atau ukuran paket status akta cerai tidak valid.', 400);
+  }
+  $aktaRows = json_decode($json, true);
+  if (!is_array($aktaRows) || !$aktaRows || count($aktaRows) > 250 || array_keys($aktaRows) !== range(0, count($aktaRows) - 1)) {
+    kasuari_sync_error('Paket status akta cerai tidak valid.', 400);
+  }
+  if (!mysqli_begin_transaction($koneksi)) kasuari_sync_db_failure($koneksi, 'status akta cerai');
+  try {
+    kasuari_akta_stage_rows($koneksi, $pnId, $requestId, $aktaRows);
+    if (!mysqli_commit($koneksi)) throw new RuntimeException(mysqli_error($koneksi));
+  } catch (Exception $error) {
+    mysqli_rollback($koneksi);
+    error_log('Kasuari paket akta cerai gagal: ' . $error->getMessage());
+    kasuari_sync_error('Paket status akta cerai gagal disimpan. Periksa log pusat.', 422);
+  }
+  echo 'AKTA_BATCH_OK';
+  exit;
+}
+
 if ($action === 'batch') {
   $sections = array(
     'perkara_banding' => array('table' => 'perkara_banding', 'label' => 'perkara banding'),
@@ -402,13 +471,17 @@ if ($action === 'batch') {
 }
 
 if ($action === 'finalize') {
+  $sippIncluded = isset($_POST['sipp_included']) && (string) $_POST['sipp_included'] === '1';
+  if ($sippIncluded && (!kasuari_sipp_schema($koneksi) || !kasuari_sipp_auth($koneksi, $pnId, $_POST['sipp_token'] ?? ''))) {
+    kasuari_sync_error('Token atau skema portal SIPP belum siap.', 403);
+  }
   if (!mysqli_begin_transaction($koneksi)) {
     kasuari_sync_db_failure($koneksi, 'finalisasi sinkronisasi');
   }
 
   $existingStatement = mysqli_prepare(
     $koneksi,
-    "SELECT jumlah_perkara FROM sync_requests WHERE request_id=? LIMIT 1"
+    "SELECT jumlah_perkara, pn_id FROM sync_requests WHERE request_id=? LIMIT 1"
   );
   if (!$existingStatement) {
     kasuari_sync_db_failure($koneksi, 'finalisasi sinkronisasi');
@@ -422,9 +495,21 @@ if ($action === 'finalize') {
     error_log('Kasuari sync gagal saat memeriksa finalisasi: ' . $statementError);
     kasuari_sync_error('Gagal memeriksa finalisasi sinkronisasi. ' . kasuari_sync_database_message($statementError, $statementCode));
   }
-  mysqli_stmt_bind_result($existingStatement, $existingCount);
+  mysqli_stmt_bind_result($existingStatement, $existingCount, $existingPnId);
   if (mysqli_stmt_fetch($existingStatement)) {
     mysqli_stmt_close($existingStatement);
+    if ((int) $existingPnId !== (int) $pnId) {
+      mysqli_rollback($koneksi);
+      kasuari_sync_error('Identitas proses sudah dipakai satker lain.', 409);
+    }
+    if ($sippIncluded) {
+      $receipt = kasuari_sipp_select($koneksi, 'SELECT state, manifest_hash FROM kasuari_sipp_requests WHERE pn_id=? AND request_id=?', 'is', array($pnId, $requestId));
+      $manifest = isset($_POST['sipp_manifest']) && is_string($_POST['sipp_manifest']) ? json_decode($_POST['sipp_manifest'], true) : null;
+      if (!$receipt || $receipt[0]['state'] !== 'completed' || !is_array($manifest) || !hash_equals((string) $receipt[0]['manifest_hash'], kasuari_sipp_manifest_hash($manifest))) {
+        mysqli_rollback($koneksi);
+        kasuari_sync_error('Finalisasi sebelumnya tidak memuat snapshot SIPP yang sama. Kirim ulang dengan proses baru.', 409);
+      }
+    }
     if (!mysqli_commit($koneksi)) {
       kasuari_sync_db_failure($koneksi, 'finalisasi sinkronisasi');
     }
@@ -433,6 +518,14 @@ if ($action === 'finalize') {
   }
   mysqli_stmt_close($existingStatement);
 
+  if (!$sippIncluded && kasuari_sipp_schema($koneksi)) {
+    $pendingSipp = kasuari_sipp_select($koneksi, 'SELECT state FROM kasuari_sipp_requests WHERE pn_id=? AND request_id=?', 'is', array($pnId, $requestId));
+    if ($pendingSipp) {
+      mysqli_rollback($koneksi);
+      kasuari_sync_error('Proses ini memuat paket SIPP. Finalisasi wajib menyertakan manifest dan token SIPP.', 409);
+    }
+  }
+
   $countResult = mysqli_query($koneksi, "SELECT COUNT(*) AS jumlah FROM perkara WHERE pn_id=" . $pnId);
   if (!$countResult) {
     kasuari_sync_db_failure($koneksi, 'penghitungan perkara');
@@ -440,6 +533,30 @@ if ($action === 'finalize') {
   $countRow = mysqli_fetch_assoc($countResult);
   $jumlahPerkara = isset($countRow['jumlah']) ? (int) $countRow['jumlah'] : 0;
   $tanggal = date('Y-m-d H:i:s');
+  if ($sippIncluded) {
+    try {
+      $sippManifest = isset($_POST['sipp_manifest']) && is_string($_POST['sipp_manifest']) ? json_decode($_POST['sipp_manifest'], true) : null;
+      kasuari_sipp_publish($koneksi, $pnId, $requestId, $sippManifest, $tanggal);
+    } catch (Exception $error) {
+      mysqli_rollback($koneksi);
+      error_log('Finalisasi portal SIPP gagal: ' . $error->getMessage());
+      kasuari_sync_error('Snapshot modul SIPP belum lengkap. Kirim ulang dari satker.', 422);
+    }
+  }
+  if (isset($_POST['akta_status_included']) && (string) $_POST['akta_status_included'] === '1') {
+    $aktaCountInput = isset($_POST['akta_row_count']) ? (string) $_POST['akta_row_count'] : '';
+    if (!preg_match('/^[0-9]{1,9}$/D', $aktaCountInput) || !kasuari_akta_schema_ready($koneksi)) {
+      mysqli_rollback($koneksi);
+      kasuari_sync_error('Jumlah atau skema status akta cerai tidak valid.', 400);
+    }
+    try {
+      kasuari_akta_publish($koneksi, $pnId, $requestId, (int) $aktaCountInput, $tanggal);
+    } catch (Exception $error) {
+      mysqli_rollback($koneksi);
+      error_log('Kasuari finalisasi akta cerai gagal: ' . $error->getMessage());
+      kasuari_sync_error('Status akta cerai belum dapat dipublikasikan. Kirim ulang data dari satker.', 422);
+    }
+  }
   $localCount = isset($_POST['local_perkara_count']) && preg_match('/^\d+$/', (string) $_POST['local_perkara_count'])
     ? (int) $_POST['local_perkara_count']
     : $jumlahPerkara;

@@ -24,7 +24,7 @@ if ($modul !== null && (!is_string($modul) || !preg_match('/^[A-Za-z0-9_ -]+$/D'
     exit;
 }
 if(isset($modul)){
-	$adminModules = array('pengguna', 'blangko', 'jenis_blangko', 'variabel', 'identitas_satker', 'laporan_perkara_banding', 'preview_laporan_perkara_banding');
+	$adminModules = array('pengguna', 'blangko', 'jenis_blangko', 'variabel', 'identitas_satker', 'laporan_perkara_banding', 'preview_laporan_perkara_banding', 'sipp', 'sipp_config');
 	if (isset($_SESSION['userid']) && in_array($modul, $adminModules, true) && !kasuari_is_admin()) {
 		http_response_code(403);
 		include "modul/akses_ditolak.php";

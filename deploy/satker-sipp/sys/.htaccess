@@ -1,0 +1,3 @@
+<FilesMatch "^sys_(?:sipp\.local|koneksi)(?:\.php)(?:\..*)?$">
+ Require all denied
+</FilesMatch>

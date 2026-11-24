@@ -2,6 +2,7 @@
 include_once("sys/sys_session.php");
 $nama_halaman = "INFORMASI DETAIL PERKARA BANDING";
 include_once("sys/header.php");
+require_once __DIR__ . '/../sys/sys_akta_cerai.php';
 $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 $sql = "SELECT 
           perkara.jenis_perkara_nama,
@@ -56,6 +57,8 @@ foreach ($data as $key => $value) {
     $$key = $value;
 }
 $status_banding_text = kasuari_status_banding_tampil($data);
+$aktaMap = kasuari_akta_load($koneksi, array($data));
+$aktaPerkara = $data;
 $permohonanbanding = kasuari_tanggal_indonesia($permohonanbanding ?? '');
 $pengirimanberkasbanding = kasuari_tanggal_indonesia($pengirimanberkasbanding ?? '');
 $tanggalpendaftaranbanding = kasuari_tanggal_indonesia($tanggalpendaftaranbanding ?? '');
@@ -135,6 +138,7 @@ $putusanpn = kasuari_tanggal_indonesia($putusanpn ?? '');
                                             <b><?php echo $status_banding_text ?></b>
                                         </span>
                                     </div>
+                                    <?php echo kasuari_akta_html($aktaPerkara, $aktaMap, true); ?>
                                 </div>
                             </div>
                         </div>

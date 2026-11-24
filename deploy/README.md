@@ -51,6 +51,11 @@ Endpoint pengiriman adalah `/sync`, sedangkan riwayat pengiriman memakai
 `/sync_data`. Petugas tetap menggunakan tombol Kirimkan Data. Pelaporan status
 berjalan setiap lima menit selama halaman sinkronisasi terbuka.
 
+Jika satu satker mengalami timeout sebelum pengiriman, lihat
+`deploy/satker-network/README.md`. Paket tersebut berisi pembaruan client dan
+alat pemeriksaan jaringan tanpa membaca data SIPP. Buat ZIP distribusi dengan
+`php tools/build_satker_network_package.php` dari repository ini.
+
 Jika environment `KASUARI_SYNC_ENDPOINT` pernah diatur pada server satker,
 perbarui nilainya menjadi `https://kasuari.pta-papuabarat.go.id/sync` karena
 override tersebut diprioritaskan untuk pengiriman dan pelaporan status.

@@ -2,6 +2,8 @@
 include_once("sys/sys_session.php");
 include_once("sys/sys_koneksi.php");
 include_once("sys/sys_fungsi.php");
+require_once __DIR__ . '/../sys/sys_authorization.php';
+require_once __DIR__ . '/../sys/sys_akta_cerai.php';
 header('Content-Type: application/json; charset=utf-8');
 
 $startGET = filter_input(INPUT_GET, "start", FILTER_SANITIZE_NUMBER_INT);
@@ -58,6 +60,8 @@ $column = array(
 
 $baseSql = "SELECT
               perkara.id,
+              perkara.pn_id,
+              perkara.perkara_id,
               perkara.nomor_perkara,
               perkara.jenis_perkara_nama,
               perkara.tanggal_pendaftaran AS tanggalpendaftaran,
@@ -128,7 +132,10 @@ $number_filter_row = (int) ($countFilteredRow['total'] ?? 0);
 
 $nomor = $start;
 $data = array();
-while ($row = mysqli_fetch_assoc($result)) {
+$aktaCases = array();
+while ($row = mysqli_fetch_assoc($result)) $aktaCases[] = $row;
+$aktaMap = kasuari_akta_load($koneksi, $aktaCases);
+foreach ($aktaCases as $row) {
   $nomor++;
   $id = (int) ($row['id'] ?? 0);
   $nomorPerkara = htmlspecialchars($row['nomor_perkara'] ?? "", ENT_QUOTES, 'UTF-8');
@@ -149,7 +156,7 @@ while ($row = mysqli_fetch_assoc($result)) {
   $sub_array[] = "<span class='ks-date-chip'>" . $tanggalDaftar . "</span>";
   $sub_array[] = "<span class='ks-date-chip muted'>" . $tanggalPutusan . "</span>";
   $sub_array[] = "<span class='ks-status-pill " . $stageClass . "'>" . $tahapan . "</span>";
-  $sub_array[] = "<span class='ks-status-pill " . $processClass . "'>" . $proses . "</span>";
+  $sub_array[] = "<span class='ks-status-pill " . $processClass . "'>" . $proses . "</span>" . kasuari_akta_html($row, $aktaMap);
   $sub_array[] = "<a class='kasuari-action-link ks-view-action' href='perkara_detil_satker&id=" . $id . "' title='Lihat detail perkara' aria-label='Lihat detail perkara'><i class='bi bi-eye' aria-hidden='true'></i></a>";
   $data[] = $sub_array;
 }

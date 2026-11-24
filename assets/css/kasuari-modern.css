@@ -65,6 +65,26 @@
   color-scheme: light;
 }
 
+.ks-akta-status { margin-top: 10px; min-width: 0; }
+.ks-akta-status .badge {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: left;
+  line-height: 1.5;
+  font-size: 12px;
+  border-radius: var(--r-sm);
+}
+.ks-akta-fields { margin: 12px 0 0; text-align: left; }
+.ks-akta-fields > div { padding: 8px 0; border-bottom: 1px solid var(--border); }
+.ks-akta-fields dt { color: var(--text-m); font-size: 12px; font-weight: 500; }
+.ks-akta-fields dd { margin: 3px 0 0; color: var(--text-h); font-size: 13px; overflow-wrap: anywhere; }
+.ks-akta-note { margin: 12px 0 0; color: var(--text-m); font-size: 12px; text-align: left; }
+@media (max-width: 1199.98px) {
+  .ks-satker-table td > .ks-akta-status,
+  .ks-banding-table td > .ks-akta-status { grid-column: 2; margin-top: 0; }
+}
+
 /* ── Reset ───────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; }
 html { color-scheme: light !important; }

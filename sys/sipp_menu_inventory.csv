@@ -1,0 +1,393 @@
+﻿id,jenis_menu,induk_id,judul,hierarki,route,parameter,published,aktif_dengan_induk,controller_nama_sama_tersedia
+1,mainmenu,NULL,Home,Home,default,,1,1,0
+2,mainmenu,NULL,System,System,,,1,1,0
+3,mainmenu,2,User Management,System > User Management,users_list,,1,1,0
+20,mainmenu,2,Konfigurasi System,System > Konfigurasi System,configuration,,1,1,0
+37,mainmenu,2,Audit Trail,System > Audit Trail,audittrail_list,,1,1,0
+38,mainmenu,2,Antrian Direktori Putusan,System > Antrian Direktori Putusan,antrian_dirput,,1,1,0
+64,mainmenu,NULL,Referensi,Referensi,,,1,1,0
+84,mainmenu,NULL,Laporan,Laporan,,,1,1,0
+85,mainmenu,2,Manajemen Menu,System > Manajemen Menu,menus_list,,1,1,0
+100,mainmenu,64,Ruangan Sidang,Referensi > Ruangan Sidang,ruangan_sidang_list,,1,1,0
+106,mainmenu,2012,Perdata Umum,Laporan > Laporan Perdata Umum > Perdata Umum,laporan_perdata,"varreport_alur_perkara_id=1,2,18",1,0,0
+107,mainmenu,NULL,Perdata Umum,Perdata Umum,,,0,0,0
+108,mainmenu,NULL,Pidana Umum,Pidana Umum,,,0,0,0
+110,mainmenu,2003,Register Induk Perkara Permohonan,Perdata Umum > Register Induk Perkara > Register Induk Perkara Permohonan,perkara_list,varlist_alur_perkara_id=2,1,0,1
+111,mainmenu,108,Register Induk Perkara Pidana Biasa,Pidana Umum > Register Induk Perkara Pidana Biasa,perkara_list,varlist_alur_perkara_id=111,1,0,1
+112,mainmenu,108,Register Induk Perkara Pidana Singkat,Pidana Umum > Register Induk Perkara Pidana Singkat,perkara_list,varlist_alur_perkara_id=112,1,0,1
+113,mainmenu,108,Register Induk Perkara Pidana Cepat,Pidana Umum > Register Induk Perkara Pidana Cepat,perkara_list,varlist_alur_perkara_id=113,1,0,1
+114,mainmenu,2003,Register Induk Perkara Gugatan,Perdata Umum > Register Induk Perkara > Register Induk Perkara Gugatan,perkara_list,varlist_alur_perkara_id=1,1,0,1
+117,mainmenu,2003,Register Permohonan Banding,Perdata Umum > Register Induk Perkara > Register Permohonan Banding,perkara_banding_list,"varlist_alur_perkara_id=1,7",1,0,0
+118,mainmenu,64,Hakim,Referensi > Hakim,,,1,1,0
+119,mainmenu,64,Panitera,Referensi > Panitera,,,1,1,0
+120,mainmenu,64,Jurusita,Referensi > Jurusita,jurusita_list,,1,1,0
+121,mainmenu,64,Mediator,Referensi > Mediator,mediator_list,,1,1,0
+122,mainmenu,2003,Register Permohonan Kasasi,Perdata Umum > Register Induk Perkara > Register Permohonan Kasasi,perkara_kasasi_list,"varlist_alur_perkara_id=1,2,7",1,0,0
+123,mainmenu,2003,Register Permohonan Peninjauan Kembali,Perdata Umum > Register Induk Perkara > Register Permohonan Peninjauan Kembali,perkara_pk_list,"varlist_alur_perkara_id=1,2,7",1,0,0
+124,mainmenu,2003,Register Permohonan Eksekusi,Perdata Umum > Register Induk Perkara > Register Permohonan Eksekusi,perkara_eksekusi_list,"varlist_alur_perkara_id=1,7,8,18",1,0,0
+126,mainmenu,108,Register Permohonan Banding,Pidana Umum > Register Permohonan Banding,perkara_banding_list,"varlist_alur_perkara_id=111,112,113,126,127",1,0,0
+127,mainmenu,108,Register Permohonan Kasasi,Pidana Umum > Register Permohonan Kasasi,perkara_kasasi_list,"varlist_alur_perkara_id=111,112,113",1,0,0
+128,mainmenu,108,Register Permohonan Peninjauan Kembali,Pidana Umum > Register Permohonan Peninjauan Kembali,perkara_pk_list,"varlist_alur_perkara_id=111,112,113",1,0,0
+129,mainmenu,108,Register Permohonan Grasi,Pidana Umum > Register Permohonan Grasi,perkara_grasi_list,"varlist_alur_perkara_id=111,112,113",1,0,0
+130,mainmenu,135,Gugatan,Jadwal Sidang > Perdata Umum > Gugatan,jadwal_sidang_list,varlist_alur_perkara_id=1,1,0,0
+131,mainmenu,135,Permohonan,Jadwal Sidang > Perdata Umum > Permohonan,jadwal_sidang_list,varlist_alur_perkara_id=2,1,0,0
+132,mainmenu,84,Kepailitan & PKPU,Laporan > Kepailitan & PKPU,laporan_pailit,"varreport_alur_perkara_id=3,4",0,0,0
+133,mainmenu,84,Hak Kekayaan Intelektual (HKI),Laporan > Hak Kekayaan Intelektual (HKI),laporan_hki,varreport_alur_perkara_id=5,0,0,0
+134,mainmenu,84,Pengadilan Hubungan Industrial (PHI),Laporan > Pengadilan Hubungan Industrial (PHI),laporan_phi,varreport_alur_perkara_id=6,0,0,0
+135,mainmenu,157,Perdata Umum,Jadwal Sidang > Perdata Umum,jadwal_sidang_list,"varlist_alur_perkara_id=1,2,7,8",0,0,0
+136,mainmenu,157,Pidana Umum,Jadwal Sidang > Pidana Umum,jadwal_sidang_list,"varlist_alur_perkara_id=111,112,113,114,119",0,0,0
+137,mainmenu,84,Pidana Umum,Laporan > Pidana Umum,laporan_pidana,"varreport_alur_perkara_id=111,112,113,114",0,0,0
+140,mainmenu,84,Tindak Pidana Korupsi,Laporan > Tindak Pidana Korupsi,laporan_tipikor,varreport_alur_perkara_id=115,0,0,0
+141,mainmenu,84,Perikanan,Laporan > Perikanan,laporan_perikanan,varreport_alur_perkara_id=116,0,0,0
+142,mainmenu,84,Hak Asasi Manusia (HAM),Laporan > Hak Asasi Manusia (HAM),laporan_ham,varreport_alur_perkara_id=117,0,0,0
+145,mainmenu,108,Register Induk Perkara Lalu-Lintas,Pidana Umum > Register Induk Perkara Lalu-Lintas,perkara_lalulintas_list,varlist_alur_perkara_id=114,1,0,0
+146,mainmenu,NULL,Perdata Khusus,Perdata Khusus,,"varlist_alur_perkara_id=3,4,5,6",0,0,0
+147,mainmenu,NULL,Pidana Khusus,Pidana Khusus,,"varlist_alur_perkara_id=115,116,117",0,0,0
+148,mainmenu,146,Pengadilan Hubungan Industrial (PHI),Perdata Khusus > Pengadilan Hubungan Industrial (PHI),,,0,0,0
+149,mainmenu,146,Kepailitan & PKPU,Perdata Khusus > Kepailitan & PKPU,,"varlist_alur_perkara_id=3,4",0,0,0
+150,mainmenu,2006,Register Induk Kepailitan,Perdata Khusus > Kepailitan & PKPU > Register Induk Perkara > Register Induk Kepailitan,perkara_list,varlist_alur_perkara_id=3,1,0,1
+151,mainmenu,146,Hak Kekayaan Intelektual (HKI),Perdata Khusus > Hak Kekayaan Intelektual (HKI),,,0,0,0
+152,mainmenu,2006,Register Induk PKPU,Perdata Khusus > Kepailitan & PKPU > Register Induk Perkara > Register Induk PKPU,perkara_list,varlist_alur_perkara_id=4,1,0,1
+154,mainmenu,147,Tindak Pidana Korupsi (Tipikor),Pidana Khusus > Tindak Pidana Korupsi (Tipikor),perkara_list,varlist_alur_perkara_id=115,1,0,1
+155,mainmenu,147,Perikanan,Pidana Khusus > Perikanan,perkara_list,varlist_alur_perkara_id=116,1,0,1
+156,mainmenu,147,Hak Asasi Manusia (HAM),Pidana Khusus > Hak Asasi Manusia (HAM),perkara_list,varlist_alur_perkara_id=117,1,0,1
+157,mainmenu,NULL,Jadwal Sidang,Jadwal Sidang,jadwal_sidang_list,"varlist_alur_perkara_id=1,2,3,4,5,6,7,8,9,10,11,12,13,14,17,111,112,113,114,115,116,117,118,119,120,121,122,123,18,19,20,21,22,23,24,25,26,27,28,29,30",1,1,0
+158,mainmenu,118,Hakim Tingkat Pertama,Referensi > Hakim > Hakim Tingkat Pertama,hakim_pn_list,,1,1,0
+159,mainmenu,118,Hakim Tinggi,Referensi > Hakim > Hakim Tinggi,hakim_pt_list,,1,1,0
+160,mainmenu,118,Hakim Agung,Referensi > Hakim > Hakim Agung,hakim_ma_list,,1,1,0
+164,mainmenu,2006,Register Permohonan Kasasi Kepailitan,Perdata Khusus > Kepailitan & PKPU > Register Induk Perkara > Register Permohonan Kasasi Kepailitan,perkara_kasasi_list,"varlist_alur_perkara_id=3,4",1,0,0
+165,mainmenu,2006,Register Permohonan Peninjauan Kembali Kepailitan,Perdata Khusus > Kepailitan & PKPU > Register Induk Perkara > Register Permohonan Peninjauan Kembali Kepailitan,perkara_pk_list,"varlist_alur_perkara_id=3,4",1,0,0
+166,mainmenu,2006,Register Penyitaan Kepailitan,Perdata Khusus > Kepailitan & PKPU > Register Induk Perkara > Register Penyitaan Kepailitan,perkara_penyitaan_list,"varlist_alur_perkara_id=3,4",1,0,0
+167,mainmenu,2006,Register Pemberesan Harta Pailit,Perdata Khusus > Kepailitan & PKPU > Register Induk Perkara > Register Pemberesan Harta Pailit,perkara_harta_pailit_list,"varlist_alur_perkara_id=3,4",1,0,0
+168,mainmenu,2006,Register Gugatan Lain-Lain,Perdata Khusus > Kepailitan & PKPU > Register Induk Perkara > Register Gugatan Lain-Lain,perkara_pailit_list,varlist_alur_perkara_id=20,1,0,0
+169,mainmenu,2006,Register Rehabilitasi,Perdata Khusus > Kepailitan & PKPU > Register Induk Perkara > Register Rehabilitasi,perkara_pailit_list,varlist_alur_perkara_id=30,1,0,0
+170,mainmenu,2006,Register Kurator,Perdata Khusus > Kepailitan & PKPU > Register Induk Perkara > Register Kurator,kurator_list,,0,0,0
+171,mainmenu,2006,Register Pengurus,Perdata Khusus > Kepailitan & PKPU > Register Induk Perkara > Register Pengurus,,,0,0,0
+172,mainmenu,2006,Register Penyegelan,Perdata Khusus > Kepailitan & PKPU > Register Induk Perkara > Register Penyegelan,perkara_penyegelan_list,,1,0,0
+173,mainmenu,151,Register Induk Perkara HKI,Perdata Khusus > Hak Kekayaan Intelektual (HKI) > Register Induk Perkara HKI,perkara_list,varlist_alur_perkara_id=5,1,0,1
+174,mainmenu,151,Register Permohonan Kasasi HKI,Perdata Khusus > Hak Kekayaan Intelektual (HKI) > Register Permohonan Kasasi HKI,perkara_kasasi_list,varlist_alur_perkara_id=5,1,0,0
+175,mainmenu,151,Register Permohonan Peninjauan Kembali HKI,Perdata Khusus > Hak Kekayaan Intelektual (HKI) > Register Permohonan Peninjauan Kembali HKI,perkara_pk_list,varlist_alur_perkara_id=5,1,0,0
+176,mainmenu,148,Register Induk Perkara Gugatan PHI,Perdata Khusus > Pengadilan Hubungan Industrial (PHI) > Register Induk Perkara Gugatan PHI,perkara_list,varlist_alur_perkara_id=6,1,0,1
+177,mainmenu,148,Register Permohonan Kasasi PHI,Perdata Khusus > Pengadilan Hubungan Industrial (PHI) > Register Permohonan Kasasi PHI,perkara_kasasi_list,varlist_alur_perkara_id=6,1,0,0
+178,mainmenu,148,Register Permohonan Peninjauan Kembali PHI,Perdata Khusus > Pengadilan Hubungan Industrial (PHI) > Register Permohonan Peninjauan Kembali PHI,perkara_pk_list,varlist_alur_perkara_id=6,1,0,0
+179,mainmenu,148,Register Eksekusi PHI,Perdata Khusus > Pengadilan Hubungan Industrial (PHI) > Register Eksekusi PHI,perkara_eksekusi_list,varlist_alur_perkara_id=6,1,0,0
+180,mainmenu,148,Register Penyitaan PHI,Perdata Khusus > Pengadilan Hubungan Industrial (PHI) > Register Penyitaan PHI,perkara_penyitaan_list,varlist_alur_perkara_id=6,1,0,0
+181,mainmenu,148,Register Pendaftaran Perjanjian Bersama Bipartit,Perdata Khusus > Pengadilan Hubungan Industrial (PHI) > Register Pendaftaran Perjanjian Bersama Bipartit,pb_bipartit_list,varlist_alur_perkara_id=501,1,0,0
+182,mainmenu,148,Register Pendaftaran Perjanjian Bersama Mediasi,Perdata Khusus > Pengadilan Hubungan Industrial (PHI) > Register Pendaftaran Perjanjian Bersama Mediasi,pb_mediasi_list,varlist_alur_perkara_id=502,1,0,0
+183,mainmenu,148,Register Pendaftaran Perjanjian Bersama Konsiliasi,Perdata Khusus > Pengadilan Hubungan Industrial (PHI) > Register Pendaftaran Perjanjian Bersama Konsiliasi,pb_konsiliasi_list,varlist_alur_perkara_id=503,1,0,0
+184,mainmenu,148,Register Pendaftaran Putusan Arbitrase,Perdata Khusus > Pengadilan Hubungan Industrial (PHI) > Register Pendaftaran Putusan Arbitrase,pb_putusan_arbitrase_list,varlist_alur_perkara_id=504,1,0,0
+185,mainmenu,148,Register Pendaftaran Akta Perdamaian Arbitrase,Perdata Khusus > Pengadilan Hubungan Industrial (PHI) > Register Pendaftaran Akta Perdamaian Arbitrase,pb_akta_arbitrase_list,varlist_alur_perkara_id=505,1,0,0
+186,mainmenu,154,Register Induk Perkara Korupsi,Pidana Khusus > Tindak Pidana Korupsi (Tipikor) > Register Induk Perkara Korupsi,perkara_list,varlist_alur_perkara_id=115,1,0,1
+187,mainmenu,154,Register Permohonan Banding,Pidana Khusus > Tindak Pidana Korupsi (Tipikor) > Register Permohonan Banding,perkara_banding_list,varlist_alur_perkara_id=115,1,0,0
+188,mainmenu,154,Register Permohonan Kasasi,Pidana Khusus > Tindak Pidana Korupsi (Tipikor) > Register Permohonan Kasasi,perkara_kasasi_list,varlist_alur_perkara_id=115,1,0,0
+189,mainmenu,154,Register Permohonan Peninjauan Kembali,Pidana Khusus > Tindak Pidana Korupsi (Tipikor) > Register Permohonan Peninjauan Kembali,perkara_pk_list,varlist_alur_perkara_id=115,1,0,0
+190,mainmenu,154,Register Permohonan Grasi,Pidana Khusus > Tindak Pidana Korupsi (Tipikor) > Register Permohonan Grasi,perkara_grasi_list,varlist_alur_perkara_id=115,1,0,0
+191,mainmenu,155,Register Induk Perkara Perikanan,Pidana Khusus > Perikanan > Register Induk Perkara Perikanan,perkara_list,varlist_alur_perkara_id=116,1,0,1
+192,mainmenu,155,Register Permohonan Banding,Pidana Khusus > Perikanan > Register Permohonan Banding,perkara_banding_list,varlist_alur_perkara_id=116,1,0,0
+193,mainmenu,155,Register Permohonan Kasasi,Pidana Khusus > Perikanan > Register Permohonan Kasasi,perkara_kasasi_list,varlist_alur_perkara_id=116,1,0,0
+194,mainmenu,155,Register Permohonan Grasi,Pidana Khusus > Perikanan > Register Permohonan Grasi,perkara_grasi_list,varlist_alur_perkara_id=116,1,0,0
+195,mainmenu,156,Register Induk Perkara HAM,Pidana Khusus > Hak Asasi Manusia (HAM) > Register Induk Perkara HAM,perkara_list,varlist_alur_perkara_id=117,1,0,1
+196,mainmenu,156,Register Permohonan Banding,Pidana Khusus > Hak Asasi Manusia (HAM) > Register Permohonan Banding,perkara_banding_list,varlist_alur_perkara_id=117,1,0,0
+197,mainmenu,156,Register Permohonan Kasasi,Pidana Khusus > Hak Asasi Manusia (HAM) > Register Permohonan Kasasi,perkara_kasasi_list,varlist_alur_perkara_id=117,1,0,0
+198,mainmenu,156,Register Permohonan Peninjauan Kembali,Pidana Khusus > Hak Asasi Manusia (HAM) > Register Permohonan Peninjauan Kembali,perkara_pk_list,varlist_alur_perkara_id=117,1,0,0
+199,mainmenu,156,Register Permohonan Grasi,Pidana Khusus > Hak Asasi Manusia (HAM) > Register Permohonan Grasi,perkara_grasi_list,varlist_alur_perkara_id=117,1,0,0
+200,mainmenu,2004,Jurnal Perkara Gugatan,Perdata Umum > Jurnal Perkara > Jurnal Perkara Gugatan,jurnal_perkara_list,varlist_alur_perkara_id=1;var_tahapan_id=10,1,0,0
+201,mainmenu,2004,Jurnal Perkara Permohonan,Perdata Umum > Jurnal Perkara > Jurnal Perkara Permohonan,jurnal_perkara_list,varlist_alur_perkara_id=2;var_tahapan_id=10,1,0,0
+202,mainmenu,2004,Jurnal Permohonan Banding,Perdata Umum > Jurnal Perkara > Jurnal Permohonan Banding,jurnal_banding_list,varlist_alur_perkara_id=1;var_tahapan_id=20,1,0,0
+203,mainmenu,2004,Jurnal Permohonan Kasasi,Perdata Umum > Jurnal Perkara > Jurnal Permohonan Kasasi,jurnal_kasasi_list,"varlist_alur_perkara_id=1,2;var_tahapan_id=30",1,0,0
+204,mainmenu,2004,Jurnal Permohonan Peninjauan Kembali,Perdata Umum > Jurnal Perkara > Jurnal Permohonan Peninjauan Kembali,jurnal_pk_list,"varlist_alur_perkara_id=1,2;var_tahapan_id=40",1,0,0
+205,mainmenu,2004,Jurnal Permohonan Eksekusi,Perdata Umum > Jurnal Perkara > Jurnal Permohonan Eksekusi,jurnal_eksekusi_list,"varlist_alur_perkara_id=1,7,8,18;var_tahapan_id=50",1,0,0
+207,mainmenu,2005,Buku Induk Keuangan Perkara Perdata,Perdata Umum > Register Induk Keuangan > Buku Induk Keuangan Perkara Perdata,jurnal_induk_list,"varlist_alur_perkara_id=1,2,7,8",1,0,0
+208,mainmenu,2005,Buku Keuangan Biaya Eksekusi,Perdata Umum > Register Induk Keuangan > Buku Keuangan Biaya Eksekusi,,,0,0,0
+209,mainmenu,2005,Buku Induk Penerimaan Uang Hak-hak Kepaniteraan,Perdata Umum > Register Induk Keuangan > Buku Induk Penerimaan Uang Hak-hak Kepaniteraan,jurnal_hkk_list,"varlist_alur_perkara_id=1,2",1,0,0
+213,mainmenu,2007,Jurnal Perkara Kepailitan,Perdata Khusus > Kepailitan & PKPU > Jurnal Keuangan Perkara > Jurnal Perkara Kepailitan,jurnal_perkara_list,varlist_alur_perkara_id=3;var_tahapan_id=10,1,0,0
+214,mainmenu,2007,Jurnal Perkara PKPU,Perdata Khusus > Kepailitan & PKPU > Jurnal Keuangan Perkara > Jurnal Perkara PKPU,jurnal_perkara_list,varlist_alur_perkara_id=4;var_tahapan_id=10,1,0,0
+215,mainmenu,2007,Jurnal Permohonan Kasasi,Perdata Khusus > Kepailitan & PKPU > Jurnal Keuangan Perkara > Jurnal Permohonan Kasasi,jurnal_kasasi_list,"varlist_alur_perkara_id=3,4;var_tahapan_id=30",1,0,0
+216,mainmenu,2007,Jurnal Permohonan Peninjauan Kembali,Perdata Khusus > Kepailitan & PKPU > Jurnal Keuangan Perkara > Jurnal Permohonan Peninjauan Kembali,jurnal_pk_list,"varlist_alur_perkara_id=3,4;var_tahapan_id=40",1,0,0
+217,mainmenu,2007,Jurnal Gugatan Lain-Lain,Perdata Khusus > Kepailitan & PKPU > Jurnal Keuangan Perkara > Jurnal Gugatan Lain-Lain,jurnal_perkara_pailit_list,varlist_alur_perkara_id=20;var_tahapan_id=10,1,0,0
+218,mainmenu,2007,Jurnal Permohonan Rehabilitasi,Perdata Khusus > Kepailitan & PKPU > Jurnal Keuangan Perkara > Jurnal Permohonan Rehabilitasi,jurnal_perkara_pailit_list,varlist_alur_perkara_id=30;var_tahapan_id=10,1,0,0
+219,mainmenu,2008,Buku Induk Keuangan Perkara Perdata Kepailitan & PKPU,Perdata Khusus > Kepailitan & PKPU > Register Induk Keuangan > Buku Induk Keuangan Perkara Perdata Kepailitan & PKPU,jurnal_induk_list,"varlist_alur_perkara_id=3,4",1,0,0
+220,mainmenu,2008,Buku Keuangan Biaya Eksekusi,Perdata Khusus > Kepailitan & PKPU > Register Induk Keuangan > Buku Keuangan Biaya Eksekusi,,,0,0,0
+221,mainmenu,2008,Buku Induk Penerimaan Uang Hak-hak Kepaniteraan,Perdata Khusus > Kepailitan & PKPU > Register Induk Keuangan > Buku Induk Penerimaan Uang Hak-hak Kepaniteraan,jurnal_hkk_list,"varlist_alur_perkara_id=3,4",1,0,0
+222,mainmenu,151,Jurnal Keuangan Perkara HKI,Perdata Khusus > Hak Kekayaan Intelektual (HKI) > Jurnal Keuangan Perkara HKI,jurnal_perkara_list,varlist_alur_perkara_id=5;var_tahapan_id=10,1,0,0
+223,mainmenu,151,Jurnal Keuangan Pemohonan Kasasi Perkara HKI,Perdata Khusus > Hak Kekayaan Intelektual (HKI) > Jurnal Keuangan Pemohonan Kasasi Perkara HKI,jurnal_kasasi_list,varlist_alur_perkara_id=5;var_tahapan_id=30,1,0,0
+224,mainmenu,151,Jurnal Keuangan Permohonan PK Perkara HKI,Perdata Khusus > Hak Kekayaan Intelektual (HKI) > Jurnal Keuangan Permohonan PK Perkara HKI,jurnal_pk_list,varlist_alur_perkara_id=5;var_tahapan_id=40,1,0,0
+225,mainmenu,151,Buku Induk Keuangan Perkara HKI,Perdata Khusus > Hak Kekayaan Intelektual (HKI) > Buku Induk Keuangan Perkara HKI,jurnal_induk_list,varlist_alur_perkara_id=5,1,0,0
+226,mainmenu,151,Buku Induk Penerimaan Uang Hak-hak Kepaniteraan,Perdata Khusus > Hak Kekayaan Intelektual (HKI) > Buku Induk Penerimaan Uang Hak-hak Kepaniteraan,jurnal_hkk_list,varlist_alur_perkara_id=5,1,0,0
+227,mainmenu,148,Jurnal Keuangan Perkara Gugatan PHI,Perdata Khusus > Pengadilan Hubungan Industrial (PHI) > Jurnal Keuangan Perkara Gugatan PHI,jurnal_perkara_list,varlist_alur_perkara_id=6;var_tahapan_id=10,1,0,0
+228,mainmenu,148,Jurnal Keuangan Pemohonan Kasasi Perkara PHI,Perdata Khusus > Pengadilan Hubungan Industrial (PHI) > Jurnal Keuangan Pemohonan Kasasi Perkara PHI,jurnal_kasasi_list,varlist_alur_perkara_id=6;var_tahapan_id=30,1,0,0
+229,mainmenu,148,Jurnal Keuangan Permohonan PK Perkara PHI,Perdata Khusus > Pengadilan Hubungan Industrial (PHI) > Jurnal Keuangan Permohonan PK Perkara PHI,jurnal_pk_list,varlist_alur_perkara_id=6;var_tahapan_id=40,1,0,0
+230,mainmenu,148,Jurnal Keuangan Eksekusi Perkara PHI,Perdata Khusus > Pengadilan Hubungan Industrial (PHI) > Jurnal Keuangan Eksekusi Perkara PHI,jurnal_perkara_list,varlist_alur_perkara_id=6;var_tahapan_id=50,1,0,0
+231,mainmenu,148,Buku Induk Keuangan Perkara PHI,Perdata Khusus > Pengadilan Hubungan Industrial (PHI) > Buku Induk Keuangan Perkara PHI,jurnal_induk_list,varlist_alur_perkara_id=6,1,0,0
+232,mainmenu,148,Buku Induk Penerimaan Uang HHK,Perdata Khusus > Pengadilan Hubungan Industrial (PHI) > Buku Induk Penerimaan Uang HHK,jurnal_hkk_list,varlist_alur_perkara_id=6,1,0,0
+233,mainmenu,108,Register Penahanan Pidana Umum,Pidana Umum > Register Penahanan Pidana Umum,penahanan_list,"varlist_alur_perkara_id=111,112",1,0,0
+234,mainmenu,154,Register Penahanan Tipikor,Pidana Khusus > Tindak Pidana Korupsi (Tipikor) > Register Penahanan Tipikor,penahanan_list,varlist_alur_perkara_id=115,1,0,0
+235,mainmenu,155,Register Penahanan Perikanan,Pidana Khusus > Perikanan > Register Penahanan Perikanan,penahanan_list,varlist_alur_perkara_id=116,1,0,0
+236,mainmenu,156,Register Penahanan HAM,Pidana Khusus > Hak Asasi Manusia (HAM) > Register Penahanan HAM,penahanan_list,varlist_alur_perkara_id=117,1,0,0
+237,mainmenu,155,Register Permohonan Peninjauan Kembali,Pidana Khusus > Perikanan > Register Permohonan Peninjauan Kembali,perkara_pk_list,varlist_alur_perkara_id=116,1,0,0
+238,mainmenu,64,Biaya Perkara,Referensi > Biaya Perkara,ref_biaya_perkara_list,,1,1,0
+239,mainmenu,119,Panitera Tingkat Pertama,Referensi > Panitera > Panitera Tingkat Pertama,panitera_pn_list,,1,1,0
+240,mainmenu,119,Panitera Pengadilan Tinggi,Referensi > Panitera > Panitera Pengadilan Tinggi,panitera_pt_list,,1,1,0
+241,mainmenu,119,Panitera Mahkamah Agung,Referensi > Panitera > Panitera Mahkamah Agung,panitera_ma_list,,1,1,0
+243,mainmenu,64,Hari Libur,Referensi > Hari Libur,hari_libur_list,,1,1,0
+244,mainmenu,64,Template Amar,Referensi > Template Amar,template_amar_list,,1,1,0
+248,mainmenu,136,Pidana Biasa,Jadwal Sidang > Pidana Umum > Pidana Biasa,jadwal_sidang_list,varlist_alur_perkara_id=111,1,0,0
+249,mainmenu,136,Pidana Singkat,Jadwal Sidang > Pidana Umum > Pidana Singkat,jadwal_sidang_list,varlist_alur_perkara_id=112,1,0,0
+250,mainmenu,136,Pidana Cepat,Jadwal Sidang > Pidana Umum > Pidana Cepat,jadwal_sidang_list,varlist_alur_perkara_id=113,1,0,0
+251,mainmenu,136,Pidana Lalulintas,Jadwal Sidang > Pidana Umum > Pidana Lalulintas,jadwal_sidang_list,varlist_alur_perkara_id=114,1,0,0
+252,mainmenu,157,Perdata Khusus,Jadwal Sidang > Perdata Khusus,jadwal_sidang_list,"varlist_alur_perkara_id=3,4,5,6",0,0,0
+253,mainmenu,157,Pidana Khusus,Jadwal Sidang > Pidana Khusus,jadwal_sidang_list,"varlist_alur_perkara_id=115,116,117,118",0,0,0
+254,mainmenu,252,Kepailitan,Jadwal Sidang > Perdata Khusus > Kepailitan,jadwal_sidang_list,varlist_alur_perkara_id=3,1,0,0
+255,mainmenu,252,PKPU,Jadwal Sidang > Perdata Khusus > PKPU,jadwal_sidang_list,varlist_alur_perkara_id=4,1,0,0
+256,mainmenu,252,Hak Kekayaan Intelektual (HKI),Jadwal Sidang > Perdata Khusus > Hak Kekayaan Intelektual (HKI),jadwal_sidang_list,varlist_alur_perkara_id=5,1,0,0
+257,mainmenu,252,Pengadilan Hubungan Industrial (PHI),Jadwal Sidang > Perdata Khusus > Pengadilan Hubungan Industrial (PHI),jadwal_sidang_list,varlist_alur_perkara_id=6,1,0,0
+258,mainmenu,253,Tindak Pidana Korupsi (TIPIKOR),Jadwal Sidang > Pidana Khusus > Tindak Pidana Korupsi (TIPIKOR),jadwal_sidang_list,varlist_alur_perkara_id=115,1,0,0
+259,mainmenu,253,Perikanan,Jadwal Sidang > Pidana Khusus > Perikanan,jadwal_sidang_list,varlist_alur_perkara_id=116,1,0,0
+260,mainmenu,253,Hak Asasi Manusia (HAM),Jadwal Sidang > Pidana Khusus > Hak Asasi Manusia (HAM),jadwal_sidang_list,varlist_alur_perkara_id=117,1,0,0
+261,mainmenu,NULL,Peta Situs,Peta Situs,peta_situs,,0,0,0
+262,mainmenu,NULL,Pesan,Pesan,pesan_masuk_list,NULL,0,0,0
+263,mainmenu,262,Pesan Masuk,Pesan > Pesan Masuk,pesan_masuk_list,NULL,0,0,0
+264,mainmenu,262,Pesan Keluar,Pesan > Pesan Keluar,pesan_keluar_list,NULL,0,0,0
+265,mainmenu,2,Konfigurasi Saldo Awal,System > Konfigurasi Saldo Awal,saldo_awal_edit,NULL,1,1,0
+266,mainmenu,147,Pidana Anak,Pidana Khusus > Pidana Anak,,,0,0,0
+267,mainmenu,266,Register Induk Pidana Anak,Pidana Khusus > Pidana Anak > Register Induk Pidana Anak,perkara_list,varlist_alur_perkara_id=118,1,0,1
+268,mainmenu,84,Pidana Anak,Laporan > Pidana Anak,laporan_pidana_anak,varreport_alur_perkara_id=118,0,0,0
+269,mainmenu,266,Register Penahanan,Pidana Khusus > Pidana Anak > Register Penahanan,penahanan_list,varlist_alur_perkara_id=118,1,0,0
+270,mainmenu,84,Pidana Praperadilan,Laporan > Pidana Praperadilan,laporan_pidana,varreport_alur_perkara_id=119,0,0,0
+300,mainmenu,6120,Register Perkara Praperadilan,Permohonan Pidana > Register Perkara Praperadilan,perkara_list,varlist_alur_perkara_id=119,1,1,1
+301,mainmenu,108,Register Barang Bukti,Pidana Umum > Register Barang Bukti,barang_bukti_list,"varlist_alur_perkara_id=111,112,113,114,115,116,11",1,0,0
+302,mainmenu,2004,Jurnal Permohonan Eksekusi Hak Tanggungan,Perdata Umum > Jurnal Perkara > Jurnal Permohonan Eksekusi Hak Tanggungan,jurnal_ht_list,varlist_alur_perkara_id=0;var_tahapan_id=51,1,0,0
+303,mainmenu,2003,Register Permohonan Eksekusi Hak Tanggungan,Perdata Umum > Register Induk Perkara > Register Permohonan Eksekusi Hak Tanggungan,perkara_ht_list,varlist_alur_perkara_id=0,1,0,0
+401,mainmenu,108,Register Induk Pidana Pelanggaran,Pidana Umum > Register Induk Pidana Pelanggaran,perkara_list,varlist_alur_perkara_id=121,0,0,1
+402,mainmenu,NULL,Pidana Militer,Pidana Militer,,,0,0,0
+403,mainmenu,402,Register Induk Pidana Kejahatan,Pidana Militer > Register Induk Pidana Kejahatan,perkara_list,varlist_alur_perkara_id=120,0,0,1
+404,mainmenu,402,Register Induk Pidana Pelangggaran,Pidana Militer > Register Induk Pidana Pelangggaran,perkara_list,varlist_alur_perkara_id=121,0,0,1
+405,mainmenu,402,Register Permohonan Banding,Pidana Militer > Register Permohonan Banding,perkara_banding_list,"varlist_alur_perkara_id=120,121,128,129",0,0,0
+406,mainmenu,402,Register Permohonan Kasasi,Pidana Militer > Register Permohonan Kasasi,perkara_kasasi_list,varlist_alur_perkara_id=120,0,0,0
+407,mainmenu,402,Register Permohonan Peninjauan Kembali,Pidana Militer > Register Permohonan Peninjauan Kembali,perkara_pk_list,varlist_alur_perkara_id=120,0,0,0
+408,mainmenu,402,Register Permohonan Grasi,Pidana Militer > Register Permohonan Grasi,perkara_grasi_list,varlist_alur_perkara_id=120,0,0,0
+409,mainmenu,402,Register Penahanan Pidana Militer,Pidana Militer > Register Penahanan Pidana Militer,penahanan_list,varlist_alur_perkara_id=120,0,0,0
+410,mainmenu,402,Register Barang Bukti,Pidana Militer > Register Barang Bukti,barang_bukti_list,varlist_alur_perkara_id=120,0,0,0
+600,mainmenu,NULL,Jurnal Perkara,Jurnal Perkara,,,0,0,0
+601,mainmenu,NULL,Register Induk Perkara,Register Induk Perkara,,,0,0,0
+602,mainmenu,NULL,Register Keuangan,Register Keuangan,,,0,0,0
+603,mainmenu,600,Jurnal Induk Perkara TUN,Jurnal Perkara > Jurnal Induk Perkara TUN,jurnal_perkara_list,varlist_alur_perkara_id=9;var_tahapan_id=10,0,0,0
+604,mainmenu,600,Jurnal Permohonan,Jurnal Perkara > Jurnal Permohonan,jurnal_perkara_list,varlist_alur_perkara_id=10;var_tahapan_id=10,0,0,0
+605,mainmenu,600,Jurnal Gugatan Keberatan (KIP),Jurnal Perkara > Jurnal Gugatan Keberatan (KIP),jurnal_perkara_list,varlist_alur_perkara_id=11;var_tahapan_id=10,0,0,0
+606,mainmenu,600,Jurnal Permohonan Fiktif Positif,Jurnal Perkara > Jurnal Permohonan Fiktif Positif,jurnal_perkara_list,varlist_alur_perkara_id=12;var_tahapan_id=10,0,0,0
+607,mainmenu,600,Jurnal Permohonan Penyalahgunaan Wewenang,Jurnal Perkara > Jurnal Permohonan Penyalahgunaan Wewenang,jurnal_perkara_list,varlist_alur_perkara_id=13;var_tahapan_id=10,0,0,0
+608,mainmenu,600,Jurnal Banding,Jurnal Perkara > Jurnal Banding,jurnal_perkara_list,"varlist_alur_perkara_id=9,10;var_tahapan_id=20",0,0,0
+609,mainmenu,600,Jurnal Kasasi,Jurnal Perkara > Jurnal Kasasi,jurnal_perkara_list,"varlist_alur_perkara_id=9,11;var_tahapan_id=30",0,0,0
+610,mainmenu,600,Jurnal PK,Jurnal Perkara > Jurnal PK,jurnal_pk_list,"varlist_alur_perkara_id=9,10,11;var_tahapan_id=40",0,0,0
+611,mainmenu,600,Jurnal Pengawasan Eksekusi,Jurnal Perkara > Jurnal Pengawasan Eksekusi,jurnal_eksekusi_list,"varlist_alur_perkara_id=9,10,11;var_tahapan_id=50",0,0,0
+612,mainmenu,600,Jurnal Permohonan Pertanahan,Jurnal Perkara > Jurnal Permohonan Pertanahan,jurnal_perkara_list,varlist_alur_perkara_id=14;var_tahapan_id=10,0,0,0
+613,mainmenu,601,Register Induk Perkara TUN,Register Induk Perkara > Register Induk Perkara TUN,perkara_list,varlist_alur_perkara_id=9,0,0,1
+614,mainmenu,601,Register Permohonan,Register Induk Perkara > Register Permohonan,perkara_list,varlist_alur_perkara_id=10,0,0,1
+615,mainmenu,601,Register Gugatan Keberatan (KIP),Register Induk Perkara > Register Gugatan Keberatan (KIP),perkara_list,varlist_alur_perkara_id=11,0,0,1
+616,mainmenu,601,Register Permohonan Fiktif Positif,Register Induk Perkara > Register Permohonan Fiktif Positif,perkara_list,varlist_alur_perkara_id=12,0,0,1
+617,mainmenu,601,Register Permohonan Penyalahgunaan Wewenang,Register Induk Perkara > Register Permohonan Penyalahgunaan Wewenang,perkara_list,varlist_alur_perkara_id=13,0,0,1
+618,mainmenu,601,Register Permohonan Pertanahan,Register Induk Perkara > Register Permohonan Pertanahan,perkara_list,varlist_alur_perkara_id=14,0,0,1
+619,mainmenu,601,Register Banding,Register Induk Perkara > Register Banding,perkara_banding_list,"varlist_alur_perkara_id=9,10",0,0,0
+620,mainmenu,601,Register Kasasi,Register Induk Perkara > Register Kasasi,perkara_kasasi_list,"varlist_alur_perkara_id=9,11",0,0,0
+621,mainmenu,601,Register Peninjauan Kembali,Register Induk Perkara > Register Peninjauan Kembali,perkara_pk_list,"varlist_alur_perkara_id=9,10,11",0,0,0
+622,mainmenu,602,Buku Hak-Hak Keuangan Kepaniteraan/PNBP,Register Keuangan > Buku Hak-Hak Keuangan Kepaniteraan/PNBP,jurnal_hkk_list,"varlist_alur_perkara_id=9,10,11,12,13,14",0,0,0
+623,mainmenu,602,Buku Induk Keuangan Perkara,Register Keuangan > Buku Induk Keuangan Perkara,jurnal_induk_list,"varlist_alur_perkara_id=9,10,11,12,13,14",0,0,0
+624,mainmenu,84,Perkara TUN,Laporan > Perkara TUN,laporan_tun,varreport_alur_perkara_id=9,0,0,0
+625,mainmenu,84,Permohonan UU AP,Laporan > Permohonan UU AP,laporan_tun,varreport_alur_perkara_id=10,0,0,0
+626,mainmenu,84,Gugatan Keberatan (KIP),Laporan > Gugatan Keberatan (KIP),laporan_tun,varreport_alur_perkara_id=11,0,0,0
+627,mainmenu,84,Permohonan Fiktif Positif,Laporan > Permohonan Fiktif Positif,laporan_tun,varreport_alur_perkara_id=12,0,0,0
+628,mainmenu,84,Permohonan Penyalahgunaan Wewenang,Laporan > Permohonan Penyalahgunaan Wewenang,laporan_tun,varreport_alur_perkara_id=13,0,0,0
+629,mainmenu,84,Permohonan Pertanahan,Laporan > Permohonan Pertanahan,laporan_tun,varreport_alur_perkara_id=14,0,0,0
+630,mainmenu,157,Gugatan,Jadwal Sidang > Gugatan,jadwal_sidang_list,varlist_alur_perkara_id=9,0,0,0
+631,mainmenu,157,Permohonan,Jadwal Sidang > Permohonan,jadwal_sidang_list,varlist_alur_perkara_id=10,0,0,0
+632,mainmenu,157,Gugatan Keberatan (KIP),Jadwal Sidang > Gugatan Keberatan (KIP),jadwal_sidang_list,varlist_alur_perkara_id=11,0,0,0
+633,mainmenu,157,Permohonan Fiktif Positif,Jadwal Sidang > Permohonan Fiktif Positif,jadwal_sidang_list,varlist_alur_perkara_id=12,0,0,0
+634,mainmenu,157,Permohonan Penyalahgunaan Wewenang,Jadwal Sidang > Permohonan Penyalahgunaan Wewenang,jadwal_sidang_list,varlist_alur_perkara_id=13,0,0,0
+635,mainmenu,157,Permohonan Pertanahan,Jadwal Sidang > Permohonan Pertanahan,jadwal_sidang_list,varlist_alur_perkara_id=14,0,0,0
+636,mainmenu,601,Register Pengawasan Eksekusi TUN,Register Induk Perkara > Register Pengawasan Eksekusi TUN,perkara_eksekusi_list,"varlist_alur_perkara_id=9,10,11",0,0,0
+700,mainmenu,NULL,Jurnal Perkara,Jurnal Perkara,,,1,1,0
+701,mainmenu,NULL,Register Induk Keuangan,Register Induk Keuangan,,,1,1,0
+702,mainmenu,NULL,Perdata,Perdata,,,1,1,0
+703,mainmenu,700,Jurnal Perkara Gugatan,Jurnal Perkara > Jurnal Perkara Gugatan,jurnal_perkara_list,varlist_alur_perkara_id=15;var_tahapan_id=10,1,1,0
+704,mainmenu,700,Jurnal Perkara Permohonan,Jurnal Perkara > Jurnal Perkara Permohonan,jurnal_perkara_list,varlist_alur_perkara_id=16;var_tahapan_id=10,1,1,0
+705,mainmenu,700,Jurnal Permohonan Banding,Jurnal Perkara > Jurnal Permohonan Banding,jurnal_banding_list,varlist_alur_perkara_id=15;var_tahapan_id=20,1,1,0
+706,mainmenu,700,Jurnal Permohonan Kasasi,Jurnal Perkara > Jurnal Permohonan Kasasi,jurnal_kasasi_list,"varlist_alur_perkara_id=15,16;var_tahapan_id=30",1,1,0
+707,mainmenu,700,Jurnal Permohonan Peninjauan Kembali,Jurnal Perkara > Jurnal Permohonan Peninjauan Kembali,jurnal_pk_list,"varlist_alur_perkara_id=15,16;var_tahapan_id=40",1,1,0
+708,mainmenu,700,Jurnal Permohonan Eksekusi,Jurnal Perkara > Jurnal Permohonan Eksekusi,jurnal_eksekusi_list,"varlist_alur_perkara_id=15,17,32;var_tahapan_id=50",1,1,0
+709,mainmenu,700,Jurnal Permohonan Eksekusi Hak Tanggungan,Jurnal Perkara > Jurnal Permohonan Eksekusi Hak Tanggungan,jurnal_ht_list,varlist_alur_perkara_id=0;var_tahapan_id=51,1,1,0
+710,mainmenu,701,Buku Induk Penerimaan Uang Hak-hak Kepaniteraan,Register Induk Keuangan > Buku Induk Penerimaan Uang Hak-hak Kepaniteraan,jurnal_hkk_list,"varlist_alur_perkara_id=15,16",1,1,0
+711,mainmenu,701,Buku Induk Keuangan Perkara Perdata,Register Induk Keuangan > Buku Induk Keuangan Perkara Perdata,jurnal_induk_list,"varlist_alur_perkara_id=15,16",1,1,0
+712,mainmenu,702,Register Induk Perkara Gugatan,Perdata > Register Induk Perkara Gugatan,perkara_list,varlist_alur_perkara_id=15,1,1,1
+713,mainmenu,702,Register Induk Perkara Permohonan,Perdata > Register Induk Perkara Permohonan,perkara_list,varlist_alur_perkara_id=16,1,1,1
+714,mainmenu,702,Register Permohonan Banding,Perdata > Register Permohonan Banding,perkara_banding_list,"varlist_alur_perkara_id=15,32",1,1,0
+715,mainmenu,702,Register Permohonan Kasasi,Perdata > Register Permohonan Kasasi,perkara_kasasi_list,"varlist_alur_perkara_id=15,16,32",1,1,0
+716,mainmenu,702,Register Permohonan Peninjauan Kembali,Perdata > Register Permohonan Peninjauan Kembali,perkara_pk_list,"varlist_alur_perkara_id=15,16,32",1,1,0
+717,mainmenu,702,Register Permohonan Eksekusi,Perdata > Register Permohonan Eksekusi,perkara_eksekusi_list,"varlist_alur_perkara_id=15,17,32",1,1,0
+718,mainmenu,702,Register Permohonan Eksekusi Hak Tanggungan,Perdata > Register Permohonan Eksekusi Hak Tanggungan,perkara_ht_list,varlist_alur_perkara_id=0,1,1,0
+719,mainmenu,84,Perdata Agama,Laporan > Perdata Agama,laporan_agama,"varreport_alur_perkara_id=15,16",1,1,0
+720,mainmenu,84,Mediasi,Laporan > Mediasi,laporan_mediasi,,1,1,0
+721,mainmenu,157,Sidang Gugatan,Jadwal Sidang > Sidang Gugatan,jadwal_sidang_list,"varlist_alur_perkara_id=15,32",1,1,0
+722,mainmenu,157,Sidang Permohonan,Jadwal Sidang > Sidang Permohonan,jadwal_sidang_list,varlist_alur_perkara_id=16,1,1,0
+723,mainmenu,157,Sidang Jinayat,Jadwal Sidang > Sidang Jinayat,jadwal_sidang_list,varlist_alur_perkara_id=122,1,1,0
+724,mainmenu,157,Sidang Praperadilan,Jadwal Sidang > Sidang Praperadilan,jadwal_sidang_list,varlist_alur_perkara_id=123,1,1,0
+1000,mainmenu,266,Register Permohonan Banding,Pidana Khusus > Pidana Anak > Register Permohonan Banding,perkara_banding_list,varlist_alur_perkara_id=118,1,0,0
+1001,mainmenu,266,Register Permohonan Kasasi,Pidana Khusus > Pidana Anak > Register Permohonan Kasasi,perkara_kasasi_list,varlist_alur_perkara_id=118,1,0,0
+1002,mainmenu,266,Register Permohonan Peninjauan Kembali,Pidana Khusus > Pidana Anak > Register Permohonan Peninjauan Kembali,perkara_pk_list,varlist_alur_perkara_id=118,1,0,0
+1003,mainmenu,2,Backup,System > Backup,backup,,1,1,0
+1004,mainmenu,253,Tindak Pidana Anak,Jadwal Sidang > Pidana Khusus > Tindak Pidana Anak,jadwal_sidang_list,varlist_alur_perkara_id=118,1,0,0
+2000,mainmenu,NULL,Lapor,Lapor,testing_dev_list,,0,0,0
+2001,mainmenu,2003,Register Induk Perkara Gugatan Sederhana,Perdata Umum > Register Induk Perkara > Register Induk Perkara Gugatan Sederhana,perkara_list,varlist_alur_perkara_id=8,1,0,1
+2002,mainmenu,2004,Jurnal Perkara Gugatan Sederhana,Perdata Umum > Jurnal Perkara > Jurnal Perkara Gugatan Sederhana,jurnal_perkara_list,varlist_alur_perkara_id=8;var_tahapan_id=10,1,0,0
+2003,mainmenu,107,Register Induk Perkara,Perdata Umum > Register Induk Perkara,,,1,0,0
+2004,mainmenu,107,Jurnal Perkara,Perdata Umum > Jurnal Perkara,,,1,0,0
+2005,mainmenu,107,Register Induk Keuangan,Perdata Umum > Register Induk Keuangan,,,1,0,0
+2006,mainmenu,149,Register Induk Perkara,Perdata Khusus > Kepailitan & PKPU > Register Induk Perkara,,,1,0,0
+2007,mainmenu,149,Jurnal Keuangan Perkara,Perdata Khusus > Kepailitan & PKPU > Jurnal Keuangan Perkara,,,1,0,0
+2008,mainmenu,149,Register Induk Keuangan,Perdata Khusus > Kepailitan & PKPU > Register Induk Keuangan,,,1,0,0
+2010,mainmenu,2012,Mediasi,Laporan > Laporan Perdata Umum > Mediasi,laporan_mediasi,,1,0,0
+2011,mainmenu,2012,Perkara Gugatan Sederhana,Laporan > Laporan Perdata Umum > Perkara Gugatan Sederhana,laporan_gugatan_sederhana,,1,0,1
+2012,mainmenu,84,Laporan Perdata Umum,Laporan > Laporan Perdata Umum,,,0,0,0
+2013,mainmenu,135,Bantahan (Derden Verzet),Jadwal Sidang > Perdata Umum > Bantahan (Derden Verzet),jadwal_sidang_list,varlist_alur_perkara_id=7,1,0,0
+2014,mainmenu,135,Gugatan Sederhana,Jadwal Sidang > Perdata Umum > Gugatan Sederhana,jadwal_sidang_list,varlist_alur_perkara_id=8,1,0,0
+2015,mainmenu,136,Praperadilan,Jadwal Sidang > Pidana Umum > Praperadilan,jadwal_sidang_list,varlist_alur_perkara_id=119,1,0,0
+2016,mainmenu,NULL,Delegasi,Delegasi,delegasi,,1,1,0
+2017,mainmenu,2016,Delegasi Masuk,Delegasi > Delegasi Masuk,perkara_list_delegasi,var_id=1,0,0,0
+2018,mainmenu,2016,Delegasi Keluar,Delegasi > Delegasi Keluar,perkara_list_delegasi,var_id=2,0,0,0
+2020,mainmenu,84,Kejahatan,Laporan > Kejahatan,laporan_pid_mil,varreport_alur_perkara_id=120,0,0,1
+2021,mainmenu,84,Pelanggaran,Laporan > Pelanggaran,laporan_pid_mil,varreport_alur_perkara_id=121,0,0,1
+2022,mainmenu,157,Pidana Kejahatan,Jadwal Sidang > Pidana Kejahatan,jadwal_sidang_list,varlist_alur_perkara_id=120,0,0,0
+2023,mainmenu,157,Pidana Pelanggaran,Jadwal Sidang > Pidana Pelanggaran,jadwal_sidang_list,varlist_alur_perkara_id=121,0,0,0
+2024,mainmenu,NULL,Jinayat,Jinayat,,NULL,1,1,0
+2025,mainmenu,2024,Register Induk Perkara Jinayat,Jinayat > Register Induk Perkara Jinayat,perkara_list,varlist_alur_perkara_id=122,1,1,1
+2026,mainmenu,2024,Register Induk Perkara Praperadilan Jinayat,Jinayat > Register Induk Perkara Praperadilan Jinayat,perkara_list,varlist_alur_perkara_id=123,1,1,1
+2027,mainmenu,2024,Register Permohonan Banding,Jinayat > Register Permohonan Banding,perkara_banding_list,"varlist_alur_perkara_id=122,130,131",1,1,0
+2028,mainmenu,2024,Register Permohonan Kasasi,Jinayat > Register Permohonan Kasasi,perkara_kasasi_list,varlist_alur_perkara_id=122,1,1,0
+2029,mainmenu,2024,Register Permohonan Peninjauan Kembali,Jinayat > Register Permohonan Peninjauan Kembali,perkara_pk_list,varlist_alur_perkara_id=122,1,1,0
+2030,mainmenu,2024,Register Permohonan Grasi,Jinayat > Register Permohonan Grasi,perkara_grasi_list,varlist_alur_perkara_id=122,1,1,0
+2031,mainmenu,2024,Register Penahanan,Jinayat > Register Penahanan,penahanan_list,varlist_alur_perkara_id=122,1,1,0
+2032,mainmenu,2024,Register Barang Bukti,Jinayat > Register Barang Bukti,barang_bukti_list,varlist_alur_perkara_id=120,1,1,0
+5000,mainmenu,NULL,Arsip Perkara,Arsip Perkara,,,1,1,0
+5001,mainmenu,5000,Daftar Arsip Perkara,Arsip Perkara > Daftar Arsip Perkara,list_arsip,,1,1,0
+6000,mainmenu,NULL,Antrian,Antrian,,,1,1,0
+6001,mainmenu,6000,Input Antrian Para Pihak,Antrian > Input Antrian Para Pihak,antrian,input=1,1,1,0
+6002,mainmenu,6000,Input Antrian Hakim/PP,Antrian > Input Antrian Hakim/PP,antrian,input=2,1,1,0
+6003,mainmenu,6000,Display Antrian,Antrian > Display Antrian,antrian,input=3,1,1,0
+6004,mainmenu,702,Blanko Template,Perdata > Blanko Template,blanko_template,NULL,1,1,0
+6005,mainmenu,107,Blanko Template,Perdata Umum > Blanko Template,blanko_template,NULL,1,0,0
+6006,mainmenu,NULL,About,About,,NULL,0,0,0
+6007,mainmenu,6006,Buku Panduan,About > Buku Panduan,buku_panduan,fa-edit,0,0,0
+6008,mainmenu,6006,Tentang SIPP,About > Tentang SIPP,tentang_sipp,fa-exclamation-circle ,1,0,0
+6010,mainmenu,6006,Catatan Pembaruan,About > Catatan Pembaruan,release_note,fa-gear,1,0,0
+6011,mainmenu,108,Blanko Template,Pidana Umum > Blanko Template,blanko_template_pidana,,1,0,0
+6012,mainmenu,266,Register Diversi,Pidana Khusus > Pidana Anak > Register Diversi,register_diversi_list,NULL,1,0,0
+6013,mainmenu,266,Register Anak Belum 12 Tahun,Pidana Khusus > Pidana Anak > Register Anak Belum 12 Tahun,register_anak_blm_12tahun,NULL,1,0,0
+6014,mainmenu,266,Register Anak Korban & Anak Saksi,Pidana Khusus > Pidana Anak > Register Anak Korban & Anak Saksi,register_anak_korban_saksi,NULL,1,0,0
+6015,mainmenu,700,Jurnal Perkara Gugatan Sederhana,Jurnal Perkara > Jurnal Perkara Gugatan Sederhana,jurnal_perkara_list,varlist_alur_perkara_id=17;var_tahapan_id=10,1,1,0
+6016,mainmenu,702,Register Induk Perkara Gugatan Sederhana,Perdata > Register Induk Perkara Gugatan Sederhana,perkara_list,varlist_alur_perkara_id=17,1,1,1
+6017,mainmenu,NULL,e-Court,e-Court,,NULL,1,1,0
+6018,mainmenu,NULL,e-Payment,e-Payment,generate_va,NULL,1,1,0
+6020,mainmenu,2004,Jurnal Permohonan Konsinyasi,Perdata Umum > Jurnal Perkara > Jurnal Permohonan Konsinyasi,jurnal_perkara_list,varlist_alur_perkara_id=18;var_tahapan_id=10,1,0,0
+6021,mainmenu,2003,Register Induk Perkara Permohonan Konsinyasi,Perdata Umum > Register Induk Perkara > Register Induk Perkara Permohonan Konsinyasi,perkara_list,varlist_alur_perkara_id=18,1,0,1
+6022,mainmenu,6017,Tingkat Pertama,e-Court > Tingkat Pertama,pendaftaran_online,NULL,1,1,0
+6023,mainmenu,6017,Upaya Hukum Banding,e-Court > Upaya Hukum Banding,pendaftaran_banding_online,NULL,1,1,0
+6024,mainmenu,64,Kejaksaan,Referensi > Kejaksaan,ref_kejaksaan,NULL,1,1,0
+6025,mainmenu,NULL,SPPT,SPPT,,NULL,0,0,0
+6026,mainmenu,6025,Data SPPT Diterima,SPPT > Data SPPT Diterima,sppt_inbound,NULL,0,0,0
+6027,mainmenu,157,Sidang Gugatan Sederhana,Jadwal Sidang > Sidang Gugatan Sederhana,jadwal_sidang_list,varlist_alur_perkara_id=17,1,1,0
+6028,mainmenu,6025,Data SPPT Gagal Dikirim,SPPT > Data SPPT Gagal Dikirim,sppt_outbound,NULL,0,0,0
+6029,mainmenu,135,Permohonan Konsinyasi,Jadwal Sidang > Perdata Umum > Permohonan Konsinyasi,jadwal_sidang_list,varlist_alur_perkara_id=18,0,0,0
+6030,mainmenu,146,KPPU,Perdata Khusus > KPPU,,,0,0,0
+6031,mainmenu,6030,Register Induk KPPU,Perdata Khusus > KPPU > Register Induk KPPU,perkara_list,varlist_alur_perkara_id=19,0,0,1
+6032,mainmenu,6030,Register Permohonan Kasasi,Perdata Khusus > KPPU > Register Permohonan Kasasi,perkara_kasasi_list,varlist_alur_perkara_id=19,0,0,0
+6033,mainmenu,6030,Register Permohonan Eksekusi,Perdata Khusus > KPPU > Register Permohonan Eksekusi,perkara_eksekusi_list,varlist_alur_perkara_id=19,0,0,0
+6034,mainmenu,6030,Jurnal Perkara KPPU,Perdata Khusus > KPPU > Jurnal Perkara KPPU,jurnal_perkara_list,varlist_alur_perkara_id=19;var_tahapan_id=10,0,0,0
+6035,mainmenu,6030,Jurnal Permohonan Kasasi,Perdata Khusus > KPPU > Jurnal Permohonan Kasasi,jurnal_kasasi_list,varlist_alur_perkara_id=19;var_tahapan_id=30,0,0,0
+6036,mainmenu,6030,Jurnal Permohonan Eksekusi,Perdata Khusus > KPPU > Jurnal Permohonan Eksekusi,jurnal_eksekusi_list,varlist_alur_perkara_id=19;var_tahapan_id=50,0,0,0
+6037,mainmenu,84,KPPU,Laporan > KPPU,laporan_kppu,varlist_alur_perkara_id=19,0,0,0
+6038,mainmenu,252,Komisi Pengawas Persaingan Usaha (KPPU),Jadwal Sidang > Perdata Khusus > Komisi Pengawas Persaingan Usaha (KPPU),jadwal_sidang_list,varlist_alur_perkara_id=19,0,0,0
+6039,mainmenu,6025,Data SPPT Berhasil Dikirim,SPPT > Data SPPT Berhasil Dikirim,sppt_pengiriman,NULL,0,0,0
+6040,mainmenu,2006,Register Permohonan Renvoi Prosedur,Perdata Khusus > Kepailitan & PKPU > Register Induk Perkara > Register Permohonan Renvoi Prosedur,perkara_pailit_list,varlist_alur_perkara_id=21,0,0,0
+6041,mainmenu,2006,Register Perlawanan Atas Boedel Pailit,Perdata Khusus > Kepailitan & PKPU > Register Induk Perkara > Register Perlawanan Atas Boedel Pailit,perkara_pailit_list,varlist_alur_perkara_id=22,0,0,0
+6042,mainmenu,2006,Register Pengesahan Perdamaian,Perdata Khusus > Kepailitan & PKPU > Register Induk Perkara > Register Pengesahan Perdamaian,perkara_pailit_list,varlist_alur_perkara_id=23,0,0,0
+6043,mainmenu,2006,Register Pembatalan Perdamaian,Perdata Khusus > Kepailitan & PKPU > Register Induk Perkara > Register Pembatalan Perdamaian,perkara_pailit_list,varlist_alur_perkara_id=24,0,0,0
+6044,mainmenu,2006,Register Pembetulan Berita Acara Rapat Pemungutan Suara,Perdata Khusus > Kepailitan & PKPU > Register Induk Perkara > Register Pembetulan Berita Acara Rapat Pemungutan Suara,perkara_pailit_list,varlist_alur_perkara_id=25,0,0,0
+6045,mainmenu,2006,Register Permohonan Pencabutan Pernyataan Pailit,Perdata Khusus > Kepailitan & PKPU > Register Induk Perkara > Register Permohonan Pencabutan Pernyataan Pailit,perkara_pailit_list,varlist_alur_perkara_id=26,0,0,0
+6046,mainmenu,2006,Register Keberatan Atas Pembagian Harta Pailit,Perdata Khusus > Kepailitan & PKPU > Register Induk Perkara > Register Keberatan Atas Pembagian Harta Pailit,perkara_pailit_list,varlist_alur_perkara_id=27,0,0,0
+6047,mainmenu,2006,Register Penggantian Dan Penambahan Kurator,Perdata Khusus > Kepailitan & PKPU > Register Induk Perkara > Register Penggantian Dan Penambahan Kurator,perkara_pailit_list,varlist_alur_perkara_id=28,0,0,0
+6048,mainmenu,2006,Register Penentuan Biaya Kepailitan Dan Imbalan Jasa Kurator,Perdata Khusus > Kepailitan & PKPU > Register Induk Perkara > Register Penentuan Biaya Kepailitan Dan Imbalan Jasa Kurator,perkara_pailit_list,varlist_alur_perkara_id=29,0,0,0
+6049,mainmenu,2006,Register Permohonan Pencabutan PKPU,Perdata Khusus > Kepailitan & PKPU > Register Induk Perkara > Register Permohonan Pencabutan PKPU,perkara_pailit_list,varlist_alur_perkara_id=31,0,0,0
+6050,mainmenu,132,Register Kepailitan & PKPU,Laporan > Kepailitan & PKPU > Register Kepailitan & PKPU,laporan_pailit,"varreport_alur_perkara_id=3,4",0,0,0
+6051,mainmenu,252,Gugatan Lain-Lain,Jadwal Sidang > Perdata Khusus > Gugatan Lain-Lain,jadwal_sidang_list,varlist_alur_perkara_id=20,0,0,0
+6052,mainmenu,252,Permohonan Renvoi Prosedur,Jadwal Sidang > Perdata Khusus > Permohonan Renvoi Prosedur,jadwal_sidang_list,varlist_alur_perkara_id=21,0,0,0
+6053,mainmenu,252,Perlawanan Atas Boedel Pailit,Jadwal Sidang > Perdata Khusus > Perlawanan Atas Boedel Pailit,jadwal_sidang_list,varlist_alur_perkara_id=22,0,0,0
+6054,mainmenu,252,Pengesahan Perdamaian,Jadwal Sidang > Perdata Khusus > Pengesahan Perdamaian,jadwal_sidang_list,varlist_alur_perkara_id=23,0,0,0
+6055,mainmenu,252,Pembatalan Perdamaian,Jadwal Sidang > Perdata Khusus > Pembatalan Perdamaian,jadwal_sidang_list,varlist_alur_perkara_id=24,0,0,0
+6056,mainmenu,252,Pembetulan Berita Acara Rapat Pemungutan Suara,Jadwal Sidang > Perdata Khusus > Pembetulan Berita Acara Rapat Pemungutan Suara,jadwal_sidang_list,varlist_alur_perkara_id=25,0,0,0
+6057,mainmenu,252,Permohonan Pencabutan Pernyataan Pailit,Jadwal Sidang > Perdata Khusus > Permohonan Pencabutan Pernyataan Pailit,jadwal_sidang_list,varlist_alur_perkara_id=26,0,0,0
+6058,mainmenu,252,Keberatan Atas Pembagian Harta Pailit,Jadwal Sidang > Perdata Khusus > Keberatan Atas Pembagian Harta Pailit,jadwal_sidang_list,varlist_alur_perkara_id=27,0,0,0
+6059,mainmenu,252,Penggantian Dan Penambahan Kurator,Jadwal Sidang > Perdata Khusus > Penggantian Dan Penambahan Kurator,jadwal_sidang_list,varlist_alur_perkara_id=28,0,0,0
+6060,mainmenu,252,Penentuan Biaya Kepailitan Dan Imbalan Jasa Kurator,Jadwal Sidang > Perdata Khusus > Penentuan Biaya Kepailitan Dan Imbalan Jasa Kurator,jadwal_sidang_list,varlist_alur_perkara_id=29,0,0,0
+6061,mainmenu,252,Permohonan Rehabilitasi,Jadwal Sidang > Perdata Khusus > Permohonan Rehabilitasi,jadwal_sidang_list,varlist_alur_perkara_id=30,0,0,0
+6062,mainmenu,252,Permohonan Pencabutan PKPU,Jadwal Sidang > Perdata Khusus > Permohonan Pencabutan PKPU,jadwal_sidang_list,varlist_alur_perkara_id=31,0,0,0
+6063,mainmenu,132,Gugatan Lain-Lain,Laporan > Kepailitan & PKPU > Gugatan Lain-Lain,laporan_pailit,varreport_alur_perkara_id=20,0,0,0
+6064,mainmenu,132,Permohonan Renvoi Prosedur,Laporan > Kepailitan & PKPU > Permohonan Renvoi Prosedur,laporan_pailit,varreport_alur_perkara_id=21,0,0,0
+6065,mainmenu,132,Perlawanan Atas Boedel Pailit,Laporan > Kepailitan & PKPU > Perlawanan Atas Boedel Pailit,laporan_pailit,varreport_alur_perkara_id=22,0,0,0
+6066,mainmenu,132,Pengesahan Perdamaian,Laporan > Kepailitan & PKPU > Pengesahan Perdamaian,laporan_pailit,varreport_alur_perkara_id=23,0,0,0
+6067,mainmenu,132,Pembatalan Perdamaian,Laporan > Kepailitan & PKPU > Pembatalan Perdamaian,laporan_pailit,varreport_alur_perkara_id=24,0,0,0
+6068,mainmenu,132,Pembetulan Berita Acara Rapat Pemungutan Suara,Laporan > Kepailitan & PKPU > Pembetulan Berita Acara Rapat Pemungutan Suara,laporan_pailit,varreport_alur_perkara_id=25,0,0,0
+6069,mainmenu,132,Permohonan Pencabutan Pernyataan Pailit,Laporan > Kepailitan & PKPU > Permohonan Pencabutan Pernyataan Pailit,laporan_pailit,varreport_alur_perkara_id=26,0,0,0
+6070,mainmenu,132,Keberatan Atas Pembagian Harta Pailit,Laporan > Kepailitan & PKPU > Keberatan Atas Pembagian Harta Pailit,laporan_pailit,varreport_alur_perkara_id=27,0,0,0
+6071,mainmenu,132,Penggantian Dan Penambahan Kurator,Laporan > Kepailitan & PKPU > Penggantian Dan Penambahan Kurator,laporan_pailit,varreport_alur_perkara_id=28,0,0,0
+6072,mainmenu,132,Penentuan Biaya Kepailitan Dan Imbalan Jasa Kurator,Laporan > Kepailitan & PKPU > Penentuan Biaya Kepailitan Dan Imbalan Jasa Kurator,laporan_pailit,varreport_alur_perkara_id=29,0,0,0
+6073,mainmenu,132,Permohonan Rehabilitasi,Laporan > Kepailitan & PKPU > Permohonan Rehabilitasi,laporan_pailit,varreport_alur_perkara_id=30,0,0,0
+6074,mainmenu,132,Permohonan Pencabutan PKPU,Laporan > Kepailitan & PKPU > Permohonan Pencabutan PKPU,laporan_pailit,varreport_alur_perkara_id=31,0,0,0
+6075,mainmenu,2007,Jurnal Perlawanan Atas Boedel Pailit,Perdata Khusus > Kepailitan & PKPU > Jurnal Keuangan Perkara > Jurnal Perlawanan Atas Boedel Pailit,jurnal_perkara_pailit_list,varlist_alur_perkara_id=22;var_tahapan_id=10,0,0,0
+6076,mainmenu,2007,Jurnal Pengesahan Perdamaian,Perdata Khusus > Kepailitan & PKPU > Jurnal Keuangan Perkara > Jurnal Pengesahan Perdamaian,jurnal_perkara_pailit_list,varlist_alur_perkara_id=23;var_tahapan_id=10,0,0,0
+6077,mainmenu,2007,Jurnal Pembatalan Perdamaian,Perdata Khusus > Kepailitan & PKPU > Jurnal Keuangan Perkara > Jurnal Pembatalan Perdamaian,jurnal_perkara_pailit_list,varlist_alur_perkara_id=24;var_tahapan_id=10,0,0,0
+6078,mainmenu,2007,Jurnal Pembetulan Berita Acara Rapat Pemungutan Suara,Perdata Khusus > Kepailitan & PKPU > Jurnal Keuangan Perkara > Jurnal Pembetulan Berita Acara Rapat Pemungutan Suara,jurnal_perkara_pailit_list,varlist_alur_perkara_id=25;var_tahapan_id=10,0,0,0
+6079,mainmenu,2007,Jurnal Permohonan Pencabutan Pernyataan Pailit,Perdata Khusus > Kepailitan & PKPU > Jurnal Keuangan Perkara > Jurnal Permohonan Pencabutan Pernyataan Pailit,jurnal_perkara_pailit_list,varlist_alur_perkara_id=26;var_tahapan_id=10,0,0,0
+6080,mainmenu,2007,Jurnal Keberatan Atas Pembagian Harta Pailit,Perdata Khusus > Kepailitan & PKPU > Jurnal Keuangan Perkara > Jurnal Keberatan Atas Pembagian Harta Pailit,jurnal_perkara_pailit_list,varlist_alur_perkara_id=27;var_tahapan_id=10,0,0,0
+6081,mainmenu,2007,Jurnal Penggantian Dan Penambahan Kurator,Perdata Khusus > Kepailitan & PKPU > Jurnal Keuangan Perkara > Jurnal Penggantian Dan Penambahan Kurator,jurnal_perkara_pailit_list,varlist_alur_perkara_id=28;var_tahapan_id=10,0,0,0
+6082,mainmenu,2007,Jurnal Penentuan Biaya Kepailitan Dan Imbalan Jasa Kurator,Perdata Khusus > Kepailitan & PKPU > Jurnal Keuangan Perkara > Jurnal Penentuan Biaya Kepailitan Dan Imbalan Jasa Kurator,jurnal_perkara_pailit_list,varlist_alur_perkara_id=29;var_tahapan_id=10,0,0,0
+6083,mainmenu,2007,Jurnal Permohonan Pencabutan PKPU,Perdata Khusus > Kepailitan & PKPU > Jurnal Keuangan Perkara > Jurnal Permohonan Pencabutan PKPU,jurnal_perkara_pailit_list,varlist_alur_perkara_id=31;var_tahapan_id=10,0,0,0
+6084,mainmenu,6030,Jurnal Permohonan Eksekusi Tanpa Keberatan KPPU,Perdata Khusus > KPPU > Jurnal Permohonan Eksekusi Tanpa Keberatan KPPU,jurnal_eksekusi_tanpa_keberatan,varlist_alur_perkara_id=0;var_tahapan_id=52,0,0,0
+6085,mainmenu,2004,Jurnal Permohonan Eksekusi Tanpa Keberatan BPSK,Perdata Umum > Jurnal Perkara > Jurnal Permohonan Eksekusi Tanpa Keberatan BPSK,jurnal_eksekusi_tanpa_keberatan,varlist_alur_perkara_id=0;var_tahapan_id=53,1,0,0
+6086,mainmenu,6030,Register Permohonan Eksekusi Tanpa Keberatan KPPU,Perdata Khusus > KPPU > Register Permohonan Eksekusi Tanpa Keberatan KPPU,perkara_tk_list,varlist_alur_perkara_id=52,0,0,0
+6087,mainmenu,2003,Register Permohonan Eksekusi Tanpa Keberatan BPSK,Perdata Umum > Register Induk Perkara > Register Permohonan Eksekusi Tanpa Keberatan BPSK,perkara_tk_list,varlist_alur_perkara_id=53,1,0,0
+6088,mainmenu,402,Register Induk Perbedaan Pendapat,Pidana Militer > Register Induk Perbedaan Pendapat,perkara_list,varlist_alur_perkara_id=124,0,0,1
+6089,mainmenu,157,Perbedaan Pendapat,Jadwal Sidang > Perbedaan Pendapat,jadwal_sidang_list,varlist_alur_perkara_id=124,0,0,0
+6090,mainmenu,84,Perbedaan Pendapat,Laporan > Perbedaan Pendapat,laporan_pid_mil,varreport_alur_perkara_id=124,0,0,1
+6091,mainmenu,64,Penyidik,Referensi > Penyidik,ref_penyidik,NULL,1,1,0
+6092,mainmenu,6017,Pidana,e-Court > Pidana,pendaftaran_pidana_online,NULL,1,1,0
+6093,mainmenu,NULL,Jinayat Anak,Jinayat Anak,,,1,1,0
+6094,mainmenu,6093,Register Induk Pidana Anak,Jinayat Anak > Register Induk Pidana Anak,perkara_list,varlist_alur_perkara_id=125,1,1,1
+6095,mainmenu,6093,Register Penahanan,Jinayat Anak > Register Penahanan,penahanan_list,varlist_alur_perkara_id=125,1,1,0
+6096,mainmenu,6093,Register Permohonan Banding,Jinayat Anak > Register Permohonan Banding,perkara_banding_list,varlist_alur_perkara_id=125,1,1,0
+6097,mainmenu,6093,Register Permohonan Kasasi,Jinayat Anak > Register Permohonan Kasasi,perkara_kasasi_list,varlist_alur_perkara_id=125,1,1,0
+6098,mainmenu,6093,Register Permohonan Peninjauan Kembali,Jinayat Anak > Register Permohonan Peninjauan Kembali,perkara_pk_list,varlist_alur_perkara_id=125,1,1,0
+6099,mainmenu,6093,Register Diversi,Jinayat Anak > Register Diversi,register_diversi_list,NULL,1,1,0
+6100,mainmenu,6093,Register Anak Belum 12 Tahun,Jinayat Anak > Register Anak Belum 12 Tahun,register_anak_blm_12tahun,NULL,1,1,0
+6101,mainmenu,6093,Register Anak Korban & Anak Saksi,Jinayat Anak > Register Anak Korban & Anak Saksi,register_anak_korban_saksi,NULL,1,1,0
+6102,mainmenu,157,Sidang Jinayat Anak,Jadwal Sidang > Sidang Jinayat Anak,jadwal_sidang_list,varlist_alur_perkara_id=125,1,1,0
+6103,mainmenu,6017,Verifikasi Pembebasan Biaya Perkara,e-Court > Verifikasi Pembebasan Biaya Perkara,verifikasi_prodeo,NULL,1,1,0
+6104,mainmenu,6017,Upaya Hukum Perlawanan,e-Court > Upaya Hukum Perlawanan,pendaftaran_perlawanan_online,NULL,1,1,0
+6105,mainmenu,6017,Upaya Hukum Kasasi,e-Court > Upaya Hukum Kasasi,pendaftaran_kasasi_online,NULL,1,1,0
+6106,mainmenu,6017,Upaya Hukum PK,e-Court > Upaya Hukum PK,pendaftaran_pk_online,NULL,1,1,0
+6107,mainmenu,2,Monitoring Sync Antrian,System > Monitoring Sync Antrian,monitoring_sinkron,NULL,1,1,0
+6108,mainmenu,108,Register Induk Permohonan Restitusi,Pidana Umum > Register Induk Permohonan Restitusi,perkara_list,varlist_alur_perkara_id=126,1,0,1
+6109,mainmenu,108,Register Induk Permohonan Kompensasi,Pidana Umum > Register Induk Permohonan Kompensasi,perkara_list,varlist_alur_perkara_id=127,1,0,1
+6110,mainmenu,402,Register Induk Permohonan Restitusi,Pidana Militer > Register Induk Permohonan Restitusi,perkara_list,varlist_alur_perkara_id=128,1,0,1
+6111,mainmenu,402,Register Induk Permohonan Kompensasi,Pidana Militer > Register Induk Permohonan Kompensasi,perkara_list,varlist_alur_perkara_id=129,1,0,1
+6112,mainmenu,NULL,Smart Majelis,Smart Majelis,,NULL,1,1,0
+6113,mainmenu,6112,SK Majelis Tetap,Smart Majelis > SK Majelis Tetap,majelis_tetap/list_sk_majelis_tetap,NULL,1,1,0
+6114,mainmenu,6112,Majelis Tetap,Smart Majelis > Majelis Tetap,majelis_tetap/list_majelis_tetap,NULL,1,1,0
+6115,mainmenu,6112,Kompetensi Majelis,Smart Majelis > Kompetensi Majelis,kompetensi_majelis,NULL,1,1,0
+6116,mainmenu,6112,Konflik Kepentingan,Smart Majelis > Konflik Kepentingan,konflik_kepentingan,NULL,1,1,0
+6117,mainmenu,6017,Register Perjanjian Bersama Bipartit,e-Court > Register Perjanjian Bersama Bipartit,pendaftaran_pb,NULL,1,1,0
+6118,mainmenu,148,Pencatatan PNBP Perjanjian Bersama,Perdata Khusus > Pengadilan Hubungan Industrial (PHI) > Pencatatan PNBP Perjanjian Bersama,jurnal_pnbp_pb_list,pencatatan_pnbp_pb,1,0,0
+6119,mainmenu,6112,Laporan Statistik Smart Majelis,Smart Majelis > Laporan Statistik Smart Majelis,laporan_beban_perkara,NULL,1,1,0
+6120,mainmenu,NULL,Permohonan Pidana,Permohonan Pidana,,varlist_alur_perkara_id=133,1,1,0
+6121,mainmenu,6120,Register Permohonan Pengakuan Bersalah,Permohonan Pidana > Register Permohonan Pengakuan Bersalah,perkara_list,varlist_alur_perkara_id=132,1,1,1
+6122,mainmenu,6120,Register Perjanjian Penundaan Penuntutan,Permohonan Pidana > Register Perjanjian Penundaan Penuntutan,perkara_list,varlist_alur_perkara_id=133,1,1,1
+6123,mainmenu,6120,Register Penetapan Tindakan Rehabilitasi Atau Perawatan,Permohonan Pidana > Register Penetapan Tindakan Rehabilitasi Atau Perawatan,perkara_list,varlist_alur_perkara_id=134,1,1,1
+6124,mainmenu,6120,Register Kimwasmat,Permohonan Pidana > Register Kimwasmat,register_kimwasmat,NULL,1,1,0

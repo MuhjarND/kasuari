@@ -2,6 +2,7 @@
 include_once("sys/sys_session.php");
 $nama_halaman = "Register Perkara Banding";
 include_once("sys/header.php");
+require_once __DIR__ . '/../sys/sys_akta_cerai.php';
 
 $totalBanding = 0;
 $totalBandingResult = mysqli_query($koneksi, "SELECT COUNT(*) AS total FROM perkara_banding WHERE tanggal_pendaftaran_banding IS NOT NULL");
@@ -62,6 +63,9 @@ function register_banding_status_class($text) {
 
         $sql = "SELECT
                   perkara_banding.id,
+                  perkara_banding.pn_id,
+                  perkara_banding.perkara_id,
+                  perkara_banding.jenis_banding,
                   perkara_banding.nomor_perkara_banding,
                   perkara_banding.nomor_perkara_pn,
                   perkara_banding.tanggal_pendaftaran_banding AS tanggalpendaftaranbanding,
@@ -84,7 +88,10 @@ function register_banding_status_class($text) {
           error_log('KASUARI register_perkara list failed: ' . mysqli_error($koneksi));
           $table .= '<tr><td class="kasuari-empty-state" colspan="8">Data perkara banding belum dapat dimuat. Periksa struktur database server.</td></tr>';
         }
-        while ($query && ($data = mysqli_fetch_assoc($query))) {
+        $aktaCases = array();
+        while ($query && ($data = mysqli_fetch_assoc($query))) $aktaCases[] = $data;
+        $aktaMap = kasuari_akta_load($koneksi, $aktaCases);
+        foreach ($aktaCases as $data) {
           $no++;
           $statusBandingText = kasuari_status_banding_tampil($data);
           $statusBanding = htmlspecialchars($statusBandingText, ENT_QUOTES, 'UTF-8');
@@ -101,7 +108,7 @@ function register_banding_status_class($text) {
             <td>' . $nomorPerkaraPn . '</td>
             <td>' . ($tanggalPendaftaran !== '' ? $tanggalPendaftaran : '-') . '</td>
             <td>' . ($tanggalPutusan !== '' ? $tanggalPutusan : '-') . '</td>
-            <td><span class="ks-banding-status ' . $statusBandingClass . '">' . $statusBanding . '</span></td>
+            <td><span class="ks-banding-status ' . $statusBandingClass . '">' . $statusBanding . '</span>' . kasuari_akta_html($data, $aktaMap) . '</td>
             <td class="text-center"><a class="kasuari-action-link" href="perkara_detil_banding&id=' . $data["id"] . '" title="Detail Perkara"><i class="bi bi-eye" aria-hidden="true"></i> Detail</a></td>
           </tr>';
         }

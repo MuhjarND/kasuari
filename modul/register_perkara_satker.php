@@ -2,6 +2,7 @@
 include_once("sys/sys_session.php");
 $nama_halaman = "Register Perkara Satker";
 include_once("sys/header.php");
+require_once __DIR__ . '/../sys/sys_akta_cerai.php';
 
 $totalPerkaraSatker = 0;
 $selectedSatkerId = filter_input(INPUT_GET, 'satker_id', FILTER_VALIDATE_INT);
@@ -107,6 +108,8 @@ function satker_type_class($text) {
             <?php
             $sql = "SELECT
                       perkara.id,
+                      perkara.pn_id,
+                      perkara.perkara_id,
                       perkara.nomor_perkara,
                       perkara.jenis_perkara_nama,
                       perkara.tanggal_pendaftaran AS tanggalpendaftaran,
@@ -129,7 +132,10 @@ function satker_type_class($text) {
               error_log('KASUARI register_perkara_satker list failed: ' . mysqli_error($koneksi));
               echo "<tr><td class='kasuari-empty-state' colspan='9'>Data perkara satker belum dapat dimuat. Periksa struktur database server.</td></tr>";
             }
-            while ($query && ($data = mysqli_fetch_assoc($query))) {
+            $aktaCases = array();
+            while ($query && ($data = mysqli_fetch_assoc($query))) $aktaCases[] = $data;
+            $aktaMap = kasuari_akta_load($koneksi, $aktaCases);
+            foreach ($aktaCases as $data) {
               $no++;
               $nomorPerkara = htmlspecialchars($data["nomor_perkara"] ?? "", ENT_QUOTES, 'UTF-8');
               $satker = htmlspecialchars(str_replace("PENGADILAN AGAMA", "PA", $data["pengaju"] ?? ""), ENT_QUOTES, 'UTF-8');
@@ -147,7 +153,7 @@ function satker_type_class($text) {
               echo "<td><span class='ks-date-chip'>" . htmlspecialchars(kasuari_tanggal_indonesia($data["tanggalpendaftaran"] ?? ""), ENT_QUOTES, 'UTF-8') . "</span></td>";
               echo "<td><span class='ks-date-chip muted'>" . htmlspecialchars(kasuari_tanggal_indonesia($data["tanggalputusan"] ?? ""), ENT_QUOTES, 'UTF-8') . "</span></td>";
               echo "<td><span class='ks-status-pill " . $stageClass . "'>" . $tahapan . "</span></td>";
-              echo "<td><span class='ks-status-pill " . $processClass . "'>" . $proses . "</span></td>";
+              echo "<td><span class='ks-status-pill " . $processClass . "'>" . $proses . "</span>" . kasuari_akta_html($data, $aktaMap) . "</td>";
               echo "<td><a class='kasuari-action-link ks-view-action' href='perkara_detil_satker&id=" . (int) $data["id"] . "' title='Lihat detail perkara' aria-label='Lihat detail perkara'><i class='bi bi-eye' aria-hidden='true'></i></a></td>";
               echo "</tr>";
             }

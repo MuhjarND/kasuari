@@ -2,6 +2,8 @@
 include_once("sys/sys_session.php");
 include_once("sys/sys_koneksi.php");
 include_once("sys/sys_fungsi.php");
+require_once __DIR__ . '/../sys/sys_authorization.php';
+require_once __DIR__ . '/../sys/sys_akta_cerai.php';
 header('Content-Type: application/json; charset=utf-8');
 
 function register_banding_status_class($text) {
@@ -28,6 +30,9 @@ $sortDirection = $sortDirectionInput === "ASC" ? "ASC" : "DESC";
 $column = array("perkara_banding.id", "perkara_banding.nomor_perkara_banding", "pengadilan_agama.nama", "perkara_banding.nomor_perkara_pn", "perkara_banding.tanggal_pendaftaran_banding", "perkara_banding.putusan_banding", "perkara_banding.status_banding_text", "");
 $sql = "SELECT 
           perkara_banding.id,
+          perkara_banding.pn_id,
+          perkara_banding.perkara_id,
+          perkara_banding.jenis_banding,
           perkara_banding.nomor_perkara_banding,
           perkara_banding.nomor_perkara_pn,
           perkara_banding.tanggal_pendaftaran_banding AS tanggalpendaftaranbanding,
@@ -95,7 +100,10 @@ $number_all_data = (int) ($countAllRow['total'] ?? 0);
 $number_filter_row = (int) ($countFilteredRow['total'] ?? 0);
 $nomor=$start;
 $data = array();
-while($row=mysqli_fetch_assoc($result)){
+$aktaCases = array();
+while ($row = mysqli_fetch_assoc($result)) $aktaCases[] = $row;
+$aktaMap = kasuari_akta_load($koneksi, $aktaCases);
+foreach ($aktaCases as $row) {
 	$nomor++;
 	$sub_array = array();
 	$sub_array[] = $nomor;
@@ -107,7 +115,7 @@ while($row=mysqli_fetch_assoc($result)){
 	$statusBandingText = kasuari_status_banding_tampil($row);
 	$statusBanding = htmlspecialchars($statusBandingText, ENT_QUOTES, 'UTF-8');
 	$statusBandingClass = register_banding_status_class($statusBandingText);
-	$sub_array[] = "<span class='ks-banding-status " . $statusBandingClass . "'>" . $statusBanding . "</span>";
+	$sub_array[] = "<span class='ks-banding-status " . $statusBandingClass . "'>" . $statusBanding . "</span>" . kasuari_akta_html($row, $aktaMap);
 	$sub_array[] = "<a class='kasuari-action-link' href='perkara_detil_banding&id=".$row["id"]."' title='Detail Perkara'><i class='bi bi-eye' aria-hidden='true'></i> Detail</a>";
 	$data[] = $sub_array;
 }

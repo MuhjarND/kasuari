@@ -57,6 +57,7 @@ $isMenu = function ($items) use ($currentModule) {
 
   <!-- Kasuari UI -->
   <link rel="stylesheet" href="assets/css/kasuari-modern.css?v=<?php echo @filemtime('assets/css/kasuari-modern.css'); ?>" />
+  <link rel="stylesheet" href="assets/css/kasuari-sipp.css?v=<?php echo @filemtime('assets/css/kasuari-sipp.css'); ?>" />
   <link rel="stylesheet" href="assets/css/kasuari-profile.css?v=<?php echo @filemtime('assets/css/kasuari-profile.css'); ?>" />
 </head>
 <body class="layout-fixed sidebar-expand-lg bg-body-tertiary kasuari-app">
@@ -204,6 +205,12 @@ $isMenu = function ($items) use ($currentModule) {
             </li>
 
             <!-- Register Perkara -->
+            <?php if ($isAdministrator):
+              require_once __DIR__ . '/sys_sipp_view.php';
+              $sippNavCourt = $currentModule === 'sipp' && isset($_GET['satker']) && is_scalar($_GET['satker']) ? (int) $_GET['satker'] : 0;
+              $sippNavSection = isset($_GET['bagian']) && is_string($_GET['bagian']) ? $_GET['bagian'] : '';
+              echo kasuari_sipp_navigation($sippNavCourt, $sippNavSection);
+            endif; ?>
             <li class="nav-item <?php echo $isMenu(['register_perkara','register_perkara_satker','register_perkara_belum_dikirim','register_perkara_dicabut','perkara_detil_banding','perkara_detil_satker']) ? 'menu-open' : ''; ?>">
               <a href="#" class="nav-link <?php echo $isMenu(['register_perkara','register_perkara_satker','register_perkara_belum_dikirim','register_perkara_dicabut','perkara_detil_banding','perkara_detil_satker']) ? 'active' : ''; ?>">
                 <i class="nav-icon bi bi-folder2-open"></i>

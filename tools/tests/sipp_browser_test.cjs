@@ -1,0 +1,110 @@
+const {chromium} = require('playwright');
+const fs = require('node:fs');
+const path = require('node:path');
+const assert = (value, label) => { if (!value) throw new Error(label); console.log('PASS: ' + label); };
+(async () => {
+  const base = process.env.KASUARI_SIPP_TEST_URL;
+  if (!base || !base.startsWith('http://127.0.0.1:')) throw new Error('Isolated test server required.');
+  const output = process.env.KASUARI_SIPP_TEST_OUTPUT;
+  fs.mkdirSync(output, {recursive:true});
+  const browser = await chromium.launch({headless:true, executablePath:process.env.KASUARI_TEST_CHROMIUM || undefined});
+  try {
+    for (const [label,width,height] of [['desktop',1488,1058],['mobile',390,900],['tablet',1024,900]]) {
+      const page = await browser.newPage({viewport:{width,height}, acceptDownloads:true});
+      const errors=[]; page.on('pageerror',e=>errors.push(e.message));
+      const goto = async (section='') => {
+        await page.goto(base + '/index.php?modul=sipp&satker=439&bagian='+section,{waitUntil:'domcontentloaded'});
+        await page.locator('.ks-sipp-heading h1').waitFor();
+      };
+      await goto();
+      assert((await page.title()).includes('SIPP PA Sorong'),label+': page identity.');
+      assert(await page.locator('.ks-sipp-module').count()===48,label+': all 48 module links render.');
+      assert(await page.locator('#sipp-court option').count()===4,label+': four satker selectable.');
+      assert(await page.locator('.ks-sipp-nav').count()===1,label+': nested SIPP sidebar renders.');
+      assert(await page.locator('.ks-sipp-topnav [aria-current="page"]').textContent()==='Ringkasan',label+': active overview tab is explicit.');
+      assert((await page.locator('.ks-sipp-summary').textContent()).includes('Record tersimpan'),label+': synchronization summary renders.');
+      assert(await page.locator('.app-content').evaluate(el=>getComputedStyle(el).backgroundColor)==='rgb(255, 255, 255)',label+': main workspace uses white concept background.');
+      await page.locator('#sipp-module-search').fill('akta');
+      await page.waitForFunction(()=>document.querySelector('[data-sipp-result-count]').textContent==='1 modul');
+      assert(await page.locator('.ks-sipp-module:visible').count()===1,label+': live module search narrows directory.');
+      await page.reload({waitUntil:'domcontentloaded'});
+      assert(await page.locator('#sipp-module-search').inputValue()==='akta' && await page.locator('.ks-sipp-module:visible').count()===1,label+': directory filter survives reload.');
+      await page.getByRole('button',{name:'Reset filter modul',exact:true}).click();
+      await page.locator('#sipp-module-group').selectOption('Persidangan');
+      assert(await page.locator('.ks-sipp-module:visible').count()===4,label+': group filter exposes only four hearing modules.');
+      await page.locator('#sipp-module-search').fill('no-such-module');
+      await page.getByRole('heading',{name:'Modul tidak ditemukan',exact:true}).waitFor();
+      assert(await page.locator('.ks-sipp-module:visible').count()===0,label+': empty directory state is visible.');
+      await page.getByRole('button',{name:'Reset filter modul',exact:true}).click();
+      assert(await page.locator('.ks-sipp-module:visible').count()===48,label+': reset restores all modules.');
+      if (width>=992) {
+        const tree=page.locator('.ks-sipp-module-tree').first();
+        await tree.locator(':scope > a').click();
+        await tree.locator(':scope > ul > li > a').filter({hasText:/^Persidangan$/}).click();
+        await tree.getByRole('link',{name:'Jadwal Sidang',exact:true}).click();
+        await page.locator('#sipp-q').waitFor();
+        assert(new URL(page.url()).searchParams.get('bagian')==='jadwal',label+': nested sidebar navigates to the selected module.');
+        await goto();
+      }
+      if (label==='mobile') {
+        await page.getByRole('button',{name:'Buka navigasi',exact:true}).click();
+        await page.waitForFunction(()=>document.body.classList.contains('sidebar-open'));
+        assert(await page.locator('.ks-sipp-nav > .nav-link').isVisible(),label+': sidebar opens from menu button.');
+        await page.getByRole('button',{name:'Buka navigasi',exact:true}).click({force:true});
+        await page.waitForFunction(()=>!document.body.classList.contains('sidebar-open'));
+      }
+      await page.locator('.ks-sipp-module').filter({hasText:'Register Perkara'}).click();
+      await page.locator('#sipp-q').waitFor();
+      assert((await page.locator('.ks-sipp-table-wrap').textContent()).includes('10/Pdt.G/2026/PA.Test'),label+': synchronized source record displayed.');
+      await page.locator('#sipp-q').fill('not-a-case');
+      await page.getByRole('button',{name:'Tampilkan',exact:true}).click();
+      await page.getByText('Tidak ada data yang sesuai.',{exact:true}).waitFor();
+      assert(new URL(page.url()).searchParams.get('q')==='not-a-case',label+': search preserved in URL and no-results visible.');
+      await page.getByRole('link',{name:'Reset',exact:true}).click();
+      if (width<768) assert(await page.locator('.ks-sipp-record-table-wrap').evaluate(el=>el.scrollWidth<=el.clientWidth+1),label+': record fields fit without horizontal table scrolling.');
+      assert(await page.locator('.ks-sipp .btn-primary').first().evaluate(el=>getComputedStyle(el).backgroundImage)==='none',label+': primary command has no legacy gradient.');
+      assert(await page.locator('.ks-sipp-records .ks-sipp-status--success').evaluate(el=>getComputedStyle(el).color)==='rgb(255, 255, 255)',label+': solid status label has white contrast.');
+      await page.screenshot({path:path.join(output,label+'-register.png'),fullPage:false,animations:'disabled'});
+      const downloadEvent=page.waitForEvent('download');
+      await page.getByRole('link',{name:'CSV',exact:true}).click();
+      const download=await downloadEvent;
+      assert(download.suggestedFilename()==='sipp_439_perkara.csv',label+': CSV download succeeds.');
+      await page.getByRole('link',{name:'Detail Register Perkara',exact:true}).click();
+      await page.getByRole('heading',{name:'Riwayat dan data terkait perkara',exact:true}).waitFor();
+      assert((await page.locator('.ks-sipp-details').textContent()).includes('10/Pdt.G/2026/PA.Test'),label+': record detail and timeline available.');
+      await page.screenshot({path:path.join(output,label+'-detail.png'),fullPage:false,animations:'disabled'});
+      assert(!await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),label+': no document horizontal overflow.');
+      await page.locator('#sipp-court').selectOption('431');
+      await page.locator('.ks-sipp-heading h1').waitFor();
+      assert((await page.locator('.ks-sipp-heading').textContent()).includes('PA Manokwari'),label+': switching court updates page.');
+      assert(!(await page.locator('.ks-sipp').textContent()).includes('10/Pdt.G/2026/PA.Test'),label+': no cross-court record leakage.');
+      await goto('mediasi');
+      assert((await page.locator('.ks-sipp').textContent()).includes('Sumber belum tersedia'),label+': missing source table explicitly explained.');
+      await goto('menu_sumber');
+      assert(await page.locator('tbody tr').count()===50,label+': menu inventory is paginated.');
+      await page.locator('#menu-q').fill('Kasasi');
+      await page.getByRole('button',{name:'Cari',exact:true}).click();
+      assert((await page.locator('tbody').textContent()).includes('Kasasi'),label+': original SIPP menu search works.');
+      await goto('integrasi');
+      await page.evaluate(()=>document.querySelector('#sippTokenModal').addEventListener('shown.bs.modal',()=>{window.sippModalShown=true;},{once:true}));
+      await page.getByRole('button',{name:'Ganti konfigurasi token',exact:true}).click();
+      await page.waitForFunction(()=>window.sippModalShown===true);
+      await page.screenshot({path:path.join(output,label+'-token-modal.png'),fullPage:false,animations:'disabled'});
+      await page.keyboard.press('Escape');
+      await page.locator('#sippTokenModal.show').waitFor({state:'hidden'});
+      await page.waitForFunction(()=>document.activeElement?.textContent.trim()==='Ganti konfigurasi token');
+      assert(await page.getByRole('button',{name:'Ganti konfigurasi token',exact:true}).evaluate(el=>el===document.activeElement),label+': token modal closes and restores focus.');
+      await goto('');
+      await page.screenshot({path:path.join(output,label+'-overview.png'),fullPage:false,animations:'disabled'});
+      assert(!await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),label+': overview has no horizontal overflow.');
+      assert(errors.length===0,label+': no app JavaScript errors. '+errors.join(';'));
+      await page.close();
+    }
+    const noScript=await browser.newContext({javaScriptEnabled:false,viewport:{width:1280,height:900}});
+    const serverPage=await noScript.newPage();
+    await serverPage.goto(base+'/index.php?modul=sipp&satker=439&q=akta',{waitUntil:'domcontentloaded'});
+    assert(await serverPage.locator('.ks-sipp-module:visible').count()===1 && (await serverPage.locator('[data-sipp-result-count]').textContent()).trim()==='1 modul','Server-rendered directory filters also work without JavaScript.');
+    await noScript.close();
+    console.log('SIPP screenshots: '+output);
+  } finally { await browser.close(); }
+})().catch(error=>{console.error(error);process.exitCode=1;});

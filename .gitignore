@@ -1,17 +1,28 @@
 # Runtime logs
 *.log
+/sys/sys_sipp.local.php
+/output/satker-sipp/
+
+# Generated feature distribution and visual checks
+/output/satker-akta-cerai/
+/output/playwright/akta-cerai/
 
 # Generated document previews and exports
 /hasil/*
 !/hasil/.gitkeep
 
 # Konfigurasi khusus server; jangan simpan kredensial database ke Git
+/database/u1483703_db_kasuari.sql
 /sys/sys_koneksi.local.php
 /sys/sys_koneksi.local.php.*
+/sys/sys_public_case_status.local.php
+/sys/sys_public_case_status.local.php.*
+!/sys/sys_public_case_status.local.example.php
 /.env
 /.env.*
 !/.env.example
 /uploads/profiles/*
 !/uploads/profiles/.htaccess
 /output/profile-tests/
+/output/satker-network/
 /.playwright-cli/
